@@ -7,6 +7,85 @@
 
 ---
 
+## [2026-09-28 02:48:42] — Literature Check Run
+
+**Search Queries:**
+- `"mouse dynamics" "authentication"`
+- `"curvature" "mouse trajectory"`
+
+**Run Statistics:**
+- Total Raw Results Fetched: `10`
+- Unique Candidates Across Sources: `8`
+- Genuinely New (Unlogged) Candidates: `8`
+- Already in Annotated Bibliography (Filtered): `0`
+
+### New Candidate Papers for Review
+
+#### 1. Privacy-preserving and robust mouse dynamics authentication using hybrid transformer-CNN and federated learning
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-17
+- **Venue**: *Frontiers in Artificial Intelligence*
+- **Authors**: K. Sasikumar, Sivakumar Nagarajan
+- **DOI / Link**: [https://doi.org/10.3389/frai.2026.1914353](https://doi.org/10.3389/frai.2026.1914353)
+- **Abstract / Summary**: Traditional methods like passwords and PINs are increasingly vulnerable, making continuous authentication essential. Behavioral biometrics such as mouse dynamics provide a non-intrusive way to verify users through their unique interaction patterns. This study proposes a secure and privacy-preserving framework for mouse dynamics authentication using a Hybr...
+
+#### 2. Scaling Synthetic Training Data for Mouse-Dynamics Authentication
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-09
+- **Venue**: *Zenodo (CERN European Organization for Nuclear Research)*
+- **Authors**: Karthik Godugolla, Charles Devlen, Daqing Hou
+- **DOI / Link**: [https://doi.org/10.5281/zenodo.22679675](https://doi.org/10.5281/zenodo.22679675)
+- **Abstract / Summary**: Per-user authentication from mouse dynamics degrades when a user has contributed little enrolment data, motivating the use of generative models to synthesize additional genuine sequences. We evaluate whether TimeGAN-synthesized sequences improve a per-user BiLSTM authenticator across 14 users, using a pipeline in which the generator and the authenticator ...
+
+#### 3. Emotion classification from keystroke dynamics: a dual-input deep learning approach
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-09
+- **Venue**: *Scientific Reports*
+- **Authors**: Karina Kolmogortseva, Myung‐Sun Kim, Myung‐Sun Kim, Soonja Yeom et al.
+- **DOI / Link**: [https://doi.org/10.1038/s41598-026-70720-1](https://doi.org/10.1038/s41598-026-70720-1)
+- **Abstract / Summary**: Accurate emotion recognition from human-computer interactions is essential for adaptive and user-centered applications. Traditional affect recognition methods often overlook individual behavioral patterns, thereby limiting their effectiveness across diverse user populations. We propose a personalized deep learning framework for emotion recognition from ke...
+
+#### 4. Efficient Detection of Anomalous User Behavior in Cloud Environments Using Simulated Mouse Dynamics and a Hybrid Ensemble Model
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-08
+- **Venue**: *Journal La Multiapp*
+- **Authors**: Uqba bn Nafaa Mohammed, Zeyad Farooq Lutfi, Raed Waheed Kadhim
+- **DOI / Link**: [https://doi.org/10.37899/journallamultiapp.v7i4.5930](https://doi.org/10.37899/journallamultiapp.v7i4.5930)
+- **Abstract / Summary**: This study proposes a lightweight and interpretable framework for identifying suspicious behavior within a cloud-based environment through the use of simulated mouse dynamics and a voting ensemble classifier. Contrary to existing approaches that heavily focus on the use of deep learning techniques, this study utilizes a combination of three classical mach...
+
+#### 5. TriadAuth: Continuous Authentication Through Structured GUI Sequence Modelling With Drift Adaptation and Modality‐Aware Explanations
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-07
+- **Venue**: *CAAI Transactions on Intelligence Technology*
+- **Authors**: Ahmed Abdullah Alzahrani
+- **DOI / Link**: [https://doi.org/10.1049/cit2.70173](https://doi.org/10.1049/cit2.70173)
+- **Abstract / Summary**: ABSTRACT Continuous authentication (CA) systems based on behavioural biometrics are increasingly deployed in zero‐trust architectures, yet their performance degrades over time due to natural behavioural drift arising from device changes, fatigue and evolving habits. This paper presents TriadAuth, a CA framework that fuses keystroke dynamics, mouse dynamic...
+
+#### 6. Derived Mouse Dynamics Dataset: A Feature-Enhanced Dataset for Behavioral Biometrics and Continuous Authentication
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-06
+- **Venue**: *Mendeley Data*
+- **Authors**: Rizwan ur Rahman, Sneha Shaji
+- **DOI / Link**: [https://doi.org/10.17632/9rv9s3v2br](https://doi.org/10.17632/9rv9s3v2br)
+- **Abstract / Summary**: The Derived_Mouse_Dynamics_dataset is a feature-enhanced dataset developed for research and intends to provide a richer feature representation of mouse behaviour for application in user profiling, continuous authentication, behavioural analysis, anomaly detection and machine learning approaches. The hypothesis is that individual users exhibit distinctive ...
+
+#### 7. AI-DRIVEN CHEATING DETECTION IN ONLINE EXAMINATIONS: A SYSTEMATIC REVIEW OF MULTIMODAL METHODS, ETHICAL CHALLENGES, AND FUTURE DIRECTIONS
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-03
+- **Venue**: *Advanced Education*
+- **Authors**: Beyza Esin Ozseven, Turgut Özseven
+- **DOI / Link**: [https://doi.org/10.20535/2410-8286.351338](https://doi.org/10.20535/2410-8286.351338)
+- **Abstract / Summary**: The rapid proliferation of online and remote examinations, accelerated by the COVID-19 pandemic and recent advancements in digital learning technologies, has raised significant concerns about academic integrity. Traditional online monitoring approaches have proven increasingly inadequate in detecting sophisticated cheating behaviors, including impersonati...
+
+#### 8. Detecting LLM-Assisted Academic Dishonesty Using Keystroke Dynamics
+- **Source(s)**: OpenAlex
+- **Publication Date / Year**: 2026-09-01
+- **Venue**: *IEEE Transactions on Biometrics Behavior and Identity Science*
+- **Authors**: Atharva Mehta, Rajesh Kumar. K, Aman Singla, Kartik Singh Bisht et al.
+- **DOI / Link**: [https://doi.org/10.1109/tbiom.2026.3683979](https://doi.org/10.1109/tbiom.2026.3683979)
+- **Abstract / Summary**: The rapid adoption of generative AI tools has heightened concerns regarding academic integrity, as students increasingly engage in dishonest practices by copying or paraphrasing AI-generated content. Existing plagiarism detection systems, which rely primarily on text-intrinsic features, are ineffective at identifying AI-assisted or paraphrased submissions...
+
+---
 ## [2026-09-21 02:35:11] — Literature Check Run
 
 **Search Queries:**
