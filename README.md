@@ -90,15 +90,38 @@ python scripts/audit_writing.py references/background_pure_paragraphs.md --json
 ```
 
 ### 4.2 Fetching New Literature Candidates
-To query academic APIs (arXiv, OpenAlex, Semantic Scholar) and cross-check new candidate papers against the compiled bibliography:
+To query academic APIs, import manual entries, and cross-check new candidate papers against the compiled bibliography:
 
 ```powershell
-# Run literature checker with default queries
+# Run literature checker with default queries across all active free sources
 python references/example-rrl-fetch.py
 
-# Query a specific topic
-python references/example-rrl-fetch.py --query "mouse dynamics continuous authentication"
+# Query custom topics with increased limit
+python references/example-rrl-fetch.py --queries '"mouse dynamics" "authentication"' '"curvature" "mouse trajectory"' --limit 15
+
+# Enable Philippines scope (queries OpenAlex-PH and DOAJ-PH)
+python references/example-rrl-fetch.py --ph
+
+# Import manual ResearchGate / ejournals.ph entries (with Crossref verification)
+python references/example-rrl-fetch.py --import-file manual_rrl.txt
+
+# Export candidate papers to BibTeX (.bib) and compilable LaTeX skeleton (.tex)
+python references/example-rrl-fetch.py --latex references/rrl_candidates
+
+# Run specific connectors only
+python references/example-rrl-fetch.py --sources arxiv openalex europepmc pubmed crossref doaj
+
+# Dry-run report to stdout without writing to new-candidates.md
+python references/example-rrl-fetch.py --dry-run
 ```
+
+#### Supported Connectors & Keys
+* **Free / No Key:** OpenAlex, arXiv, Semantic Scholar, Europe PMC, PubMed (NCBI), ERIC, DOAJ, DBLP, OpenAIRE, Zenodo, OSF Preprints, Crossref.
+* **Optional / Key-Required:** Google Scholar (`SERPAPI_KEY`), Springer Nature (`SPRINGER_API_KEY`), IEEE Xplore (`IEEE_API_KEY`), CORE (`CORE_API_KEY`), Semantic Scholar (`SEMANTIC_SCHOLAR_API_KEY`), NCBI (`NCBI_API_KEY`).
+* **Enrichment:** Unpaywall (`RRL_EMAIL`) automatically adds legal, free publisher and repository PDF links.
+* **Manual Import:** ResearchGate, ejournals.ph, and HERDIN via text files without violating bot/scraping policies.
+
+See [`references/literature-sources.md`](file:///home/tin/thesis-mouse-biometrics/references/literature-sources.md) for full endpoint specifications, access methods, and policy details.
 
 ---
 
