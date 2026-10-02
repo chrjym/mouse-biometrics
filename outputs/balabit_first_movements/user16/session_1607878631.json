@@ -1,0 +1,23 @@
+{
+  "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user16/session_1607878631",
+  "timestamp_unit": "milliseconds",
+  "capture_phase": "first_point_only",
+  "capture_rule": {
+    "min_step_px": 3.0,
+    "sustain_points": 3,
+    "idle_ms": 100.0,
+    "max_duration_ms": 1000.0
+  },
+  "point_count": 1,
+  "start_timestamp_ms": 1310.00000006,
+  "end_timestamp_ms": 1310.00000006,
+  "points": [
+    {
+      "timestamp_ms": 1310.00000006,
+      "x": 538.0,
+      "y": 239.0,
+      "event_type": "Move",
+      "button": "NoButton"
+    }
+  ]
+}

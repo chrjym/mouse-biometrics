@@ -1,0 +1,400 @@
+{
+  "input_dir": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files",
+  "output_dir": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements",
+  "pattern": "*",
+  "processed": 65,
+  "failed": 0,
+  "captures": [
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user12/session_2144641057",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user12/session_2144641057.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user12/session_5265929106",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user12/session_5265929106.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user12/session_5815391283",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user12/session_5815391283.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user12/session_7409188284",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user12/session_7409188284.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user12/session_8872593360",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user12/session_8872593360.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user12/session_9031593624",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user12/session_9031593624.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user12/session_9838420452",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user12/session_9838420452.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user15/session_0205904470",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user15/session_0205904470.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user15/session_1366248436",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user15/session_1366248436.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user15/session_5657866014",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user15/session_5657866014.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user15/session_6715291950",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user15/session_6715291950.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user15/session_8694009379",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user15/session_8694009379.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user15/session_8848361933",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user15/session_8848361933.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user16/session_0735651357",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user16/session_0735651357.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user16/session_1607878631",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user16/session_1607878631.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user16/session_1658051584",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user16/session_1658051584.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user16/session_3012944488",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user16/session_3012944488.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user16/session_5398005306",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user16/session_5398005306.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user16/session_6961018175",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user16/session_6961018175.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user20/session_0214655159",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user20/session_0214655159.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user20/session_0764157160",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user20/session_0764157160.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user20/session_2372891077",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user20/session_2372891077.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user20/session_3767642011",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user20/session_3767642011.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user20/session_7888368102",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user20/session_7888368102.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user20/session_9673196280",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user20/session_9673196280.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user20/session_9818121880",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user20/session_9818121880.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user21/session_0347800921",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user21/session_0347800921.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user21/session_0639882460",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user21/session_0639882460.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user21/session_5306911480",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user21/session_5306911480.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user21/session_6886360376",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user21/session_6886360376.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user21/session_7001496014",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user21/session_7001496014.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user21/session_7767882493",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user21/session_7767882493.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user21/session_8505229187",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user21/session_8505229187.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user23/session_0405064924",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user23/session_0405064924.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user23/session_1123244103",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user23/session_1123244103.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user23/session_2080551697",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user23/session_2080551697.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user23/session_3195683016",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user23/session_3195683016.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user23/session_7336984763",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user23/session_7336984763.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user23/session_9962419470",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user23/session_9962419470.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user29/session_0595774526",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user29/session_0595774526.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user29/session_2786719181",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user29/session_2786719181.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user29/session_3135434116",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user29/session_3135434116.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user29/session_3424156599",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user29/session_3424156599.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user29/session_4384625557",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user29/session_4384625557.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user29/session_5396497934",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user29/session_5396497934.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user29/session_8617964668",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user29/session_8617964668.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user35/session_1909471574",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user35/session_1909471574.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user35/session_3412209090",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user35/session_3412209090.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user35/session_5394017914",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user35/session_5394017914.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user35/session_6509784211",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user35/session_6509784211.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user35/session_6820312264",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user35/session_6820312264.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user7/session_0041905381",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user7/session_0041905381.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user7/session_1060325796",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user7/session_1060325796.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user7/session_3320405034",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user7/session_3320405034.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user7/session_3826583375",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user7/session_3826583375.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user7/session_6668463071",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user7/session_6668463071.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user7/session_8961330453",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user7/session_8961330453.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user7/session_9017095287",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user7/session_9017095287.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user9/session_0335985747",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user9/session_0335985747.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user9/session_3390119815",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user9/session_3390119815.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user9/session_3879637058",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user9/session_3879637058.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user9/session_4373781904",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user9/session_4373781904.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user9/session_5155383252",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user9/session_5155383252.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user9/session_7285432516",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user9/session_7285432516.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/balabit/training_files/user9/session_8764610836",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/balabit_first_movements/user9/session_8764610836.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    }
+  ],
+  "errors": []
+}

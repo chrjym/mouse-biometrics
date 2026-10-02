@@ -1,0 +1,1480 @@
+{
+  "input_dir": "/home/tin/thesis-mouse-biometrics/data/sapimouse",
+  "output_dir": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements",
+  "pattern": "*.csv",
+  "processed": 245,
+  "failed": 0,
+  "captures": [
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user1/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user1/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user1/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user1/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user10/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user10/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user10/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user10/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user100/session_2020_03_31_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user100/session_2020_03_31_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user100/session_2020_03_31_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user100/session_2020_03_31_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user101/session_2020_06_08_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user101/session_2020_06_08_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user101/session_2020_06_08_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user101/session_2020_06_08_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user102/session_2020_03_31_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user102/session_2020_03_31_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user102/session_2020_03_31_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user102/session_2020_03_31_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user103/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user103/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user103/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user103/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user104/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user104/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user104/session_2020_10_15_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user104/session_2020_10_15_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user105/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user105/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user105/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user105/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user106/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user106/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user106/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user106/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user107/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user107/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user107/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user107/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user108/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user108/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user108/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user108/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user109/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user109/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user109/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user109/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user11/session_2020_06_03_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user11/session_2020_06_03_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user11/session_2020_06_03_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user11/session_2020_06_03_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user110/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user110/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user110/session_2020_06_08_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user110/session_2020_06_08_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user111/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user111/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user111/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user111/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user112/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user112/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user112/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user112/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user113/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user113/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user113/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user113/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user114/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user114/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user114/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user114/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user115/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user115/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user115/session_2020_06_16_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user115/session_2020_06_16_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user116/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user116/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user116/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user116/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user117/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user117/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user117/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user117/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user118/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user118/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user118/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user118/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user119/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user119/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user119/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user119/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user12/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user12/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user12/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user12/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user120/session_2020_05_21_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user120/session_2020_05_21_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user120/session_2020_05_21_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user120/session_2020_05_21_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user13/session_2020_06_10_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user13/session_2020_06_10_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user13/session_2020_06_17_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user13/session_2020_06_17_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user14/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user14/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user14/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user14/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user15/session_2020_06_03_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user15/session_2020_06_03_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user15/session_2020_06_03_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user15/session_2020_06_03_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user16/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user16/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user16/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user16/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user17/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user17/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user17/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user17/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user18/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user18/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user18/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user18/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user19/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user19/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user19/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user19/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user2/session_2020_10_22_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user2/session_2020_10_22_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user2/session_2020_10_22_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user2/session_2020_10_22_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user20/session_2020_10_15_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user20/session_2020_10_15_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user20/session_2020_10_15_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user20/session_2020_10_15_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user21/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user21/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user21/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user21/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user22/session_2020_05_31_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user22/session_2020_05_31_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user22/session_2020_05_31_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user22/session_2020_05_31_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user23/session_2020_04_01_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user23/session_2020_04_01_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user23/session_2020_04_01_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user23/session_2020_04_01_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user24/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user24/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user24/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user24/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user25/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user25/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user25/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user25/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user26/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user26/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user26/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user26/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user27/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user27/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user27/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user27/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user28/session_2020_03_31_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user28/session_2020_03_31_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user28/session_2020_03_31_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user28/session_2020_03_31_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user29/session_2020_06_04_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user29/session_2020_06_04_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user29/session_2020_06_04_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user29/session_2020_06_04_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user3/session_2020_03_31_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user3/session_2020_03_31_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user3/session_2020_03_31_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user3/session_2020_03_31_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user30/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user30/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user30/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user30/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user31/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user31/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user31/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user31/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user32/session_2020_05_25_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user32/session_2020_05_25_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user32/session_2020_05_25_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user32/session_2020_05_25_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user33/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user33/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user33/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user33/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user34/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user34/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user34/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user34/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user35/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user35/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user35/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user35/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user35/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user35/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user35/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user35/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user36/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user36/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user36/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user36/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user37/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user37/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user37/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user37/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user38/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user38/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user38/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user38/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user39/session_2020_05_29_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user39/session_2020_05_29_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user39/session_2020_06_01_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user39/session_2020_06_01_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user4/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user4/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user4/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user4/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user40/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user40/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user40/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user40/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user41/session_2020_10_20_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user41/session_2020_10_20_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user41/session_2020_10_20_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user41/session_2020_10_20_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user42/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user42/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user42/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user42/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user43/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user43/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user43/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user43/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user44/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user44/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user44/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user44/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user45/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user45/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user45/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user45/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user46/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user46/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user46/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user46/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user47/session_2020_06_16_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user47/session_2020_06_16_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user47/session_2020_06_16_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user47/session_2020_06_16_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user48/session_2020_05_25_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user48/session_2020_05_25_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user48/session_2020_05_25_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user48/session_2020_05_25_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user49/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user49/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user49/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user49/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user5/session_2020_06_04_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user5/session_2020_06_04_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user5/session_2020_06_04_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user5/session_2020_06_04_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user50/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user50/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user50/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user50/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user51/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user51/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user51/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user51/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user52/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user52/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user52/session_2020_05_19_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user52/session_2020_05_19_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user53/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user53/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user53/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user53/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user54/session_2020_06_25_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user54/session_2020_06_25_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user54/session_2020_06_25_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user54/session_2020_06_25_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user55/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user55/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user55/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user55/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user56/session_2020_06_25_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user56/session_2020_06_25_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user56/session_2020_06_25_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user56/session_2020_06_25_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user57/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user57/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user57/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user57/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user58/session_2020_06_03_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user58/session_2020_06_03_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user58/session_2020_06_03_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user58/session_2020_06_03_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user59/session_2020_03_31_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user59/session_2020_03_31_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user59/session_2020_03_31_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user59/session_2020_03_31_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user6/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user6/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user6/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user6/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user60/session_2020_10_19_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user60/session_2020_10_19_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user60/session_2020_10_20_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user60/session_2020_10_20_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user61/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user61/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user61/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user61/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user62/session_2020_05_27_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user62/session_2020_05_27_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user62/session_2020_05_28_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user62/session_2020_05_28_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user62/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user62/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user62/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user62/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user63/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user63/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user63/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user63/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user64/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user64/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user64/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user64/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user65/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user65/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user65/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user65/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user66/session_2020_05_27_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user66/session_2020_05_27_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user66/session_2020_05_27_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user66/session_2020_05_27_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user67/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user67/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user67/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user67/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user68/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user68/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user68/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user68/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user69/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user69/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user69/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user69/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user7/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user7/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user7/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user7/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user70/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user70/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user70/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user70/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user71/session_2020_10_15_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user71/session_2020_10_15_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user71/session_2020_10_15_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user71/session_2020_10_15_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user72/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user72/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user72/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user72/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user73/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user73/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user73/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user73/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user74/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user74/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user74/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user74/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user75/session_2020_06_11_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user75/session_2020_06_11_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user75/session_2020_06_11_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user75/session_2020_06_11_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user76/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user76/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user76/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user76/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user77/session_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user77/session_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user77/session_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user77/session_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user78/session_2020_05_22_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user78/session_2020_05_22_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user78/session_2020_05_22_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user78/session_2020_05_22_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user79/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user79/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user79/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user79/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user8/session_2020_10_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user8/session_2020_10_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user8/session_2020_10_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user8/session_2020_10_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user80/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user80/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user80/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user80/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user81/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user81/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user81/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user81/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user82/session_2020_05_17_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user82/session_2020_05_17_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user82/session_2020_05_17_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user82/session_2020_05_17_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user83/session_2020_06_01_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user83/session_2020_06_01_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user83/session_2020_06_01_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user83/session_2020_06_01_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user84/session_2020_09_16_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user84/session_2020_09_16_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user84/session_2020_09_16_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user84/session_2020_09_16_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user85/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user85/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user85/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user85/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user85/session_2020_10_14_5min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user85/session_2020_10_14_5min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user86/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user86/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user86/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user86/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user87/session_2020_05_15_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user87/session_2020_05_15_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user87/session_2020_05_15_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user87/session_2020_05_15_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user88/session_2020_06_09_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user88/session_2020_06_09_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user88/session_2020_06_09_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user88/session_2020_06_09_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user89/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user89/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user89/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user89/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user9/session_2020_05_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user9/session_2020_05_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user9/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user9/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user90/session_2020_06_10_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user90/session_2020_06_10_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user90/session_2020_06_10_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user90/session_2020_06_10_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user91/session_2020_05_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user91/session_2020_05_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user91/session_2020_05_15_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user91/session_2020_05_15_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user92/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user92/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user92/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user92/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user93/session_2020_05_18_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user93/session_2020_05_18_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user93/session_2020_05_18_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user93/session_2020_05_18_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user94/session_2020_06_10_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user94/session_2020_06_10_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user94/session_2020_06_13_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user94/session_2020_06_13_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user95/session_2020_06_03_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user95/session_2020_06_03_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user95/session_2020_06_03_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user95/session_2020_06_03_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user96/session_2020_06_03_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user96/session_2020_06_03_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user96/session_2020_06_03_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user96/session_2020_06_03_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user97/session_2020_05_17_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user97/session_2020_05_17_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user97/session_2020_05_17_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user97/session_2020_05_17_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user98/session_2020_10_14_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user98/session_2020_10_14_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user98/session_2020_10_14_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user98/session_2020_10_14_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user99/session_2020_10_19_1min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user99/session_2020_10_19_1min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    },
+    {
+      "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user99/session_2020_10_19_3min.csv",
+      "output_file": "/home/tin/thesis-mouse-biometrics/outputs/sapimouse_first_movements/user99/session_2020_10_19_3min.json",
+      "point_count": 1,
+      "duration_ms": 0.0
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,23 @@
+{
+  "source_file": "/home/tin/thesis-mouse-biometrics/data/sapimouse/user25/session_2020_10_14_1min.csv",
+  "timestamp_unit": "milliseconds",
+  "capture_phase": "first_point_only",
+  "capture_rule": {
+    "min_step_px": 3.0,
+    "sustain_points": 3,
+    "idle_ms": 100.0,
+    "max_duration_ms": 1000.0
+  },
+  "point_count": 1,
+  "start_timestamp_ms": 5179.0,
+  "end_timestamp_ms": 5179.0,
+  "points": [
+    {
+      "timestamp_ms": 5179.0,
+      "x": 670.0,
+      "y": 363.0,
+      "event_type": "Move",
+      "button": "NoButton"
+    }
+  ]
+}
