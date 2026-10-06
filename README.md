@@ -54,6 +54,7 @@ Short-Signal Capture → Closed-Form Geometry → Convex Hull Bounding → Fréc
 | First-movement capture (first `Move`/`Drag` point per session) | Done. Outputs are in [experiments/outputs/](experiments/outputs/) |
 | Per-user first-movement visualization notebooks | Done for the 10 Balabit users (training and test) |
 | Full stroke extraction to Parquet | Script written ([experiments/scripts/combine_balabit_strokes.py](experiments/scripts/combine_balabit_strokes.py)) |
+| Initial user profiles (1-second chunks → convex/concave hull) | Done for the 10 Balabit users. See [6.4](#64-initial-user-profiles-1-second-chunks) |
 | Stages 2–5 (geometry, convex hull, Fréchet, thresholding) | Not started |
 | FAR / FRR / EER evaluation | Not started |
 
@@ -72,7 +73,7 @@ cd thesis-mouse-biometrics
 
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt    # pandas, pyarrow, matplotlib, jupyter, ipykernel
+pip install -r requirements.txt    # pandas, pyarrow, shapely, matplotlib, jupyter, ipykernel
 ```
 
 The raw Balabit and SapiMouse session files are already committed under [experiments/data/](experiments/data/), so the scripts run immediately after cloning. Run every script from the repository root.
@@ -183,6 +184,30 @@ python experiments/scripts/automate_balabit_test_first_movement_patterns.py --us
     --notebook-dir experiments/notebooks/balabit_training_files_first_movement_patterns
 ```
 
+### 6.4 Initial user profiles (1-second chunks)
+
+This ports the prototype in `experiments/initial_program/` into the pipeline. [experiments/scripts/chunk_by_second.py](experiments/scripts/chunk_by_second.py) is the shared library, and [experiments/scripts/build_initial_profiles.py](experiments/scripts/build_initial_profiles.py) is the CLI.
+
+1. **Chunk:** the position at second *t* is the first event whose `record timestamp` is ≥ *t*. Chunk *t* is the displacement from position(*t*) to position(*t*+1), with *t* shifted to (0, 0). Idle seconds become (0, 0).
+2. **Burn-in:** a chunk is burn-in if it is the first movement of the session, or the first movement after at least `--idle-seconds` (default 5) idle chunks.
+3. **Profile:** take 3 random training sessions per user (seeded, so reproducible). Collect the endpoints of the moving chunks (or only burn-in chunks with `--burn-in-only`), then compute the convex hull and the concave hull (`--concave-ratio`, default 0.1).
+
+```bash
+python experiments/scripts/build_initial_profiles.py                    # all users, ~6 s
+python experiments/scripts/build_initial_profiles.py --user user15 --burn-in-only --seed 1
+```
+
+Output in `experiments/outputs/balabit_initial_profiles/`:
+
+- `<user>/profile.json`: selected sessions, settings, counts, and the hull coordinates and areas
+- `<user>/chunks.csv`: one row per chunk (`session_id, chunk_index, t, t_plus_1`, absolute and relative positions, `is_moving`, `is_burn_in`). Git-ignored because it is ~24 MB in total; rerun the script to regenerate it.
+- `summary.json`: one entry per user
+
+Compared with the prototype, the port drops the x = y = 65535 glitch rows, follows file order instead of an unstable sort (ties in `record timestamp` are common), and uses a binary search instead of rescanning the table every second. On the prototype's example session it reproduces `initial_program/chunks.csv` exactly.
+
+> [!WARNING]
+> The prototype's example (`initial_program/user15/session_0003960194.csv`) is a **test** session labelled impostor in `public_labels.csv`, so it does not show user15's own behavior. Profiles are built from `training_files` only.
+
 ---
 
 ## 7. Notebooks
@@ -195,6 +220,7 @@ jupyter notebook experiments/notebooks/
 | :--- | :--- |
 | `experiments/notebooks/balabit_training_files_first_movement_patterns/<user>/visualize_<user>.ipynb` | Plots the first-movement point of every **training** session for one user, in session order. |
 | `experiments/notebooks/balabit_test_files_first_movement_patterns/<user>/visualize_<user>.ipynb` | Same plot for the **test** sessions (genuine and impostor mixed). |
+| [experiments/notebooks/initial_profiles.ipynb](experiments/notebooks/initial_profiles.ipynb) | All 10 initial profiles (moving and burn-in chunks, convex and concave hulls), plus a starburst of one user's chunk vectors. Run `build_initial_profiles.py` first. |
 | [experiments/notebooks/test_only.ipynb](experiments/notebooks/test_only.ipynb) | Scratch notebook used to prototype the plots before the generator script. Change `USER_ID` to inspect another user. |
 
 The generated notebooks find their data by searching upward for the folder that contains `outputs/` (that is, `experiments/`), so they work from any working directory inside it. Run the capture scripts first if `experiments/outputs/` is missing.
@@ -281,15 +307,20 @@ thesis-mouse-biometrics/
 │   │   ├── automate_balabit_test_first_movement.py  # Capture: Balabit test
 │   │   ├── automate_sapimouse.py                  # Capture: SapiMouse
 │   │   ├── automate_balabit_test_first_movement_patterns.py  # Generate per-user notebooks
-│   │   └── combine_balabit_strokes.py             # All strokes → Parquet
+│   │   ├── combine_balabit_strokes.py             # All strokes → Parquet
+│   │   ├── chunk_by_second.py                     # Shared 1-second chunking library
+│   │   └── build_initial_profiles.py              # Initial profile: chunks → convex/concave hull
 │   ├── outputs/                                   # OUTPUT: per-session JSON + summary.json
 │   │   ├── balabit_training_files_first_movements/
 │   │   ├── balabit_test_files_first_movements/
-│   │   └── sapimouse_first_movements/
-│   └── notebooks/
-│       ├── balabit_training_files_first_movement_patterns/<user>/visualize_<user>.ipynb
-│       ├── balabit_test_files_first_movement_patterns/<user>/visualize_<user>.ipynb
-│       └── test_only.ipynb
+│   │   ├── sapimouse_first_movements/
+│   │   └── balabit_initial_profiles/<user>/{profile.json,chunks.csv}
+│   ├── notebooks/
+│   │   ├── balabit_training_files_first_movement_patterns/<user>/visualize_<user>.ipynb
+│   │   ├── balabit_test_files_first_movement_patterns/<user>/visualize_<user>.ipynb
+│   │   ├── initial_profiles.ipynb
+│   │   └── test_only.ipynb
+│   └── initial_program/                           # Original chunking prototype (not tracked in git)
 │
 ├── .agents/skills/                                # Academic-writing and thesis skills for AI assistants
 ├── .github/workflows/literature-checker.yml       # Weekly literature fetch

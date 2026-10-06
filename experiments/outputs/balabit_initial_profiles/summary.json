@@ -1,0 +1,135 @@
+{
+  "input_dir": "experiments/data/balabit/training_files",
+  "profiles": [
+    {
+      "user_id": "user12",
+      "sessions": [
+        "session_8872593360",
+        "session_5815391283",
+        "session_9031593624"
+      ],
+      "chunk_count": 47294,
+      "moving_count": 22681,
+      "burn_in_count": 791,
+      "convex_area": 3333307.5,
+      "concave_area": 2494122.5
+    },
+    {
+      "user_id": "user15",
+      "sessions": [
+        "session_1366248436",
+        "session_0205904470",
+        "session_8848361933"
+      ],
+      "chunk_count": 45157,
+      "moving_count": 11324,
+      "burn_in_count": 514,
+      "convex_area": 6709326.5,
+      "concave_area": 4733035.0
+    },
+    {
+      "user_id": "user16",
+      "sessions": [
+        "session_6961018175",
+        "session_1658051584",
+        "session_1607878631"
+      ],
+      "chunk_count": 44264,
+      "moving_count": 15237,
+      "burn_in_count": 486,
+      "convex_area": 7096915.5,
+      "concave_area": 5477223.5
+    },
+    {
+      "user_id": "user20",
+      "sessions": [
+        "session_0764157160",
+        "session_2372891077",
+        "session_3767642011"
+      ],
+      "chunk_count": 16649,
+      "moving_count": 5087,
+      "burn_in_count": 244,
+      "convex_area": 3344955.5,
+      "concave_area": 2427971.5
+    },
+    {
+      "user_id": "user21",
+      "sessions": [
+        "session_0639882460",
+        "session_0347800921",
+        "session_8505229187"
+      ],
+      "chunk_count": 32470,
+      "moving_count": 9210,
+      "burn_in_count": 276,
+      "convex_area": 3495841.0,
+      "concave_area": 2307968.5
+    },
+    {
+      "user_id": "user23",
+      "sessions": [
+        "session_9962419470",
+        "session_1123244103",
+        "session_7336984763"
+      ],
+      "chunk_count": 36993,
+      "moving_count": 11059,
+      "burn_in_count": 465,
+      "convex_area": 3232507.0,
+      "concave_area": 2426710.5
+    },
+    {
+      "user_id": "user29",
+      "sessions": [
+        "session_0595774526",
+        "session_8617964668",
+        "session_2786719181"
+      ],
+      "chunk_count": 27967,
+      "moving_count": 7158,
+      "burn_in_count": 304,
+      "convex_area": 6528622.0,
+      "concave_area": 3880111.0
+    },
+    {
+      "user_id": "user35",
+      "sessions": [
+        "session_6820312264",
+        "session_3412209090",
+        "session_5394017914"
+      ],
+      "chunk_count": 27442,
+      "moving_count": 10122,
+      "burn_in_count": 440,
+      "convex_area": 3705392.5,
+      "concave_area": 2199308.5
+    },
+    {
+      "user_id": "user7",
+      "sessions": [
+        "session_6668463071",
+        "session_9017095287",
+        "session_8961330453"
+      ],
+      "chunk_count": 12084,
+      "moving_count": 6059,
+      "burn_in_count": 203,
+      "convex_area": 3318917.5,
+      "concave_area": 2176189.5
+    },
+    {
+      "user_id": "user9",
+      "sessions": [
+        "session_7285432516",
+        "session_5155383252",
+        "session_4373781904"
+      ],
+      "chunk_count": 8588,
+      "moving_count": 4099,
+      "burn_in_count": 229,
+      "convex_area": 3065246.5,
+      "concave_area": 1836818.0
+    }
+  ]
+}
