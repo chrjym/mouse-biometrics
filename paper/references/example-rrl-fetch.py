@@ -11,16 +11,16 @@ Sources supported:
 Workflow:
 1. Queries all configured sources for primary and secondary thesis search terms.
 2. Normalizes and deduplicates results across sources by DOI and fuzzy title similarity.
-3. Cross-checks against titles, DOIs, and arXiv IDs in references/annotated-bibliography.md.
+3. Cross-checks against titles, DOIs, and arXiv IDs in paper/references/annotated-bibliography.md.
 4. Filters out known papers and outputs clean, unlogged candidate papers.
-5. Prepends new candidate runs to references/new-candidates.md (preserving historical runs).
+5. Prepends new candidate runs to paper/references/new-candidates.md (preserving historical runs).
 
 Usage:
-    python references/example-rrl-fetch.py
-    python references/example-rrl-fetch.py --dry-run
-    python references/example-rrl-fetch.py --queries '"mouse dynamics" "authentication"' '"curvature" "mouse trajectory"'
-    python references/example-rrl-fetch.py --sources arxiv openalex semanticscholar
-    python references/example-rrl-fetch.py --serpapi-key YOUR_KEY
+    python paper/references/example-rrl-fetch.py
+    python paper/references/example-rrl-fetch.py --dry-run
+    python paper/references/example-rrl-fetch.py --queries '"mouse dynamics" "authentication"' '"curvature" "mouse trajectory"'
+    python paper/references/example-rrl-fetch.py --sources arxiv openalex semanticscholar
+    python paper/references/example-rrl-fetch.py --serpapi-key YOUR_KEY
 """
 
 import argparse
@@ -612,7 +612,7 @@ def format_run_section(candidates: List[dict], queries: List[str], total_raw: in
 
 def update_new_candidates_file(new_section: str, output_path: Path) -> None:
     """
-    Prepends the new run section to references/new-candidates.md while keeping
+    Prepends the new run section to paper/references/new-candidates.md while keeping
     the file header on top and all previous run sections intact below.
     """
     header = (

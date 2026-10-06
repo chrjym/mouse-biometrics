@@ -28,14 +28,14 @@ jobs:
           # Optional: Add SERPAPI_KEY to Repository Secrets to enable Google Scholar querying
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: |
-          python references/example-rrl-fetch.py
+          python paper/references/example-rrl-fetch.py
 
       - name: Commit and push changes if new candidates discovered
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          if [[ -n $(git status -s references/new-candidates.md) ]]; then
-            git add references/new-candidates.md
+          if [[ -n $(git status -s paper/references/new-candidates.md) ]]; then
+            git add paper/references/new-candidates.md
             git commit -m "chore(literature): update new candidate papers [skip ci]"
             git push
           else

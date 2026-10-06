@@ -115,17 +115,17 @@ Before finalizing any paragraph:
 
 ## 6. Automated Pre-Flight Auditor CLI
 
-A local audit script is provided at `scripts/audit_writing.py` to evaluate draft files (`.md`, `.tex`, `.txt`) against Turnitin and classifier triggers before submission:
+A local audit script is provided at `paper/tools/audit_writing.py` to evaluate draft files (`.md`, `.tex`, `.txt`) against Turnitin and classifier triggers before submission:
 
 ```powershell
 # Basic audit on any thesis draft or chapter
-python scripts/audit_writing.py path/to/chapter.md
+python paper/tools/audit_writing.py path/to/chapter.md
 
 # Detailed paragraph-by-paragraph breakdown
-python scripts/audit_writing.py path/to/chapter.md -v
+python paper/tools/audit_writing.py path/to/chapter.md -v
 
 # JSON output for automated pipelines
-python scripts/audit_writing.py path/to/chapter.md --json
+python paper/tools/audit_writing.py path/to/chapter.md --json
 ```
 
 The auditor evaluates:
