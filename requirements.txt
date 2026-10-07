@@ -4,3 +4,4 @@ shapely
 matplotlib
 jupyter
 ipykernel
+scikit-learn
