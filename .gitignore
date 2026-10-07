@@ -13,3 +13,6 @@ experiment_earl/temp/impostor/
 experiment_earl/temp/manifest.json
 experiment_earl/shapes/
 experiment_earl/results/cache/
+
+# Local scratch prompt (see CLAUDE.md)
+temp.md
