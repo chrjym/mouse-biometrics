@@ -26,14 +26,34 @@ SCALERS = {"standard": StandardScaler, "robust": RobustScaler, "none": None}
 
 def equal_error_rate(genuine: list[float], impostor: list[float]) -> float:
     """EER over session scores; a higher score means more likely genuine."""
-    genuine, impostor = np.array(genuine), np.array(impostor)
-    best = (2.0, 1.0)
-    for threshold in np.unique(np.concatenate([genuine, impostor, [np.inf]])):
-        far = np.mean(impostor >= threshold)
-        frr = np.mean(genuine < threshold)
-        if abs(far - frr) < best[0]:
-            best = (abs(far - frr), (far + frr) / 2)
-    return best[1]
+    genuine, impostor = np.sort(genuine), np.sort(impostor)
+    if not len(genuine) or not len(impostor):
+        return float("nan")
+    thresholds = np.unique(np.concatenate([genuine, impostor, [np.inf]]))
+    far = 1 - np.searchsorted(impostor, thresholds, side="left") / len(impostor)  # impostors accepted
+    frr = np.searchsorted(genuine, thresholds, side="left") / len(genuine)  # genuine rejected
+    best = np.argmin(np.abs(far - frr))
+    return float((far[best] + frr[best]) / 2)
+
+
+def window_scores(chunk_scores: np.ndarray, size: int, stride: int) -> np.ndarray:
+    """Mean chunk score over every `size` consecutive moving seconds (0 = the whole session)."""
+    if size == 0:
+        return chunk_scores.mean(keepdims=True)
+    if len(chunk_scores) < size:
+        return np.empty(0)
+    total = np.cumsum(np.insert(chunk_scores, 0, 0.0))
+    return ((total[size:] - total[:-size]) / size)[::stride]
+
+
+def window_eers(sessions: list[tuple[np.ndarray, bool]], windows: list[int], stride: int) -> dict[str, float]:
+    """EER per window size, pooling the windows of all genuine vs all impostor test sessions."""
+    eers = {}
+    for size in windows:
+        genuine = [window_scores(s, size, stride) for s, is_impostor in sessions if not is_impostor]
+        impostor = [window_scores(s, size, stride) for s, is_impostor in sessions if is_impostor]
+        eers[str(size)] = equal_error_rate(np.concatenate(genuine), np.concatenate(impostor))
+    return eers
 
 
 def load_labels(labels_path: Path, test_dir: Path) -> dict[str, list[tuple[Path, bool]]]:
@@ -68,7 +88,9 @@ def build_svm(config: dict):
 
 def benchmark_user(user_dir: Path, tests: list[tuple[Path, bool]], config: dict) -> dict:
     enroll, feats, scoring = config["enrollment"], config["features"], config["scoring"]
-    extract = lambda path: session_features(path, enroll["interval"], feats["pause_ms"], feats["turn_degrees"])
+    extract = lambda path: session_features(
+        path, enroll["interval"], feats["pause_ms"], feats["turn_degrees"], feats["resample_ms"]
+    )
     rng = random.Random(f"{enroll['seed']}-{user_dir.name}")
     sessions = sorted(path for path in user_dir.iterdir() if path.is_file())
     selected = rng.sample(sessions, enroll["sessions"])
@@ -90,12 +112,12 @@ def benchmark_user(user_dir: Path, tests: list[tuple[Path, bool]], config: dict)
     svm.decision_function(all_test)
     predict_s = time.perf_counter() - start
 
-    scores = ([], [])  # (genuine, impostor)
-    for X, is_impostor in test:
-        if scoring["session_score"] == "mean_score":
-            scores[is_impostor].append(svm.decision_function(X).mean())
-        else:
-            scores[is_impostor].append((svm.predict(X) == 1).mean())
+    if scoring["chunk_score"] == "distance":
+        chunk_score = lambda X: svm.decision_function(X)
+    else:
+        chunk_score = lambda X: (svm.predict(X) == 1).astype(float)
+    svm_scores = [(chunk_score(X), is_impostor) for X, is_impostor in test]
+    windows, stride = scoring["windows"], scoring["window_stride"]
 
     result = {
         "user_id": user_dir.name,
@@ -109,17 +131,15 @@ def benchmark_user(user_dir: Path, tests: list[tuple[Path, bool]], config: dict)
             "predict_us_per_chunk": predict_s / len(all_test) * 1e6,
             "model_kb": len(pickle.dumps(svm[-1])) / 1024,
             "support_vectors": len(svm[-1].support_vectors_),
-            "eer": equal_error_rate(*scores),
+            "eer": window_eers(svm_scores, windows, stride),
         },
     }
 
     if scoring["compare_hull"]:
         dx, dy = FEATURES.index("dx"), FEATURES.index("dy")
         hull = concave_hull(MultiPoint(train[:, [dx, dy]]), ratio=scoring["concave_ratio"])
-        hull_scores = ([], [])
-        for X, is_impostor in test:
-            hull_scores[is_impostor].append(contains_xy(hull, X[:, dx], X[:, dy]).mean())
-        result["hull_eer"] = equal_error_rate(*hull_scores)
+        hull_scores = [(contains_xy(hull, X[:, dx], X[:, dy]).astype(float), is_impostor) for X, is_impostor in test]
+        result["hull_eer"] = window_eers(hull_scores, windows, stride)
     return result
 
 
@@ -139,31 +159,34 @@ def main() -> None:
     if data["users"]:
         user_dirs = [path for path in user_dirs if path.name in set(data["users"])]
 
+    windows = [str(size) for size in config["scoring"]["windows"]]
+    window_label = lambda size: "session" if size == "0" else f"{size}s"
     print(f"Config: {args.config}")
-    print(f"Features: {', '.join(config['features']['use'])}")
-    print(f"{'user':7} {'train':>7} {'test':>8} {'feat s':>7} {'fit s':>6} {'µs/chunk':>8} "
-          f"{'KB':>4} {'SVs':>5} {'SVM EER':>8} {'hull EER':>9}")
+    print(f"Features: {', '.join(config['features']['use'])}  (resample {config['features']['resample_ms']} ms)")
+    print(f"{'user':7} {'train':>7} {'test':>8} {'feat s':>7} {'fit s':>6} {'µs/chunk':>8} {'KB':>4} {'SVs':>5} | "
+          f"SVM EER by window: " + " ".join(f"{window_label(w):>7}" for w in windows))
     results = []
     for user_dir in user_dirs:
         r = benchmark_user(user_dir, tests.get(user_dir.name, []), config)
         results.append(r)
         s = r["svm"]
-        hull = f"{r['hull_eer']:9.1%}" if "hull_eer" in r else f"{'-':>9}"
         print(f"{r['user_id']:7} {r['train_chunks']:7,} {r['test_chunks']:8,} {r['feature_extraction_s']:7.2f} "
-              f"{s['fit_s']:6.2f} {s['predict_us_per_chunk']:8.1f} {s['model_kb']:4.0f} {s['support_vectors']:5} "
-              f"{s['eer']:8.1%} {hull}")
+              f"{s['fit_s']:6.2f} {s['predict_us_per_chunk']:8.1f} {s['model_kb']:4.0f} {s['support_vectors']:5} | "
+              f"{'':19}" + " ".join(f"{s['eer'][w]:7.1%}" for w in windows))
 
-    mean_svm = float(np.mean([r["svm"]["eer"] for r in results]))
-    print(f"Mean EER  SVM: {mean_svm:.1%}", end="")
+    mean_eer = {"svm": {w: float(np.nanmean([r["svm"]["eer"][w] for r in results])) for w in windows}}
     if config["scoring"]["compare_hull"]:
-        print(f"   hull: {np.mean([r['hull_eer'] for r in results]):.1%}", end="")
+        mean_eer["hull"] = {w: float(np.nanmean([r["hull_eer"][w] for r in results])) for w in windows}
+    print(f"{'Mean EER':>62}   " + " ".join(f"{window_label(w):>7}" for w in windows))
+    for model, eers in mean_eer.items():
+        print(f"{model:>62}   " + " ".join(f"{eers[w]:7.1%}" for w in windows))
     peak_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
-    print(f"\nPeak process memory: {peak_mb:.0f} MB")
+    print(f"Peak process memory: {peak_mb:.0f} MB")
 
     output = ROOT / data["output"]
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open("w") as handle:
-        json.dump({"config": config, "mean_svm_eer": mean_svm, "peak_memory_mb": peak_mb, "users": results},
+        json.dump({"config": config, "mean_eer": mean_eer, "peak_memory_mb": peak_mb, "users": results},
                   handle, indent=2)
         handle.write("\n")
     print(f"Output: {output}")
