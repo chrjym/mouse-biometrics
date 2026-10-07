@@ -4,5 +4,5 @@ __pycache__/
 .ipynb_checkpoints/
 venv/
 
-# Regenerated in seconds by experiments/scripts/build_initial_profiles.py (~24 MB)
-experiments/outputs/balabit_initial_profiles/*/chunks.csv
+# Regenerated in seconds by experiment_earl/scripts/main.py (per-session vectors/chunks CSVs)
+experiment_earl/outputs/*/session_*/
