@@ -1,0 +1,4 @@
+sessions,threshold_mean,threshold_std,matched_detected_mean,mean_chunk_ratio,n_legit,n_impostor,n_trials
+1,0.075,0.183,0.15,0.148,3,2,20
+2,0.25,0.256,0.5,0.196,3,2,20
+3,0.275,0.302,0.55,0.234,3,2,20
