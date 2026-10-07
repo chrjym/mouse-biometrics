@@ -1,0 +1,147 @@
+{
+  "trial": 0,
+  "seed": 42,
+  "legitimate": [
+    "user12",
+    "user15",
+    "user21"
+  ],
+  "n_impostor": 7,
+  "config": {
+    "seed": 42,
+    "dataset_dir": "datasets/balabit/training_files",
+    "n_legitimate": 3,
+    "n_impostor": 7,
+    "sessions_per_user": 5,
+    "pause_gap_s": 0.5,
+    "min_points": 10,
+    "resample_n": 64,
+    "dtw_band": 0.1,
+    "dtw_tolerance": 0.15,
+    "match_shape_ratio": 0.3,
+    "match_session_ratio": 0.5,
+    "n_trials": 20,
+    "dtw_block": 20000,
+    "bar_impostors": [
+      3,
+      5,
+      7,
+      9
+    ],
+    "bar_legit_users": 1,
+    "grid_sessions": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "grid_legit_users": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "grid_impostors": 5
+  },
+  "records": [
+    {
+      "impostor": "user16",
+      "matched": true,
+      "matched_against": "user12",
+      "session_ratios": [
+        0.9901,
+        0.9784,
+        0.9861,
+        0.9888,
+        0.9841
+      ]
+    },
+    {
+      "impostor": "user20",
+      "matched": true,
+      "matched_against": "user12",
+      "session_ratios": [
+        0.9894,
+        0.9951,
+        0.994,
+        0.9895,
+        0.9961
+      ]
+    },
+    {
+      "impostor": "user23",
+      "matched": true,
+      "matched_against": "user12",
+      "session_ratios": [
+        0.9938,
+        0.9921,
+        0.9907,
+        0.9856,
+        0.991
+      ]
+    },
+    {
+      "impostor": "user29",
+      "matched": true,
+      "matched_against": "user12",
+      "session_ratios": [
+        0.995,
+        0.9959,
+        0.9945,
+        0.9937,
+        0.9939
+      ]
+    },
+    {
+      "impostor": "user35",
+      "matched": true,
+      "matched_against": "user12",
+      "session_ratios": [
+        0.9847,
+        0.9767,
+        0.9843,
+        0.9876,
+        0.9939
+      ]
+    },
+    {
+      "impostor": "user7",
+      "matched": true,
+      "matched_against": "user12",
+      "session_ratios": [
+        0.9969,
+        0.9904,
+        0.9819,
+        0.9911,
+        0.9846
+      ]
+    },
+    {
+      "impostor": "user9",
+      "matched": true,
+      "matched_against": "user12",
+      "session_ratios": [
+        0.9986,
+        0.9965,
+        1.0,
+        0.9985,
+        0.9973
+      ]
+    }
+  ],
+  "sanity": {
+    "user12": [
+      0.986,
+      0.9798
+    ],
+    "user15": [
+      0.9867
+    ],
+    "user21": [
+      0.9723,
+      0.9636
+    ]
+  }
+}

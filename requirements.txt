@@ -5,3 +5,5 @@ matplotlib
 jupyter
 ipykernel
 scikit-learn
+numba
+pyyaml

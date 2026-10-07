@@ -1,0 +1,24 @@
+# Shared settings for src/*.py (EARL shape-matching experiment, Balabit only).
+seed: 42
+dataset_dir: datasets/balabit/training_files   # relative to experiment_earl/
+n_legitimate: 3
+n_impostor: 7            # Balabit has 10 users: n_legitimate + n_impostor must be <= 10
+sessions_per_user: 5     # Balabit has 5-7 training sessions per user (fewer are used if a user has less)
+pause_gap_s: 0.5         # a gap longer than this starts a new chunk (clicks also split chunks)
+min_points: 10           # chunks with fewer points are dropped
+resample_n: 64           # points per chunk after arc-length resampling
+dtw_band: 0.1            # Sakoe-Chiba band as a share of resample_n
+dtw_tolerance: 0.15      # mean DTW distance per point (bbox diagonal = 1) at or below which two chunks match
+match_shape_ratio: 0.3   # A2: share of a session's chunks that must match for the session to match
+match_session_ratio: 0.5 # A1: share of an impostor user's sessions that must match for the user to match
+n_trials: 20
+dtw_block: 20000         # DTW pairs computed at once (memory/speed trade-off)
+
+# Bar graph (06): impostor counts on the x axis, one legitimate user.
+bar_impostors: [3, 5, 7, 9]
+bar_legit_users: 1
+
+# Heatmap (07): fixed impostor count; legit users + 5 impostors <= 10 users.
+grid_sessions: [1, 2, 3, 4, 5]
+grid_legit_users: [1, 2, 3, 4, 5]
+grid_impostors: 5
