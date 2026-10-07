@@ -54,9 +54,14 @@ def has_match(queries, library, band, cap):
     return found
 
 
+def segmentation(config: dict) -> tuple:
+    """Settings that change which chunks a session has; part of every cache key."""
+    return (config["pause_gap_s"], config["min_points"], config["min_length_px"], config["resample_n"])
+
+
 def pair_matches(query: chunk_mod.Session, library: chunk_mod.Session, config: dict) -> dict[int, np.ndarray]:
     n = config["resample_n"]
-    key = (query.key, library.key, n, config["dtw_band"], config["dtw_tolerance"])
+    key = (query.key, library.key, segmentation(config), config["dtw_band"], config["dtw_tolerance"])
     if key not in _PAIRS:
         band, cap = int(round(config["dtw_band"] * n)), config["dtw_tolerance"] * n
         _PAIRS[key] = {
@@ -79,21 +84,23 @@ def matched_chunks(query: chunk_mod.Session, library: list[chunk_mod.Session], c
 
 
 def match_trial(legit: dict[str, list], impostor: dict[str, list], config: dict) -> list[dict]:
-    """One record per impostor user: matched if enough of their sessions match any legitimate profile."""
+    """One record per impostor user. Each legitimate profile is scored separately (`per_profile`);
+    the impostor counts as matched if any single profile reaches `match_session_ratio`."""
     records = []
     for user, sessions in impostor.items():
-        best = None
-        for profile, library in legit.items():
-            ratios = [matched_chunks(s, library, config) / max(s.n_chunks, 1) for s in sessions]
-            matched = sum(r >= config["match_shape_ratio"] for r in ratios) / len(ratios)
-            if best is None or (matched, np.mean(ratios)) > (best[0], np.mean(best[2])):
-                best = (matched, profile, ratios)
-        matched, profile, ratios = best
+        per_profile = {
+            profile: [matched_chunks(s, library, config) / max(s.n_chunks, 1) for s in sessions]
+            for profile, library in legit.items()
+        }
+        share = {p: sum(r >= config["match_shape_ratio"] for r in ratios) / len(ratios)
+                 for p, ratios in per_profile.items()}
+        best = max(per_profile, key=lambda p: (share[p], np.mean(per_profile[p])))
         records.append({
             "impostor": user,
-            "matched": bool(matched >= config["match_session_ratio"]),
-            "matched_against": profile,
-            "session_ratios": [round(float(r), 4) for r in ratios],
+            "matched": bool(share[best] >= config["match_session_ratio"]),
+            "matched_against": best,
+            "session_ratios": [round(float(r), 4) for r in per_profile[best]],
+            "per_profile": {p: [round(float(r), 4) for r in ratios] for p, ratios in per_profile.items()},
         })
     return records
 
@@ -108,10 +115,10 @@ def sanity_check(legit: dict[str, list], held_out: dict[str, list], config: dict
 
 def dataset_session(user: str, name: str, config: dict) -> chunk_mod.Session:
     path = cfg_mod.ROOT / config["dataset_dir"] / user / name
-    if path not in _SESSIONS:
+    if (path, segmentation(config)) not in _SESSIONS:
         chunks = chunk_mod.segment(cfg_mod.load_session(path), config)
-        _SESSIONS[path] = chunk_mod.describe(f"{user}/{name}", chunks, config)
-    return _SESSIONS[path]
+        _SESSIONS[(path, segmentation(config))] = chunk_mod.describe(f"{user}/{name}", chunks, config)
+    return _SESSIONS[(path, segmentation(config))]
 
 
 def run_trial(config: dict, seed: int) -> dict:

@@ -65,6 +65,14 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 - Sampling rate and screen size differ by user: user7/9/20 log every ~16 ms, the rest every ~110 ms; screens range from 1280×800 (user23) to 1920×1080 (user15/16). Per-point features and hull extents partly measure these rather than behavior. Resample/normalize before claiming user differences.
 - `experiment_earl/temp/` example session is a **test** session labelled impostor, not user15's genuine data. Don't build profiles from it.
 
+## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
+
+Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`), order 01 → 07; settings in `experiment_earl/config.yaml`.
+
+- Scripts are numbered, so modules load with `import_module("00_config")`. `run_trial(config, seed)` in `04_match_shapes.py` is the in-memory version of 01–04 used by the bar graph (06) and heatmap (07); pair results are cached in `results/cache/pairs.pkl`.
+- Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate`, `temp/impostor`; `temp/` also holds Earl's tracked prototype.
+- **Known result:** chunk matching does not discriminate. At `dtw_tolerance` 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
+
 ## Thesis-writing workflow
 
 - **Read `paper/references/adviser-log.md` first** before giving thesis direction; the newest entry (top) wins. Scope as of 2026-08-31: capture user mannerisms from **short** mouse signals/trajectories, not long sessions. "Short signal" and which mannerisms to prioritize are still open questions.

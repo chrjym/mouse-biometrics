@@ -30,9 +30,13 @@ def segment(df, config: dict) -> list[tuple[np.ndarray, int]]:
     starts = np.concatenate([[0], starts[starts > 0], [len(t)]])
     chunks = []
     for lo, hi in zip(starts[:-1], starts[1:]):
-        if hi - lo >= config["min_points"]:
+        if hi - lo >= config["min_points"] and path_length(xyt[lo:hi]) >= config["min_length_px"]:
             chunks.append((xyt[lo:hi], DRAG if drag[lo:hi].mean() > 0.5 else MOVE))
     return chunks
+
+
+def path_length(chunk: np.ndarray) -> float:
+    return float(np.hypot(*np.diff(chunk[:, :2], axis=0).T).sum())
 
 
 def normalize(chunk: np.ndarray, n: int) -> np.ndarray | None:
