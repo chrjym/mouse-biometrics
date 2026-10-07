@@ -30,31 +30,37 @@ CHUNK_COLUMNS = [
 ]
 
 
-def load_session(session_path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Return record timestamps (seconds), x and y of every valid event, in file order."""
-    timestamps, xs, ys = [], [], []
+def load_session(session_path: Path) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Return record timestamps, client timestamps (both seconds), x and y of every valid event, in file order."""
+    timestamps, client, xs, ys = [], [], [], []
     with session_path.open(newline="") as handle:
         for row in csv.DictReader(handle):
             x, y = float(row["x"]), float(row["y"])
             if x >= INVALID_COORDINATE or y >= INVALID_COORDINATE:
                 continue
             timestamps.append(float(row["record timestamp"]))
+            client.append(float(row["client timestamp"]))
             xs.append(x)
             ys.append(y)
-    return np.array(timestamps), np.array(xs), np.array(ys)
+    return np.array(timestamps), np.array(client), np.array(xs), np.array(ys)
+
+
+def second_boundaries(timestamps: np.ndarray, interval: float = 1.0) -> tuple[np.ndarray, np.ndarray]:
+    """Target times and the index of the first event at or after each one.
+
+    Record timestamps never decrease within a file, so a binary search in
+    file order picks the first matching row, even among the many tied timestamps.
+    """
+    targets = np.arange(timestamps[0], timestamps[-1] + 1e-9, interval)
+    return targets, np.searchsorted(timestamps, targets, side="left")
 
 
 def build_vectors(session_path: Path, interval: float = 1.0) -> list[dict]:
-    """Sample the first event at or after every `interval` seconds (the vectors.csv rows).
-
-    Record timestamps never decrease within a file, so a binary search in file
-    order picks the first matching row, even among the many tied timestamps.
-    """
-    timestamps, xs, ys = load_session(session_path)
+    """Sample the first event at or after every `interval` seconds (the vectors.csv rows)."""
+    timestamps, _, xs, ys = load_session(session_path)
     if len(timestamps) < 2:
         return []
-    targets = np.arange(timestamps[0], timestamps[-1] + 1e-9, interval)
-    index = np.searchsorted(timestamps, targets, side="left")
+    targets, index = second_boundaries(timestamps, interval)
     x, y = xs[index], ys[index]
     dx = np.diff(x, prepend=x[0])
     dy = np.diff(y, prepend=y[0])
