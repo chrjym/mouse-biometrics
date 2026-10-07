@@ -7,49 +7,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 An undergraduate thesis (4-member group): **"Measuring Behavioral Fingerprints of Users in Mouse Trajectories for Continuous Authentication."** It is half writing, half experiments:
 
 - `paper/` — the written research: literature, survey, chapter drafts, adviser log, and writing tools.
-- `experiment_earl/` — Python scripts, TOML config, and raw datasets. This is the **only** experiments folder; the old `experiments/` folder (first-movement capture, stroke extraction, notebooks, committed outputs) was removed in commit `d10f50c` and lives on in git history (e.g. `f36850c`).
+- `experiment_earl/` — YAML config, numbered scripts in `src/`, a notebook, raw datasets (`datasets/`), and generated results/figures. This is the **only** experiments folder. Two earlier code bases are gone from the working tree but live in git history: the old `experiments/` folder (first-movement capture, stroke extraction; removed in `d10f50c`, e.g. `f36850c`) and Earl's 1-second-chunk prototype (`experiment_earl/scripts/` hull profiles + One-Class SVM benchmark, `configs/ocsvm.toml`, `temp/` reference CSVs; last present in `ab09dad`).
 
-The originally proposed method (5 stages: short-stroke segmentation → closed-form geometry → convex hull bounding → Discrete Fréchet distance → dynamic trust threshold) is **not implemented**. What runs now is Earl's idea (see `EARL_IDEA.md`): split each session into 1-second chunks shifted to (0, 0), flag burn-in chunks, and build each user's profile from 3 random training sessions, then benchmark two profile models on the Balabit test set: the **concave hull** of chunk end points (adviser instruction) versus a **One-Class SVM** on per-chunk path features. Metric is EER over sliding windows of moving seconds.
+The originally proposed method (5 stages: short-stroke segmentation → closed-form geometry → convex hull bounding → Discrete Fréchet distance → dynamic trust threshold) is **not implemented**. What exists now is the EARL shape-matching experiment (see `EARL_EXECUTION_PLAN.md` and the section below): pause-based chunks, resampled and compared with banded DTW against legitimate-user libraries. `EARL_IDEA.md` holds Earl's notes (burn-in, 1-second chunks shifted to (0, 0), convex → concave hull, One-Class SVM article).
 
 `README.md` still describes the deleted `experiments/` layout and is out of date; trust this file and the code.
 
 ## Commands
 
-Run from the repo root. There is no build, test suite, or linter.
+Run from the repo root. There is no build, test suite, or linter. Use the git-ignored `.venv` (it has numba, nbconvert).
 
 ```bash
-pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupyter, ipykernel, scikit-learn
+pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupyter, ipykernel, scikit-learn, numba, pyyaml
 
-# Hull profiles: 3 random training sessions per user -> vectors/chunks CSVs, profile.json, profile.png
-python experiment_earl/scripts/main.py [--user user15] [--sessions 3] [--seed 0] [--idle-seconds 5] [--concave-ratio 0.1]
-
-# Benchmark One-Class SVM vs concave hull (all settings live in the TOML; copy it per experiment)
-python experiment_earl/scripts/benchmark_ocsvm.py [--config experiment_earl/configs/ocsvm.toml]
+# EARL shape matching (see section below)
+.venv/bin/python experiment_earl/src/01_sample_users.py   # then 02 ... 07
+cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
 python paper/tools/audit_writing.py <draft.md> [-v] [--json]   # AI-detector cadence audit
 python paper/references/example-rrl-fetch.py [--dry-run] [--queries ...]
 ```
 
-`main.py` writes under `experiment_earl/outputs/<user>/` (per-session `session_*/` CSVs are git-ignored because they regenerate in seconds). `benchmark_ocsvm.py` writes `outputs/benchmark_ocsvm.json` containing the config used, mean EER, timing/memory, and per-user results. To validate `chunking.py` changes, regenerate for `experiment_earl/temp/` reference CSVs (`vectors.csv`, `chunks.csv`, Earl's prototype output for test session `user15/session_0003960194`); they must match exactly.
-
-**Working-tree caveat:** at the time of writing, `experiment_earl/scripts/`, `configs/`, and `temp/` are committed in `HEAD` but deleted (uncommitted) in the working tree. If they are missing, `git restore experiment_earl` before running anything; don't recreate them from scratch.
-
-## Code architecture (`experiment_earl/scripts/`)
-
-- `chunking.py` — library. `load_session` reads a raw Balabit file in file order and drops x/y ≥ 65535 glitches. `second_boundaries` picks, for each second t, the first event with `record timestamp` ≥ t via `np.searchsorted`. `build_vectors` → per-second positions; `build_chunks` → chunk t = position(t+1) − position(t), start shifted to (0, 0); `mark_burn_in` flags the first moving chunk of a session and the first moving chunk after `idle_seconds` idle chunks (recorded but **not used** to filter yet).
-- `main.py` — hull profile builder. Samples sessions with `random.Random(f"{seed}-{user}")`, concatenates chunk end points, takes shapely `convex_hull` and `concave_hull(ratio)`, writes `profile.json`/`profile.png`/`summary.json`.
-- `features.py` — per-chunk *path* features (`FEATURES`: dx, dy, path_length, straightness, mean_speed, max_speed, curvature, total_turning, direction_changes, pauses). Uses `client timestamp` (~16 ms) for speed, and optionally `resample` to a common time grid (hold last position, no interpolation) so the ~16 ms vs ~110 ms loggers are comparable. Only chunks where the cursor moved are kept.
-- `benchmark_ocsvm.py` — reads `configs/ocsvm.toml`; per user: enroll on the same seeded 3 sessions as `main.py`, fit sklearn pipeline (column select → log transform → robust/standard scaler → `OneClassSVM`), score labelled test sessions from `public_labels.csv`, and report EER per window size (`0` = whole session) plus an optional hull baseline built from (dx, dy) of the same training chunks. Only users/sessions with public labels are evaluated.
-
-Scripts import siblings as plain modules (`from chunking import ...`), which works because Python puts the script's directory on `sys.path`. Keep new scripts in the same folder.
-
 ### Conventions to match
 
-- Each script: shebang + one-line module docstring, `argparse` with `description=__doc__`, `ROOT = Path(__file__).resolve().parents[1]` (resolves to `experiment_earl/`), defaults built from `ROOT`, `main()` that prints a short summary (counts + output path).
-- Experiment settings go in the TOML with explanatory comments, not as new CLI flags; the used config is saved inside the output JSON.
-- Use the stdlib `csv.DictReader` for raw session files; numpy for the numeric work.
-- Chunk pipeline keeps `t`/`t_plus_1` in seconds of `record timestamp`.
+- Each script: shebang + one-line module docstring, `argparse` with `description=__doc__`, `ROOT = Path(__file__).resolve().parents[1]` (resolves to `experiment_earl/`), `main()` that prints a short summary (counts + output path).
+- Experiment settings go in `config.yaml` with explanatory comments, not as new CLI flags.
 - Small, plain functions; type hints on signatures; sparse comments.
 
 ## Data facts that are easy to get wrong
@@ -61,16 +44,16 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 - `state ∈ {Move, Drag, Pressed, Released}`. `y` grows downward (screen coordinates) — plots call `invert_yaxis()`.
 - Balabit users: `user7, user9, user12, user15, user16, user20, user21, user23, user29, user35`.
 - Some Balabit rows have **x = y = 65535** (logging glitches, not positions). Drop them before any spatial computation or they create ~60,000 px jumps.
-- Balabit `record timestamp` has ~0.1 s resolution, so ~90% of rows tie with a neighbor; `client timestamp` is ~16 ms and steps backward in one session (`features.resample` handles it with `maximum.accumulate`). Don't re-sort: pandas' default sort is unstable and reorders ties. Use file order or a stable sort.
+- Balabit `record timestamp` has ~0.1 s resolution, so ~90% of rows tie with a neighbor; `client timestamp` is ~16 ms and steps backward in one session (sort stably, or use `np.maximum.accumulate`). Don't re-sort: pandas' default sort is unstable and reorders ties. Use file order or a stable sort.
 - Sampling rate and screen size differ by user: user7/9/20 log every ~16 ms, the rest every ~110 ms; screens range from 1280×800 (user23) to 1920×1080 (user15/16). Per-point features and hull extents partly measure these rather than behavior. Resample/normalize before claiming user differences.
-- `experiment_earl/temp/` example session is a **test** session labelled impostor, not user15's genuine data. Don't build profiles from it.
+- Earl's old prototype example session (`user15/session_0003960194`) is a **test** session labelled impostor, not user15's genuine data. Don't build profiles from it.
 
 ## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
 
 Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`), order 01 → 07; settings in `experiment_earl/config.yaml`.
 
 - Scripts are numbered, so modules load with `import_module("00_config")`. `run_trial(config, seed)` in `04_match_shapes.py` is the in-memory version of 01–04 used by the bar graph (06) and heatmap (07); pair results are cached in `results/cache/pairs.pkl`.
-- Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate`, `temp/impostor`; `temp/` also holds Earl's tracked prototype.
+- Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
 - **Known result:** chunk matching does not discriminate. At `dtw_tolerance` 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
 
 ## Thesis-writing workflow
