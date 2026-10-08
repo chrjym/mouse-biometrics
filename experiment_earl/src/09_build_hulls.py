@@ -3,6 +3,7 @@
 
 import argparse
 import json
+import random
 from importlib import import_module
 
 import matplotlib
@@ -11,30 +12,36 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.collections import LineCollection
 from shapely import MultiPoint, concave_hull
 
 cfg_mod = import_module("00_config")
 chunk_mod = import_module("03_chunk_shapes")
 
 
-def chunk_points(config: dict, user: str) -> tuple[np.ndarray, list[str], int]:
-    """Every point of every chunk, each chunk shifted so it starts at (0, 0), from the user's first
-    `sessions_per_user` sessions (same pool order as the notebook). Also the sessions and chunk count."""
+def user_chunks(config: dict, user: str) -> tuple[list[np.ndarray], list[str]]:
+    """Every chunk as its (x, y) path shifted so it starts at (0, 0), from the user's first
+    `sessions_per_user` sessions (same pool order as the notebook), and the sessions used."""
     sessions = cfg_mod.session_pool(config, user, config["seed"])[: config["sessions_per_user"]]
-    points, n_chunks = [], 0
+    paths = []
     for folder, name in sessions:
         chunks = chunk_mod.segment(cfg_mod.load_session(cfg_mod.ROOT / folder / user / name), config)
-        n_chunks += len(chunks)
-        points += [chunk[:, :2] - chunk[0, :2] for chunk, _ in chunks]
-    return (np.vstack(points) if points else np.empty((0, 2))), [f"{folder}/{name}" for folder, name in sessions], n_chunks
+        paths += [chunk[:, :2] - chunk[0, :2] for chunk, _ in chunks]
+    return paths, [f"{folder}/{name}" for folder, name in sessions]
 
 
 def coordinates(geometry) -> list[list[float]]:
     return [list(p) for p in geometry.exterior.coords] if geometry.geom_type == "Polygon" else []
 
 
-def draw(ax, user: str, points: np.ndarray, convex, concave, small: bool = False) -> None:
-    ax.plot(points[:, 0], points[:, 1], ",", color="tab:blue", alpha=0.3, rasterized=True)
+def draw(ax, user: str, paths: list[np.ndarray], highlight: list[int], convex, concave, small: bool = False) -> None:
+    """All chunks as faint gray lines, the `highlight` chunks as bold coloured lines with a dot at their end."""
+    ax.add_collection(LineCollection(paths, colors="0.55", linewidths=0.3, alpha=0.25, rasterized=True))
+    colours = plt.get_cmap("tab20")
+    for n, i in enumerate(highlight):
+        path, colour = paths[i], colours(n % 20)
+        ax.plot(path[:, 0], path[:, 1], color=colour, linewidth=0.9 if small else 1.6, zorder=3)
+        ax.plot(*path[-1], "o", color=colour, markersize=2 if small else 4, zorder=4)
     if convex.geom_type == "Polygon":
         ax.plot(*convex.exterior.xy, color="tab:gray", linestyle="--", linewidth=1,
                 label=f"convex {convex.area / 1e6:.2f}M px²")
@@ -56,6 +63,7 @@ def draw(ax, user: str, points: np.ndarray, convex, concave, small: bool = False
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--user", action="append", help="limit to these users (repeatable)")
+    parser.add_argument("--highlight", type=int, default=30, help="random chunks per user drawn in colour (0 = none)")
     cfg_mod.add_run_argument(parser)
     args = parser.parse_args()
     config, run = cfg_mod.open_run(args.run)
@@ -70,11 +78,14 @@ def main() -> None:
 
     built, rows = {}, []
     for user in users:
-        points, sessions, n_chunks = chunk_points(config, user)
+        paths, sessions = user_chunks(config, user)
+        n_chunks = len(paths)
+        points = np.vstack(paths) if paths else np.empty((0, 2))
         unique = np.unique(points, axis=0)  # the hulls only depend on distinct points
+        highlight = random.Random(f"{config['seed']}-{user}-highlight").sample(range(n_chunks), min(args.highlight, n_chunks))
         cloud = MultiPoint(unique)
         convex, concave = cloud.convex_hull, concave_hull(cloud, ratio=config["concave_ratio"])
-        built[user] = (unique, convex, concave)
+        built[user] = (paths, highlight, convex, concave)
         rows.append({"user": user, "sessions": len(sessions), "chunks": n_chunks, "points": len(points),
                      "unique_points": len(unique), "convex_area": round(convex.area),
                      "concave_area": round(concave.area),
@@ -85,8 +96,8 @@ def main() -> None:
         }, indent=2) + "\n")
 
         fig, ax = plt.subplots(figsize=(7, 7))
-        draw(ax, user, unique, convex, concave)
-        ax.set_title(f"{user}: every point of {n_chunks:,} chunks from {len(sessions)} sessions")
+        draw(ax, user, paths, highlight, convex, concave)
+        ax.set_title(f"{user}: {n_chunks:,} chunks from {len(sessions)} sessions, {len(highlight)} highlighted")
         fig.tight_layout()
         fig.savefig(figures / f"{user}.png", dpi=120)
         plt.close(fig)
@@ -99,11 +110,11 @@ def main() -> None:
     cols = 5
     rows_n = -(-len(built) // cols)
     fig, axes = plt.subplots(rows_n, cols, figsize=(cols * 3.6, rows_n * 3.6), squeeze=False)
-    for ax, (user, (unique, convex, concave)) in zip(axes.ravel(), built.items()):
-        draw(ax, user, unique, convex, concave, small=True)
+    for ax, (user, (paths, highlight, convex, concave)) in zip(axes.ravel(), built.items()):
+        draw(ax, user, paths, highlight, convex, concave, small=True)
     for ax in axes.ravel()[len(built):]:
         ax.axis("off")
-    fig.suptitle(f"Convex (dashed) and concave (orange) hulls, {config['sessions_per_user']} sessions per user, "
+    fig.suptitle(f"Chunks (gray, {args.highlight} per user in colour), convex (dashed) and concave (orange) hulls, {config['sessions_per_user']} sessions per user, "
                  f"concave_ratio {config['concave_ratio']}")
     fig.tight_layout()
     fig.savefig(figures / "all_users.png", dpi=120)

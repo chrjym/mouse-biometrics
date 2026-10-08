@@ -117,7 +117,10 @@ Pipeline: raw data → chunks → convex hull → concave hull. For each of the 
 ```bash
 .venv/bin/python experiment_earl/src/09_build_hulls.py                 # all 10 users, ~15 seconds
 .venv/bin/python experiment_earl/src/09_build_hulls.py --user user9    # one user
+.venv/bin/python experiment_earl/src/09_build_hulls.py --highlight 60  # more chunks in colour (default 30, 0 = none)
 ```
+
+In the figures every chunk is a thin gray line starting at the black ×; a random sample of chunks (`--highlight`, the same ones on every rerun) is drawn in bold colours with a dot where each one ends, so single lines can be followed. The dashed outline is the convex hull, the orange area the concave hull.
 
 It reads the raw sessions itself, so it does not need steps 01–03 first. Outputs, inside the run folder: `hulls/<user>.json` (sessions used, point counts, both areas and outlines), `hulls/summary.csv` (one row per user) and `figures/hulls/<user>.png` plus `figures/hulls/all_users.png` (all users side by side).
 
