@@ -36,7 +36,7 @@ runs/baseline_2707e0/
 08_run_notebook      executes the notebook and saves the copy in the run folder
 ```
 
-Scripts 01–05 run **one trial**. Script 06 runs the **full sweep** and ignores the three "one trial" settings below (`n_legitimate`, `n_impostor`, `sessions_per_user`).
+Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
 
 ## Data and sampling
 
@@ -45,9 +45,9 @@ Scripts 01–05 run **one trial**. Script 06 runs the **full sweep** and ignores
 | `run_name` | `baseline` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
 | `seed` | 42 | 01, 02, 06 | Starting number for every random choice (which users, which sessions). The same seed gives the same draw, so a result can be repeated. The sweep uses `seed`, `seed + 1`, ... for its draws. |
 | `dataset_dir` | `datasets/balabit/training_files` | all | Folder with the raw Balabit sessions, relative to `experiment_earl/`. Only the training files are used. |
-| `n_legitimate` | 3 | 01 | How many users are "legitimate" in a single trial. Their shapes form the library that impostors are compared against. |
-| `n_impostor` | 7 | 01 | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
-| `sessions_per_user` | 5 | 02 | Sessions drawn per user in a single trial. If a user has fewer, all of theirs are used (Balabit users have 5–7 training sessions). |
+| `n_legitimate` | 3 | 01, notebook | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
+| `n_impostor` | 2 | 01, notebook | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
+| `sessions_per_user` | 3 | 02, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 5, because the smallest Balabit user has 5 training sessions. |
 
 ## Chunking (script 03)
 
@@ -77,7 +77,7 @@ The threshold is `matched impostor users / total impostor users`. 0 is best: imp
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `n_trials` | 20 | Random draws of users and sessions that every sweep cell is averaged over. More draws give steadier numbers but take longer. |
+| `n_trials` | 20 | Random draws of users and sessions that every sweep cell (and every notebook step) is averaged over. It does not change what is tested, only how steady the averages are: more draws give steadier numbers but take longer. |
 | `sweep_sessions_max` | 5 | The sweep tries 1 up to this many sessions per user. Every Balabit user has at least 5. |
 | `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean threshold by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
 
@@ -94,5 +94,5 @@ Any change to a value (except `run_name`) makes the next script run create a new
 ## Limits to remember
 
 - Balabit has only 10 users, so the total of legitimate and impostor users can never go above 10.
-- The notebook `notebooks/session_progression.ipynb` reads this file too, but sets its own user and session counts (3 legitimate, 2 impostor, 1–3 sessions). Its outputs go to the current run folder.
+- The notebook `notebooks/session_progression.ipynb` reads this file and sets nothing itself. It stops with a message if the user counts or `sessions_per_user` do not fit Balabit. Its outputs go to the current run folder.
 - The tolerance of 0.02 is a baseline, not a validated value: in earlier tuning, a user's own held-out sessions never matched more than impostors did.

@@ -70,7 +70,7 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
-- Experiment: 3 legitimate + 2 impostor users, sessions per user 1 → 2 → 3 (nested: step k+1 reuses step k's sessions), 20 seeded draws; the heatmap columns reuse each draw with the first 1/2/3 legitimate users (draw order, not sorted). Runs in ~4–5 min.
+- Experiment (all from `config.yaml`, nothing hardcoded): `n_legitimate` legitimate + `n_impostor` impostor users, sessions per user 1 → `sessions_per_user` (nested: step k+1 reuses step k's sessions), `n_trials` seeded draws; the heatmap columns reuse each draw with the first 1…`n_legitimate` legitimate users (draw order, not sorted). Default config: 3 + 2 users, 1–3 sessions, 20 draws; runs in ~5 min.
 - Outputs (inside the run folder): `results/session_progression{,_trials,_heatmap}.csv`, `figures/session_progression.png` (bar: mean **impostors matched**, not the threshold, as requested) and `figures/session_progression_heatmap.png` (colour = threshold 0–1 in 0.1 steps, cells also show impostors matched).
 
 ## Thesis-writing workflow
