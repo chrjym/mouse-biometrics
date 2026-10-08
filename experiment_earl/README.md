@@ -179,4 +179,5 @@ More sessions per user means more shapes to compare, so runs beyond 5 sessions t
 | `No run '...' under .../runs` | The `--run` name is wrong; the message lists the existing runs. |
 | `ModuleNotFoundError: numba` (or `nbformat`) | Use `.venv/bin/python`, or redo the setup in section 1. |
 | `'RcParams' object has no attribute '_get'` | Run `.venv/bin/pip install "matplotlib-inline<0.2"`. |
-| `No session .npz files under ...` from `07_plot_shapes.py` | Run steps 01–03 first for this config. |
+| `Run ... has no shapes yet` from `07_plot_shapes.py` | That run only has notebook results. Run steps 01–03 with the same `--run` (the message prints the commands), then export. |
+| `No shapes for userX in run ...` | That user was not drawn in this run's single trial; the message lists the users that have shapes. |
