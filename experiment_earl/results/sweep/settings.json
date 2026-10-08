@@ -36,29 +36,6 @@
     "match_shape_ratio": 0.3,
     "match_session_ratio": 0.5,
     "n_trials": 20,
-    "dtw_block": 20000,
-    "bar_impostors": [
-      3,
-      5,
-      7,
-      9
-    ],
-    "bar_legit_users": 1,
-    "grid_sessions": [
-      1,
-      2,
-      3,
-      4,
-      5
-    ],
-    "grid_legit_users": [
-      1,
-      2,
-      3,
-      4,
-      5
-    ],
-    "grid_impostors": 5,
     "sweep_sessions_max": 5,
     "sweep_delta": 0.05
   }

@@ -12,18 +12,8 @@ dtw_band: 0.1            # Sakoe-Chiba band as a share of resample_n
 dtw_tolerance: 0.02      # mean DTW distance per point (bbox diagonal = 1); 0.15 matched ~99% of everything, see plan notes
 match_shape_ratio: 0.3   # A2: share of a session's chunks that must match for the session to match
 match_session_ratio: 0.5 # A1: share of an impostor user's sessions that must match for the user to match
-n_trials: 20
-dtw_block: 20000         # DTW pairs computed at once (memory/speed trade-off)
+n_trials: 20             # random draws per sweep cell
 
-# Bar graph (06): impostor counts on the x axis, one legitimate user.
-bar_impostors: [3, 5, 7, 9]
-bar_legit_users: 1
-
-# Heatmap (07): fixed impostor count; legit users + 5 impostors <= 10 users.
-grid_sessions: [1, 2, 3, 4, 5]
-grid_legit_users: [1, 2, 3, 4, 5]
-grid_impostors: 5
-
-# Full sweep (08): every sessions x legitimate x impostor combination that fits in Balabit's 10 users.
+# Full sweep (06): every sessions x legitimate x impostor combination that fits in Balabit's 10 users.
 sweep_sessions_max: 5    # every Balabit user has at least 5 training sessions
 sweep_delta: 0.05        # a step that changes the mean threshold by less than this counts as "flat" (saturated)

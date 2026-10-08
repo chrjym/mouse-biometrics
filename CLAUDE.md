@@ -21,7 +21,9 @@ Run from the repo root. There is no build, test suite, or linter. Use the git-ig
 pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupyter, ipykernel, scikit-learn, numba, pyyaml
 
 # EARL shape matching (see section below)
-.venv/bin/python experiment_earl/src/01_sample_users.py   # then 02 ... 07
+.venv/bin/python experiment_earl/src/01_sample_users.py   # then 02 ... 05 (one trial)
+.venv/bin/python experiment_earl/src/06_sweep.py           # full sweep, resumable
+.venv/bin/python experiment_earl/src/07_plot_shapes.py     # PNG per chunk under shapes/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
@@ -50,13 +52,13 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 
 ## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
 
-Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`), order 01 → 07; settings in `experiment_earl/config.yaml`.
+Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`), 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03; settings in `experiment_earl/config.yaml`.
 
-- Scripts are numbered, so modules load with `import_module("00_config")`. `run_trial(config, seed)` in `04_match_shapes.py` is the in-memory version of 01–04 used by the bar graph (06) and heatmap (07); pair results are cached in `results/cache/pairs.pkl`.
+- Scripts are numbered, so modules load with `import_module("00_config")`. `06_sweep.py` reuses `dataset_session` and `matched_chunks` from `04_match_shapes.py`; pair results are cached in `results/cache/pairs.pkl`.
 - Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
 - **Known result:** chunk matching does not discriminate. At `dtw_tolerance` 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
 
-### Full sweep (`src/08_sweep.py`)
+### Full sweep (`src/06_sweep.py`)
 
 - Every (sessions 1..`sweep_sessions_max`) × (legitimate users) × (impostor users) cell with L + I ≤ 10, over `n_trials` draws. Per draw the 10 users are shuffled once: legitimate = front of the list, impostors = back, sessions = prefix of a shuffled order, so cells are nested and comparable. It scores every (impostor, legitimate) pair once (`results/sweep/pairs.csv`) and builds all cells from that.
 - Resumable: seeds already in `pairs.csv` are skipped, so a rerun only redraws the figures. First run ~30 min (fills the DTW cache).

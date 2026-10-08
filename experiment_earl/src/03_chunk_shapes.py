@@ -2,7 +2,6 @@
 """Split every session under temp/ into pause-based chunks and save them to shapes/ with a per-user library."""
 
 import argparse
-import json
 from dataclasses import dataclass, field
 from importlib import import_module
 from pathlib import Path
@@ -68,10 +67,7 @@ def describe(key: str, chunks: list[tuple[np.ndarray, int]], config: dict) -> Se
 
 def save_session(chunks: list[tuple[np.ndarray, int]], path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    meta = np.array([
-        [kind, np.hypot(*np.diff(c[:, :2], axis=0).T).sum(), c[-1, 2] - c[0, 2]]
-        for c, kind in chunks
-    ]).reshape(-1, 3)  # kind, path length (px), duration (s)
+    meta = np.array([[kind, path_length(c), c[-1, 2] - c[0, 2]] for c, kind in chunks]).reshape(-1, 3)  # kind, path length (px), duration (s)
     np.savez(path, meta=meta, **{f"chunk_{i}": c for i, (c, _) in enumerate(chunks)})
 
 

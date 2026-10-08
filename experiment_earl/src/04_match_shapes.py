@@ -5,18 +5,15 @@ import argparse
 import json
 import pickle
 from importlib import import_module
-from pathlib import Path
 
 import numpy as np
 from numba import njit, prange
 
 cfg_mod = import_module("00_config")
-users_mod = import_module("01_sample_users")
-sessions_mod = import_module("02_sample_sessions")
 chunk_mod = import_module("03_chunk_shapes")
 
 _PAIRS: dict = {}     # (query session, library session, settings) -> {kind: bool array per query chunk}
-_SESSIONS: dict = {}  # dataset path -> Session, so grids chunk each file once
+_SESSIONS: dict = {}  # (dataset path, segmentation) -> Session, so sweeps chunk each file once
 CACHE_PATH = cfg_mod.ROOT / "results" / "cache" / "pairs.pkl"
 
 
@@ -119,22 +116,6 @@ def dataset_session(user: str, name: str, config: dict) -> chunk_mod.Session:
         chunks = chunk_mod.segment(cfg_mod.load_session(path), config)
         _SESSIONS[(path, segmentation(config))] = chunk_mod.describe(f"{user}/{name}", chunks, config)
     return _SESSIONS[(path, segmentation(config))]
-
-
-def run_trial(config: dict, seed: int) -> dict:
-    """Draw users and sessions for `seed`, then match; the in-memory version of scripts 01 to 04."""
-    legit_users, impostor_users = users_mod.draw_users(config, seed)
-    drawn = sessions_mod.draw_sessions(config, seed, legit_users + impostor_users)
-    build = lambda user, key: [dataset_session(user, name, config) for name in drawn[user][key]]
-    legit = {u: build(u, "sessions") for u in legit_users}
-    impostor = {u: build(u, "sessions") for u in impostor_users}
-    held_out = {u: build(u, "held_out") for u in legit_users}
-    return {
-        "seed": seed,
-        "legitimate": legit_users,
-        "records": match_trial(legit, impostor, config),
-        "sanity": sanity_check(legit, held_out, config),
-    }
 
 
 def load_cache() -> None:
