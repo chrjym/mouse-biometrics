@@ -1,0 +1,65 @@
+{
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61
+  ],
+  "config": {
+    "seed": 42,
+    "dataset_dir": "datasets/balabit/training_files",
+    "n_legitimate": 3,
+    "n_impostor": 7,
+    "sessions_per_user": 5,
+    "pause_gap_s": 0.5,
+    "min_points": 10,
+    "min_length_px": 0,
+    "resample_n": 64,
+    "dtw_band": 0.1,
+    "dtw_tolerance": 0.02,
+    "match_shape_ratio": 0.3,
+    "match_session_ratio": 0.5,
+    "n_trials": 20,
+    "dtw_block": 20000,
+    "bar_impostors": [
+      3,
+      5,
+      7,
+      9
+    ],
+    "bar_legit_users": 1,
+    "grid_sessions": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "grid_legit_users": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "grid_impostors": 5,
+    "sweep_sessions_max": 5,
+    "sweep_delta": 0.05
+  }
+}

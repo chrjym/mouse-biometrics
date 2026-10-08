@@ -23,3 +23,7 @@ bar_legit_users: 1
 grid_sessions: [1, 2, 3, 4, 5]
 grid_legit_users: [1, 2, 3, 4, 5]
 grid_impostors: 5
+
+# Full sweep (08): every sessions x legitimate x impostor combination that fits in Balabit's 10 users.
+sweep_sessions_max: 5    # every Balabit user has at least 5 training sessions
+sweep_delta: 0.05        # a step that changes the mean threshold by less than this counts as "flat" (saturated)

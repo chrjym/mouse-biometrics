@@ -56,6 +56,13 @@ Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/N
 - Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
 - **Known result:** chunk matching does not discriminate. At `dtw_tolerance` 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
 
+### Full sweep (`src/08_sweep.py`)
+
+- Every (sessions 1..`sweep_sessions_max`) × (legitimate users) × (impostor users) cell with L + I ≤ 10, over `n_trials` draws. Per draw the 10 users are shuffled once: legitimate = front of the list, impostors = back, sessions = prefix of a shuffled order, so cells are nested and comparable. It scores every (impostor, legitimate) pair once (`results/sweep/pairs.csv`) and builds all cells from that.
+- Resumable: seeds already in `pairs.csv` are skipped, so a rerun only redraws the figures. First run ~30 min (fills the DTW cache).
+- Outputs: `results/sweep/{summary,saturation}.csv`, `figures/sweep_{heatmaps,lines}.png`. `saturation.csv` gives, per curve, where changes drop below `sweep_delta` and the biggest jump.
+- Result (tol 0.02, 20 draws): sessions per user drive the threshold (1→2 sessions jumps ~0.2, flat from ~4); legitimate users add a slow rise (0.16 → 0.27 over 1 → 9); impostor count barely matters (the threshold is already a share).
+
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
