@@ -108,12 +108,12 @@ The whole `runs/` folder is git-ignored: results stay on your computer. Copy a r
 
 ## 5. How long it takes
 
-The first run of a new chunking or matching setting is the slowest, because every shape comparison (DTW) is computed once and then cached in `experiment_earl/cache/` for all later runs.
+For the scripts (01–07), the first run of a new chunking or matching setting is the slowest, because every shape comparison (DTW) is computed once and then cached in `experiment_earl/cache/` for all later runs. The notebook keeps its own cache only while it runs, so every notebook run takes about the same time.
 
 | What | Typical time |
 |---|---|
-| Notebook, 3 + 2 users, 1–3 sessions, 20 draws | about 5 minutes |
-| Notebook, same, 1 draw | about 20 seconds once the cache is warm |
+| Notebook, 3 + 2 users, 1–3 sessions, 20 draws | about 4–5 minutes |
+| Notebook, same, 1 draw | about 20 seconds |
 | Sweep, 20 draws, first time | about 30 minutes; reruns that only redraw the figures take seconds |
 | Single trial 01–05 | about 1–2 minutes |
 | Chunk PNGs for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |

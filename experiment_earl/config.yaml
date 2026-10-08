@@ -3,14 +3,14 @@
 # Changing any value (except run_name) creates a new folder under runs/, so older results are kept.
 # Every setting is explained in CONFIG.md.
 
-run_name: baseline         # label for this config's folder under runs/ (a short hash of the settings is appended)
+run_name: earl_experiment1         # label for this config's folder under runs/ (a short hash of the settings is appended)
 
 # --- Experiment size (single trial 01-05 and the notebook) ---
-seed: 42                   # starting number of every random draw; the same seed gives the same draw
+seed: 38                   # starting number of every random draw; the same seed gives the same draw
 n_legitimate: 3            # users whose shapes form the legitimate profiles
 n_impostor: 2              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
 sessions_per_user: 3       # sessions per user; the notebook tests 1, 2, ... up to this (max 5: smallest user has 5)
-n_trials: 1                # random draws each result is averaged over (the notebook and the sweep)
+n_trials: 20                # random draws each result is averaged over (the notebook and the sweep)
 
 # --- Data ---
 dataset_dir: datasets/balabit/training_files   # relative to experiment_earl/
