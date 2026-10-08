@@ -134,7 +134,9 @@ Builds each user's concave hull from `anomaly_enroll_sessions` training sessions
 .venv/bin/python experiment_earl/src/10_hull_anomaly.py --user user9
 ```
 
-Only training sessions are used, so every session's owner is certain. Outputs, inside the run folder: `results/anomaly/sessions.csv` (every session scored), `results/anomaly/summary.csv` (FRR, FAR, EER per user and overall) and `figures/hull_anomaly.png`.
+Only training sessions are used, so every session's owner is certain. Outputs, inside the run folder: `results/anomaly/sessions.csv` (every session scored), `results/anomaly/summary.csv` (FRR, FAR, EER per user against all other users; the last row is the configured experiment), `results/anomaly/draws.csv` (each draw's users and rates) and `figures/hull_anomaly.png`.
+
+**Users in F–I.** Every profile is scored against every other user once; the experiment you configured is then simulated from those scores: in each of `n_trials` draws, `n_legitimate` users are the legitimate users (profiles) and `n_impostor` other users the impostors. FRR comes from the legitimate users' own held-out sessions, FAR from the drawn impostors' sessions only, and the reported FRR, FAR and EER are the mean ± std over the draws (draw 0 is the same draw as script 01). The per-user rows and bars still show each user against all 9 others.
 
 ### G. One-Class SVM anomaly test
 
@@ -145,7 +147,7 @@ The same test as F (same sessions, windows and number of registered sessions), b
 .venv/bin/python experiment_earl/src/11_ocsvm_anomaly.py --user user9
 ```
 
-It needs scikit-learn in `.venv` (`.venv/bin/pip install scikit-learn`). Outputs, inside the run folder: `results/ocsvm/sessions.csv`, `results/ocsvm/summary.csv` (FRR, FAR, EER per user and overall) and `figures/ocsvm_anomaly.png`. Compare its EER with F's to see which model separates users better.
+It needs scikit-learn in `.venv` (`.venv/bin/pip install scikit-learn`). Outputs, inside the run folder: `results/ocsvm/sessions.csv`, `results/ocsvm/summary.csv` (per user, last row = the configured experiment), `results/ocsvm/draws.csv` and `figures/ocsvm_anomaly.png`. Compare its EER with F's to see which model separates users better.
 
 ### H. DTW shape-matching anomaly test
 
@@ -156,7 +158,7 @@ The same test as F and G, with shape matching as the model. Each user's **shape 
 .venv/bin/python experiment_earl/src/12_dtw_anomaly.py --user user9  # one user, ~1 minute
 ```
 
-It saves each finished user, so an interrupted run continues where it stopped. Outputs, inside the run folder: `results/dtw/sessions.csv`, `results/dtw/summary.csv` and `figures/dtw_anomaly.png`.
+It saves each finished user, so an interrupted run continues where it stopped. Outputs, inside the run folder: `results/dtw/sessions.csv`, `results/dtw/summary.csv`, `results/dtw/draws.csv` and `figures/dtw_anomaly.png`.
 
 ### I. Registered sessions sweep: all three tests, 1 → 4 sessions
 
@@ -167,7 +169,7 @@ Reruns F, G and H with 1, 2, ... up to `anomaly_enroll_sessions` registered sess
 .venv/bin/python experiment_earl/src/13_enroll_sweep.py --method hull --method ocsvm      # the two fast ones, ~30 seconds
 ```
 
-It saves each finished (method, sessions, user) cell, so an interrupted run continues. Outputs, inside the run folder: `results/enroll_sweep/sessions.csv`, `results/enroll_sweep/summary.csv` (FRR, FAR, EER per method, session count and user; `all users` rows are pooled), `figures/enroll_sweep_lines.png` (FRR, FAR and EER against registered sessions, one line per method) and `figures/enroll_sweep_heatmap.png` (EER per method × sessions, 0–1 in 0.1 steps). Compare methods by **EER**: FRR and FAR depend on each method's fixed flag rule (DTW flags nearly every session at the 20% rule).
+It saves each finished (method, sessions, user) cell, so an interrupted run continues. Outputs, inside the run folder: `results/enroll_sweep/sessions.csv`, `results/enroll_sweep/summary.csv` (FRR, FAR, EER per method, session count and user; the last row of each block is the configured experiment), `results/enroll_sweep/draws.csv`, `figures/enroll_sweep_lines.png` (FRR, FAR and EER against registered sessions, one line per method) and `figures/enroll_sweep_heatmap.png` (EER per method × sessions, 0–1 in 0.1 steps, mean ± std over the draws). Compare methods by **EER**: FRR and FAR depend on each method's fixed flag rule (DTW flags nearly every session at the 20% rule).
 
 ### Working with an older run
 
@@ -206,10 +208,10 @@ experiment_earl/runs/<run name>/
 │   ├── sweep/saturation.csv             where each curve flattens and jumps             (B)
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)
 │   └── summary.csv                      threshold of the single trial                   (C)
-├── results/anomaly/   sessions.csv, summary.csv: hull anomaly test                (F)
-├── results/ocsvm/     sessions.csv, summary.csv: One-Class SVM anomaly test       (G)
-├── results/dtw/       sessions.csv, summary.csv: DTW shape-matching anomaly test  (H)
-├── results/enroll_sweep/  sessions.csv, summary.csv: all three tests, 1–4 sessions (I)
+├── results/anomaly/   sessions.csv, summary.csv, draws.csv: hull anomaly test     (F)
+├── results/ocsvm/     sessions.csv, summary.csv, draws.csv: One-Class SVM test    (G)
+├── results/dtw/       sessions.csv, summary.csv, draws.csv: DTW anomaly test      (H)
+├── results/enroll_sweep/  sessions.csv, summary.csv, draws.csv: all three, 1–4 sessions (I)
 ├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)

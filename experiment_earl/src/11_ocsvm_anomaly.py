@@ -17,6 +17,7 @@ from sklearn.svm import OneClassSVM
 
 cfg_mod = import_module("00_config")
 chunk_mod = import_module("03_chunk_shapes")
+hull_mod = import_module("10_hull_anomaly")
 
 FEATURES = {
     "dx": "net horizontal movement (px)",
@@ -121,23 +122,13 @@ def main() -> None:
         print(f"{user} done", flush=True)
 
     sessions = pd.DataFrame(rows)
-    summary = []
-    for user, g in list(sessions.groupby("profile")) + [("all users", sessions)]:
-        gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
-        summary.append({
-            "profile": user, "genuine_sessions": len(gen), "impostor_sessions": len(imp),
-            "genuine_outside": round(gen["outside_share"].mean(), 4),
-            "impostor_outside": round(imp["outside_share"].mean(), 4),
-            "frr": round(gen["session_flagged"].mean(), 4),
-            "far": round(1 - imp["session_flagged"].mean(), 4),
-            "eer": round(equal_error_rate(gen["worst_window_score"].to_numpy(), imp["worst_window_score"].to_numpy()), 4),
-        })
-    summary = pd.DataFrame(summary)
+    summary, draws = hull_mod.summarize(sessions, config, "worst_window_score", equal_error_rate)
 
     out = run / "results" / "ocsvm"
     out.mkdir(parents=True, exist_ok=True)
     sessions.to_csv(out / "sessions.csv", index=False)
     summary.to_csv(out / "summary.csv", index=False)
+    draws.to_csv(out / "draws.csv", index=False)
 
     figures = run / "figures"
     figures.mkdir(exist_ok=True)
@@ -151,7 +142,7 @@ def main() -> None:
     axes[0].set_ylabel("density")
     axes[0].legend(fontsize=8)
     axes[0].set_title("Genuine vs impostor sessions")
-    per_user = summary[summary["profile"] != "all users"].set_index("profile")
+    per_user = summary.iloc[:-1].set_index("profile")
     x = np.arange(len(per_user))
     axes[1].bar(x - 0.2, per_user["frr"] * 100, 0.4, color="tab:blue", label="own sessions flagged (FRR)")
     axes[1].bar(x + 0.2, per_user["far"] * 100, 0.4, color="tab:red", label="impostor sessions not flagged (FAR)")
@@ -161,18 +152,15 @@ def main() -> None:
     axes[1].set_ylabel("%  (EER on top)")
     axes[1].set_ylim(0, 110)
     axes[1].legend(fontsize=8, loc="center right")
-    axes[1].set_title("Per user")
+    axes[1].set_title("Per user (profile vs all other users)")
     pooled = summary.iloc[-1]
     fig.suptitle(f"One-Class SVM anomaly test ({', '.join(config['ocsvm_features'])}): model from {k} sessions, "
-                 f"window {config['anomaly_window']}; EER {pooled['eer']:.1%}")
+                 f"window {config['anomaly_window']}; {pooled['profile']}: EER {pooled['eer']:.1%} ± {pooled['eer_std']:.1%}")
     fig.tight_layout()
     fig.savefig(figures / "ocsvm_anomaly.png", dpi=130)
     plt.close(fig)
 
-    for _, r in summary.iterrows():
-        print(f"{r['profile']:9} own flagged (FRR) {r['frr']:6.1%} of {r['genuine_sessions']:3} | impostor missed (FAR) "
-              f"{r['far']:6.1%} of {r['impostor_sessions']:3} | strokes outside: own {r['genuine_outside']:.1%}, "
-              f"impostor {r['impostor_outside']:.1%} | EER {r['eer']:.1%}")
+    hull_mod.print_summary(summary, "outside")
     print(f"Output: {out}, {figures / 'ocsvm_anomaly.png'}")
 
 

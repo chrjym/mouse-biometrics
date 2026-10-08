@@ -76,6 +76,7 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 
 ### Hull anomaly test (`src/10_hull_anomaly.py`)
 
+- **Users (all anomaly tests 10–13, user request 2026-10-08):** every profile is scored once against every other user's sessions, then the configured experiment is simulated from those rows by `10.summarize` / `10.simulate`: per draw t in `range(n_trials)`, `01.draw_users(config, seed + t)` gives `n_legitimate` profiles and `n_impostor` impostors (draw 0 = script 01's draw); FRR from the legitimate users' own sessions, FAR from the drawn impostors only, EER pooled over the draw. Headline = mean ± std over draws (last row of `summary.csv`; each draw in `draws.csv`). Per-user rows and bars stay "user vs all 9 others". No recomputation per draw.
 - Training sessions only. Hull from `anomaly_enroll_sessions` sessions; sliding windows of `anomaly_window` chunk end points; a window is flagged when > `anomaly_outside_share` are outside; a session is flagged if any window is. Genuine = leave-one-out over the user's own training sessions (FRR); impostor = all other users' training sessions vs the user's hull (FAR); EER on the worst-window score.
 - First result (4 sessions, window 30, 20%): FRR 24.6%, FAR 59.2%, EER 43.8% overall; best user9 (EER 15.8%) and user21 (20.9%); user15/16 have FAR ~97–100% because their large-screen hulls contain other users' strokes. Own sessions have ~3.7% of strokes outside vs 6.2% for others.
 
@@ -92,8 +93,8 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 ### Registered sessions sweep (`src/13_enroll_sweep.py`)
 
 - Reruns 10, 11 and 12 (method table `METHODS`, reusing their functions) with 1 … `anomaly_enroll_sessions` registered sessions. `random.sample` on these small lists returns a prefix of the same draw for any k, so step k registers exactly what scripts 10–12 would with k sessions (step 4 reproduces their EERs). `--method` limits methods; progress per (method, k, user) in `results/enroll_sweep/progress.pkl`. ~30 s for hull + SVM, ~25 min for DTW.
-- Outputs: `results/enroll_sweep/{sessions,summary}.csv`, `figures/enroll_sweep_lines.png` (FRR/FAR/EER vs sessions, line per method), `figures/enroll_sweep_heatmap.png` (EER method × sessions, 0–1 in 0.1 steps).
-- Result (1 → 4 sessions): EER barely moves for any method: hull 44.9/48.4/48.2/43.8%, SVM 28.0/29.4/28.0/29.6%, DTW 44.5/39.9/42.9/43.7%. More sessions trade FRR for FAR (hull FRR 90.8 → 24.6%, FAR 19.5 → 59.2%; SVM FRR 32.3 → 7.7%, FAR 26.8 → 37.4%) without separating users better.
+- Outputs: `results/enroll_sweep/{sessions,summary,draws}.csv`, `figures/enroll_sweep_lines.png` (FRR/FAR/EER vs sessions, line per method), `figures/enroll_sweep_heatmap.png` (EER method × sessions, 0–1 in 0.1 steps, mean ± std over draws).
+- Result, 3 legit + 2 impostors, 20 draws (1 → 4 sessions): EER barely moves for any method: hull 44.6/49.6/46.3/44.5%, SVM 24.8/26.4/25.1/27.7%, DTW 45.7/41.8/44.3/46.5%, each ± 13–20% between draws (all-users pooled before draws: hull 44.9/48.4/48.2/43.8%, SVM 28.0/29.4/28.0/29.6%, DTW 44.5/39.9/42.9/43.7%). More sessions trade FRR for FAR (hull FRR 89.8 → 27.5%, FAR 14.5 → 56.5%; SVM FRR 33.4 → 8.2%, FAR 24.2 → 34.2%) without separating users better.
 
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 

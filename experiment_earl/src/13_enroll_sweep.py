@@ -62,14 +62,8 @@ def evaluate(method: dict, data: dict, names: dict, user: str, k: int, config: d
     return rows
 
 
-def rates(g: pd.DataFrame, method: dict) -> dict:
-    gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
-    worst_gen, worst_imp = gen[method["worst"]].to_numpy(), imp[method["worst"]].to_numpy()
-    eer = (hull_mod.equal_error_rate(worst_gen, worst_imp) if method["high_is_anomalous"]
-           else svm_mod.equal_error_rate(worst_gen, worst_imp))
-    return {"genuine_sessions": len(gen), "impostor_sessions": len(imp),
-            "frr": round(gen["session_flagged"].mean(), 4), "far": round(1 - imp["session_flagged"].mean(), 4),
-            "eer": round(eer, 4)}
+def eer_function(method: dict):
+    return hull_mod.equal_error_rate if method["high_is_anomalous"] else svm_mod.equal_error_rate
 
 
 def main() -> None:
@@ -108,16 +102,19 @@ def main() -> None:
 
     sessions = pd.DataFrame([{"method": m, "enroll_sessions": k, **row}
                              for m in methods for k in steps for u in users for row in done[(m, k, u)]])
-    summary = []
+    summary, draws = [], []
     for (m, k), g in sessions.groupby(["method", "enroll_sessions"], sort=False):
-        summary.append({"method": m, "enroll_sessions": k, "profile": "all users", **rates(g, METHODS[m])})
-        summary += [{"method": m, "enroll_sessions": k, "profile": u, **rates(gu, METHODS[m])}
-                    for u, gu in g.groupby("profile")]
-    summary = pd.DataFrame(summary)
+        per_user, per_draw = hull_mod.summarize(g, config, METHODS[m]["worst"], eer_function(METHODS[m]))
+        summary.append(per_user.assign(method=m, enroll_sessions=k))
+        draws.append(per_draw.assign(method=m, enroll_sessions=k))
+    first = ["method", "enroll_sessions"]
+    summary = pd.concat(summary)[first + list(per_user.columns)]
+    draws = pd.concat(draws)[first + list(per_draw.columns)]
     sessions.to_csv(out / "sessions.csv", index=False)
     summary.to_csv(out / "summary.csv", index=False)
+    draws.to_csv(out / "draws.csv", index=False)
 
-    pooled = summary[summary["profile"] == "all users"]
+    pooled = summary.groupby(first, sort=False).tail(1)  # the configured experiment, mean over draws
     figures = run / "figures"
     figures.mkdir(exist_ok=True)
     fig, axes = plt.subplots(1, 3, figsize=(14, 4.2), sharey=True)
@@ -125,7 +122,8 @@ def main() -> None:
                                  ("own sessions flagged (FRR)", "impostor sessions not flagged (FAR)", "EER")):
         for m in methods:
             p = pooled[pooled["method"] == m]
-            ax.plot(p["enroll_sessions"], p[metric] * 100, marker="o", label=m)
+            ax.errorbar(p["enroll_sessions"], p[metric] * 100, yerr=p[f"{metric}_std"].fillna(0) * 100,
+                        marker="o", capsize=3, label=m)
         ax.set_title(label)
         ax.set_xlabel("registered sessions")
         ax.set_xticks(list(steps))
@@ -133,29 +131,32 @@ def main() -> None:
         ax.grid(alpha=0.3)
     axes[0].set_ylabel("% of sessions")
     axes[0].legend(fontsize=8)
-    fig.suptitle(f"Anomaly tests by registered sessions (window {config['anomaly_window']}, all users pooled); "
-                 f"FRR/FAR at each method's fixed flag rule, EER over all cuts")
+    fig.suptitle(f"Anomaly tests by registered sessions: {pooled['profile'].iloc[0]}, mean ± std "
+                 f"(window {config['anomaly_window']}); FRR/FAR at each method's fixed flag rule, EER over all cuts")
     fig.tight_layout()
     fig.savefig(figures / "enroll_sweep_lines.png", dpi=130)
     plt.close(fig)
 
     grid = pooled.pivot(index="method", columns="enroll_sessions", values="eer").reindex(methods)
+    spread = pooled.pivot(index="method", columns="enroll_sessions", values="eer_std").reindex(methods)
     fig, ax = plt.subplots(figsize=(1.6 * len(steps) + 2.5, 0.8 * len(methods) + 1.6))
     image = ax.imshow(grid.to_numpy(), cmap="RdYlGn_r",
                       norm=BoundaryNorm(np.linspace(0, 1, 11), plt.get_cmap("RdYlGn_r").N), aspect="auto")
     for (i, j), value in np.ndenumerate(grid.to_numpy()):
-        ax.text(j, i, f"{value:.2f}", ha="center", va="center", fontsize=9)
+        std = spread.to_numpy()[i, j]
+        ax.text(j, i, f"{value:.2f}" + ("" if np.isnan(std) else f"\n± {std:.2f}"), ha="center", va="center", fontsize=9)
     ax.set_xticks(range(len(steps)), list(steps))
     ax.set_yticks(range(len(methods)), methods)
     ax.set_xlabel("registered sessions")
-    ax.set_title("EER (0 = perfect, 0.5 = chance)")
+    ax.set_title(f"EER, {pooled['profile'].iloc[0]} (0 = perfect, 0.5 = chance)")
     fig.colorbar(image, ax=ax, ticks=np.linspace(0, 1, 11))
     fig.tight_layout()
     fig.savefig(figures / "enroll_sweep_heatmap.png", dpi=130)
     plt.close(fig)
 
     for _, r in pooled.iterrows():
-        print(f"{r['method']:5} {r['enroll_sessions']} sessions | FRR {r['frr']:6.1%} | FAR {r['far']:6.1%} | EER {r['eer']:6.1%}")
+        print(f"{r['method']:5} {r['enroll_sessions']} sessions | FRR {r['frr']:6.1%} ± {r['frr_std']:5.1%} | "
+              f"FAR {r['far']:6.1%} ± {r['far_std']:5.1%} | EER {r['eer']:6.1%} ± {r['eer_std']:5.1%}")
     print(f"Output: {out}, {figures / 'enroll_sweep_lines.png'}, {figures / 'enroll_sweep_heatmap.png'}")
 
 

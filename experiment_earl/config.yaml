@@ -5,12 +5,12 @@
 
 run_name: experiment1       # label for this config's folder under runs/ (a short hash of the settings is appended)
 
-# --- Experiment size (single trial 01-05 and the notebook) ---
+# --- Experiment size (single trial 01-05, the notebook and the anomaly tests 10-13) ---
 seed: 934                   # starting number of every random draw; the same seed gives the same draw
-n_legitimate: 3            # users whose shapes form the legitimate profiles
+n_legitimate: 3            # users whose shapes form the legitimate profiles (anomaly tests: profiles per draw)
 n_impostor: 2              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
 sessions_per_user: 5       # sessions per user; the notebook tests 1, 2, ... up to this (max: printed by every script)
-n_trials: 20                # random draws each result is averaged over (the notebook and the sweep)
+n_trials: 20                # random draws each result is averaged over (the notebook, the sweep and the anomaly tests)
 
 # --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
 # A session belongs to the user whose folder it is in. No label file is used.

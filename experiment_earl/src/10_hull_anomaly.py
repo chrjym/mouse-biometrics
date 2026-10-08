@@ -15,6 +15,7 @@ from shapely import MultiPoint, concave_hull, contains_xy
 
 cfg_mod = import_module("00_config")
 chunk_mod = import_module("03_chunk_shapes")
+sample_mod = import_module("01_sample_users")
 
 
 def end_points(config: dict, user: str, name: str) -> np.ndarray:
@@ -46,6 +47,63 @@ def equal_error_rate(genuine: np.ndarray, impostor: np.ndarray) -> float:
     rates = np.array([(np.mean(genuine >= t), np.mean(impostor < t)) for t in cuts])  # (FRR, FAR)
     i = int(np.argmin(np.abs(rates[:, 0] - rates[:, 1])))
     return float(rates[i].mean())
+
+
+def simulate(sessions: pd.DataFrame, config: dict, worst: str, eer) -> pd.DataFrame:
+    """The experiment as configured: in each of `n_trials` draws (seed, seed + 1, ...; draw 0 = script 01's draw),
+    `n_legitimate` users are the profiles and `n_impostor` other users the impostors. FRR from the legitimate users'
+    own held-out sessions, FAR from the drawn impostors' sessions against those profiles, EER on `worst`, all pooled
+    over the legitimate users of the draw. Every profile already scored every other user, so a draw only picks rows."""
+    if config["n_trials"] < 1:
+        raise SystemExit("n_trials must be at least 1")
+    rows = []
+    for trial in range(config["n_trials"]):
+        legitimate, impostors = sample_mod.draw_users(config, config["seed"] + trial)
+        g = sessions[sessions["profile"].isin(legitimate)
+                     & ((sessions["kind"] == "genuine") | sessions["session_user"].isin(impostors))]
+        gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
+        rows.append({"trial": trial, "legitimate": " ".join(legitimate), "impostor": " ".join(impostors),
+                     "genuine_sessions": len(gen), "impostor_sessions": len(imp),
+                     "frr": gen["session_flagged"].mean(), "far": 1 - imp["session_flagged"].mean(),
+                     "eer": eer(gen[worst].to_numpy(), imp[worst].to_numpy())})
+    return pd.DataFrame(rows)
+
+
+def draws_row(draws: pd.DataFrame, config: dict) -> dict:
+    """Mean and spread over the draws; the std is NaN with one draw."""
+    row = {"profile": f"{config['n_legitimate']} legit + {config['n_impostor']} impostors, {len(draws)} draws",
+           "genuine_sessions": round(draws["genuine_sessions"].mean(), 1),
+           "impostor_sessions": round(draws["impostor_sessions"].mean(), 1)}
+    for rate in ("frr", "far", "eer"):
+        row[rate], row[f"{rate}_std"] = round(draws[rate].mean(), 4), round(draws[rate].std(), 4)
+    return row
+
+
+def summarize(sessions: pd.DataFrame, config: dict, worst: str, eer) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Per user: the profile against all other users' sessions. Last row: the configured experiment (mean over draws)."""
+    summary = []
+    for user, g in sessions.groupby("profile"):
+        gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
+        summary.append({
+            "profile": user, "genuine_sessions": len(gen), "impostor_sessions": len(imp),
+            "genuine_outside": round(gen["outside_share"].mean(), 4),
+            "impostor_outside": round(imp["outside_share"].mean(), 4),
+            "frr": round(gen["session_flagged"].mean(), 4),        # own session flagged at least once
+            "far": round(1 - imp["session_flagged"].mean(), 4),    # impostor session never flagged
+            "eer": round(eer(gen[worst].to_numpy(), imp[worst].to_numpy()), 4),
+        })
+    draws = simulate(sessions, config, worst, eer)
+    return pd.DataFrame(summary + [draws_row(draws, config)]), draws
+
+
+def print_summary(summary: pd.DataFrame, what: str) -> None:
+    for _, r in summary.iloc[:-1].iterrows():
+        print(f"{r['profile']:9} own flagged (FRR) {r['frr']:6.1%} of {int(r['genuine_sessions']):3} | impostor missed (FAR) "
+              f"{r['far']:6.1%} of {int(r['impostor_sessions']):3} | strokes {what}: own {r['genuine_outside']:.1%}, "
+              f"impostor {r['impostor_outside']:.1%} | EER {r['eer']:.1%}")
+    r = summary.iloc[-1]
+    print(f"{r['profile']}: FRR {r['frr']:.1%} ± {r['frr_std']:.1%} | FAR {r['far']:.1%} ± {r['far_std']:.1%} | "
+          f"EER {r['eer']:.1%} ± {r['eer_std']:.1%}")
 
 
 def main() -> None:
@@ -82,23 +140,13 @@ def main() -> None:
                           **score(hull, ends[(other, n)], config)} for n in names[other]]
 
     sessions = pd.DataFrame(rows)
-    summary = []
-    for user, g in list(sessions.groupby("profile")) + [("all users", sessions)]:
-        gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
-        summary.append({
-            "profile": user, "genuine_sessions": len(gen), "impostor_sessions": len(imp),
-            "genuine_outside": round(gen["outside_share"].mean(), 4),
-            "impostor_outside": round(imp["outside_share"].mean(), 4),
-            "frr": round(gen["session_flagged"].mean(), 4),        # own session flagged at least once
-            "far": round(1 - imp["session_flagged"].mean(), 4),    # impostor session never flagged
-            "eer": round(equal_error_rate(gen["max_window_outside"].to_numpy(), imp["max_window_outside"].to_numpy()), 4),
-        })
-    summary = pd.DataFrame(summary)
+    summary, draws = summarize(sessions, config, "max_window_outside", equal_error_rate)
 
     out = run / "results" / "anomaly"
     out.mkdir(parents=True, exist_ok=True)
     sessions.to_csv(out / "sessions.csv", index=False)
     summary.to_csv(out / "summary.csv", index=False)
+    draws.to_csv(out / "draws.csv", index=False)
 
     figures = run / "figures"
     figures.mkdir(exist_ok=True)
@@ -112,7 +160,7 @@ def main() -> None:
     axes[0].set_ylabel("density")
     axes[0].legend(fontsize=8)
     axes[0].set_title("Genuine vs impostor sessions")
-    per_user = summary[summary["profile"] != "all users"].set_index("profile")
+    per_user = summary.iloc[:-1].set_index("profile")
     x = np.arange(len(per_user))
     axes[1].bar(x - 0.2, per_user["frr"] * 100, 0.4, color="tab:blue", label="own sessions flagged (FRR)")
     axes[1].bar(x + 0.2, per_user["far"] * 100, 0.4, color="tab:red", label="impostor sessions not flagged (FAR)")
@@ -120,17 +168,16 @@ def main() -> None:
     axes[1].set_ylabel("%")
     axes[1].set_ylim(0, 105)
     axes[1].legend(fontsize=8)
-    axes[1].set_title("Per user")
+    axes[1].set_title("Per user (profile vs all other users)")
+    pooled = summary.iloc[-1]
     fig.suptitle(f"Concave-hull anomaly test: hull from {k} sessions, window {config['anomaly_window']}, "
-                 f"flag > {config['anomaly_outside_share']:.0%} outside")
+                 f"flag > {config['anomaly_outside_share']:.0%} outside; {pooled['profile']}: "
+                 f"EER {pooled['eer']:.1%} ± {pooled['eer_std']:.1%}")
     fig.tight_layout()
     fig.savefig(figures / "hull_anomaly.png", dpi=130)
     plt.close(fig)
 
-    for _, r in summary.iterrows():
-        print(f"{r['profile']:9} own flagged (FRR) {r['frr']:6.1%} of {r['genuine_sessions']:3} | impostor missed (FAR) "
-              f"{r['far']:6.1%} of {r['impostor_sessions']:3} | strokes outside: own {r['genuine_outside']:.1%}, "
-              f"impostor {r['impostor_outside']:.1%} | EER {r['eer']:.1%}")
+    print_summary(summary, "outside")
     print(f"Output: {out}, {figures / 'hull_anomaly.png'}")
 
 

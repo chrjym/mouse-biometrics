@@ -45,19 +45,19 @@ runs/baseline_2707e0/
 13_enroll_sweep      reruns 10, 11 and 12 with 1 up to anomaly_enroll_sessions registered sessions
 ```
 
-Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
+Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself. The **anomaly tests** (10–13) use `n_legitimate`, `n_impostor` and `n_trials`: each draw picks the legitimate users (profiles) and impostor users, and the headline FRR, FAR and EER are the mean ± std over the draws.
 
 ## Data and sampling
 
 | Setting | Default | Used by | Meaning |
 |---|---|---|---|
 | `run_name` | `baseline` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
-| `seed` | 42 | 01, 02, 06 | Starting number for every random choice (which users, which sessions). The same seed gives the same draw, so a result can be repeated. The sweep uses `seed`, `seed + 1`, ... for its draws. |
+| `seed` | 934 | 01, 02, 06, 10–13 | Starting number for every random choice (which users, which sessions). The same seed gives the same draw, so a result can be repeated. The sweep and the anomaly tests use `seed`, `seed + 1`, ... for their draws (draw 0 = script 01's draw). |
 | `dataset_dir` | `datasets/balabit/training_files` | all | Balabit training sessions, relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
 | `test_dir` | `datasets/balabit/test_files` | all | Balabit test sessions, relative to `experiment_earl/`. Also counted by folder: every session in `test_files/user12/` is user12. |
 | `use_test_files` | true | all | Adds each user's `test_files` sessions after their training sessions (up to 114 per user instead of 5). |
-| `n_legitimate` | 3 | 01, notebook | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
-| `n_impostor` | 2 | 01, notebook | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
+| `n_legitimate` | 3 | 01, notebook, 10–13 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. In the anomaly tests (10–13) they are the profiles of each draw: FRR comes from their own held-out sessions. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
+| `n_impostor` | 2 | 01, notebook, 10–13 | How many other users act as impostors in a single trial. In the anomaly tests (10–13) only these users' sessions count for FAR in each draw. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
 | `sessions_per_user` | 5 | 02, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. A user's sessions are ordered training first, then test, so steps up to 5 use training sessions only. At most 114 with `use_test_files` (user20 has 7 + 107), 5 without; every script prints the limit. |
 
 ## Chunking (script 03)
