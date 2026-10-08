@@ -29,7 +29,7 @@ Suggested format per entry:
 **Decisions:**
 - Balabit `test_files` must be part of the experiments, not only training files.
 - "All data" means all of Balabit (training + test files), not SapiMouse.
-- Group decision: use the raw data only. A session belongs to the user whose folder it is in, for training and test files alike (1,676 sessions, 114–254 per user). Balabit's `public_labels.csv` is not used. A label-based version (genuine/impostor/unlabeled test sessions, and the FAR/FRR/EER test evaluation built on it) was tried the same day and dropped.
+- Group decision: use the raw data only. A session belongs to the user whose folder it is in, for training and test files alike (1,676 sessions, 114–253 per user). Balabit's `public_labels.csv` is not used. A label-based version (genuine/impostor/unlabeled test sessions, and the FAR/FRR/EER test evaluation built on it) was tried the same day and dropped.
 
 **Open questions:**
 - Balabit published the test folders as "sessions claimed to be this user", and its public labels mark about half of the labeled ones as someone else. If the adviser asks how the folder-owner rule handles this, the label-based version is in git history (commits `a5a170c`–`35781ab`).
