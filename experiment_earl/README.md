@@ -2,7 +2,7 @@
 
 This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
 
-It uses **all of Balabit** (adviser, 2026-10-08): training files, plus test files according to Balabit's own labels. Test sessions labeled genuine add to their user's sessions (up to 30 per user); test sessions labeled impostor are scored as impostor attempts; unlabeled ones are left out. Two settings in `config.yaml`, `test_genuine_sessions` and `test_impostor_attempts`, switch this on or off.
+It uses **all of Balabit** (adviser, 2026-10-08): training files, plus test files according to Balabit's own labels. Test sessions labeled genuine add to their user's sessions; unlabeled ones are assumed to belong to the user whose folder they are in and are added after them (up to 87 sessions per user); test sessions labeled impostor are scored as impostor attempts. Three settings in `config.yaml`, `test_genuine_sessions`, `test_unlabeled_sessions` and `test_impostor_attempts`, switch each part on or off.
 
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -143,7 +143,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Message | Fix |
 |---|---|
 | `... users do not fit in the 10 Balabit users` | Lower `n_legitimate` or `n_impostor`: they must add up to 10 or less. |
-| `sessions_per_user = N but some user has only M sessions` | Lower `sessions_per_user` to M or less: 30 with `test_genuine_sessions`, 5 without. |
+| `sessions_per_user = N but some user has only M sessions` | Lower `sessions_per_user` to M or less (87 with all test sessions, 30 without unlabeled ones, 5 with training files only). |
 | `KeyError` in the notebook or sweep right after the draws | `n_trials` is 0; set it to at least 1. |
 | `No run '...' under .../runs` | The `--run` name is wrong; the message lists the existing runs. |
 | `ModuleNotFoundError: numba` (or `nbformat`) | Use `.venv/bin/python`, or redo the setup in section 1. |

@@ -46,11 +46,12 @@ Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `session
 | `run_name` | `baseline` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
 | `seed` | 42 | 01, 02, 06 | Starting number for every random choice (which users, which sessions). The same seed gives the same draw, so a result can be repeated. The sweep uses `seed`, `seed + 1`, ... for its draws. |
 | `dataset_dir` | `datasets/balabit/training_files` | all | Balabit training sessions, relative to `experiment_earl/`. Every session in a user's folder is that user (genuine). Do not point it at `test_files`: those folders mix in impostors. |
-| `test_genuine_sessions` | true | 02, 06, notebook | Test sessions that Balabit labels genuine (`is_illegal = 0` in `labels_file`) join their user's sessions, after the training ones. Raises the session limit from 5 to 30 per user. |
+| `test_genuine_sessions` | true | 02, 06, notebook | Test sessions that Balabit labels genuine (`is_illegal = 0` in `labels_file`) join their user's sessions, after the training ones. Raises the session limit from 5 to 30 per user (87 with `test_unlabeled_sessions`). |
+| `test_unlabeled_sessions` | true | 02, 06, notebook | Unlabeled test sessions are assumed to belong to the user whose folder they are in and join that user's sessions after the labeled ones (up to 87 per user). Unverified: among labeled test sessions, about half are impostors. |
 | `test_impostor_attempts` | true | 04, 06, notebook | Test sessions that Balabit labels impostor (`is_illegal = 1`) are scored as impostor attempts against the profile of the user whose folder they are in. |
 | `n_legitimate` | 3 | 01, notebook | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
 | `n_impostor` | 2 | 01, notebook | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
-| `sessions_per_user` | 3 | 02, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 30 with `test_genuine_sessions` (user9 has 7 training + 23 genuine test sessions), 5 without. Steps up to the user's training count use training sessions; later steps add test sessions. |
+| `sessions_per_user` | 3 | 02, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 87 with all test sessions (user9: 7 training + 23 labeled genuine + 57 unlabeled), 30 without the unlabeled ones, 5 with training files only. Steps up to the user's training count use training sessions; later steps add test sessions. |
 
 ## Chunking (script 03)
 
@@ -95,9 +96,9 @@ The code never decides this. Balabit does, through `public_labels.csv`:
 | Training sessions | 65 | Always genuine: the folder's own user. |
 | Test sessions labeled genuine (`is_illegal = 0`) | 411 | Join their user's sessions when `test_genuine_sessions` is true. |
 | Test sessions labeled impostor (`is_illegal = 1`) | 405 | Impostor attempts on the folder's user when `test_impostor_attempts` is true. |
-| Unlabeled test sessions | 795 | Always left out: nobody knows whose they are. |
+| Unlabeled test sessions | 795 | Assumed to be the folder's user and join their sessions when `test_unlabeled_sessions` is true; left out when false. |
 
-Every script prints these counts when it starts. Set both settings to false to use training files only (the earlier behaviour).
+Every script prints these counts and the resulting session limit when it starts. A user's sessions are always ordered training, then labeled genuine, then unlabeled, so the first steps use verified data only. Set all three settings to false to use training files only (the earlier behaviour).
 
 ## Test-set evaluation (script 09)
 

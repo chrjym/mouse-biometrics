@@ -9,7 +9,7 @@ run_name: earl_experiment_with_10_sessions         # label for this config's fol
 seed: 38                   # starting number of every random draw; the same seed gives the same draw
 n_legitimate: 3            # users whose shapes form the legitimate profiles
 n_impostor: 2              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
-sessions_per_user: 5       # sessions per user; the notebook tests 1, 2, ... up to this (max 30 with test_genuine_sessions, else 5)
+sessions_per_user: 5       # sessions per user; the notebook tests 1, 2, ... up to this (max: printed by every script)
 n_trials: 20                # random draws each result is averaged over (the notebook and the sweep)
 
 # --- Data: all of Balabit (adviser, 2026-10-08) ---
@@ -17,7 +17,8 @@ n_trials: 20                # random draws each result is averaged over (the not
 dataset_dir: datasets/balabit/training_files   # relative to experiment_earl/; every training session is its folder's user
 test_genuine_sessions: true    # test sessions labeled genuine (is_illegal 0) join their user's sessions (up to 30 per user)
 test_impostor_attempts: true   # test sessions labeled impostor (is_illegal 1) are scored as attempts on that folder's user
-                               # unlabeled test sessions are always left out: nobody knows whose they are
+test_unlabeled_sessions: true  # unlabeled test sessions are assumed to be their folder's user and join it after the labeled
+                               # ones (unverified: about half of the labeled test sessions turned out to be impostors)
 
 # --- Chunking (03): cut a session into strokes ---
 pause_gap_s: 0.5           # a pause longer than this many seconds starts a new chunk (clicks also split chunks)

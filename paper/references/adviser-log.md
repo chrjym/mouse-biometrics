@@ -28,11 +28,12 @@ Suggested format per entry:
 
 **Decisions:**
 - Balabit `test_files` must be part of the experiments, not only training files.
-- Test sessions can only be used where their label allows it: `public_labels.csv` marks 411 genuine and 405 impostor test sessions; 795 are unlabeled, so their true user is unknown.
+- "All data" means all of Balabit (training + test files), not SapiMouse.
+- Labeled test sessions follow `public_labels.csv`: 411 genuine sessions join their user's sessions, 405 impostor sessions are scored as impostor attempts.
+- Group decision: the 795 unlabeled test sessions are assumed to belong to the user whose folder they are in (`test_unlabeled_sessions`). This is an assumption, not a label: among labeled test sessions about half are impostors, so results that use unlabeled sessions should say so.
 
 **Open questions:**
-- Does "all data" also mean SapiMouse (120 users), or only all of Balabit?
-- How to use the 795 unlabeled test sessions, which cannot be counted as genuine or impostor.
+- Whether the adviser accepts the folder-owner assumption for unlabeled test sessions, or prefers them reported separately.
 
 ---
 

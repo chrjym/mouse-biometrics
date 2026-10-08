@@ -86,22 +86,26 @@ def load_labels(config: dict) -> dict[str, int]:
     return _LABELS[path]
 
 
-def _test_sessions(config: dict, user: str, label: int) -> list[str]:
+def _test_sessions(config: dict, user: str, label: int | None) -> list[str]:
+    """Test sessions in `user`'s folder with this label (None = unlabeled)."""
     labels = load_labels(config)
     folder = ROOT / config["test_dir"] / user
     return sorted(p.name for p in folder.iterdir() if labels.get(p.name) == label) if folder.exists() else []
 
 
 def session_pool(config: dict, user: str, seed: int | None = None) -> list[tuple[str, str]]:
-    """(folder, session name) of every session known to be `user`'s: training sessions first, then, with
-    `test_genuine_sessions`, the test sessions Balabit labels genuine. With `seed`, each part is shuffled on its
-    own, so the first sessions of the pool are always the long training ones and step k+1 contains step k."""
+    """(folder, session name) of every session counted as `user`'s, in this order: training sessions; with
+    `test_genuine_sessions`, test sessions Balabit labels genuine; with `test_unlabeled_sessions`, unlabeled test
+    sessions in the user's folder (assumed to be the folder's user). With `seed`, each part is shuffled on its own,
+    so the verified sessions always come first and step k+1 contains step k."""
     train = [p.name for p in list_sessions(config, user)]
-    test = _test_sessions(config, user, 0) if config.get("test_genuine_sessions") else []
+    genuine = _test_sessions(config, user, 0) if config.get("test_genuine_sessions") else []
+    unlabeled = _test_sessions(config, user, None) if config.get("test_unlabeled_sessions") else []
     if seed is not None:
         random.Random(f"{seed}-{user}").shuffle(train)
-        random.Random(f"{seed}-{user}-test").shuffle(test)
-    return [(config["dataset_dir"], n) for n in train] + [(config["test_dir"], n) for n in test]
+        random.Random(f"{seed}-{user}-test").shuffle(genuine)
+        random.Random(f"{seed}-{user}-unlabeled").shuffle(unlabeled)
+    return [(config["dataset_dir"], n) for n in train] + [(config["test_dir"], n) for n in genuine + unlabeled]
 
 
 def impostor_attempts(config: dict, user: str) -> list[str]:
@@ -120,12 +124,13 @@ def describe_data(config: dict) -> str:
     train = sum(len(list_sessions(config, u)) for u in users)
     genuine = sum(len(_test_sessions(config, u, 0)) for u in users)
     impostor = sum(len(_test_sessions(config, u, 1)) for u in users)
-    total = sum(len(list((ROOT / config["test_dir"] / u).iterdir())) for u in users)
+    unlabeled = sum(len(_test_sessions(config, u, None)) for u in users)
     used = lambda key: "used" if config.get(key) else "not used"
+    unlabeled_use = "assumed to be the folder's user" if config.get("test_unlabeled_sessions") else "left out"
     return (f"Data (labels from {config['labels_file']}): {len(users)} users, {train} training sessions; "
             f"test files: {genuine} labeled genuine ({used('test_genuine_sessions')}), "
             f"{impostor} labeled impostor ({used('test_impostor_attempts')}), "
-            f"{total - genuine - impostor} unlabeled (left out); at most {max_sessions(config)} sessions per user")
+            f"{unlabeled} unlabeled ({unlabeled_use}); at most {max_sessions(config)} sessions per user")
 
 
 def load_session(path: Path) -> pd.DataFrame:
