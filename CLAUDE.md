@@ -68,6 +68,11 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Outputs (inside the run folder): `results/sweep/{summary,saturation}.csv`, `figures/sweep_{heatmaps,lines}.png`. `saturation.csv` gives, per curve, where changes drop below `sweep_delta` and the biggest jump.
 - Result (tol 0.02, 20 draws): sessions per user drive the threshold (1→2 sessions jumps ~0.2, flat from ~4); legitimate users add a slow rise (0.16 → 0.27 over 1 → 9); impostor count barely matters (the threshold is already a share).
 
+### Hulls (`src/09_build_hulls.py`)
+
+- Per user (all 10): first `sessions_per_user` sessions of `session_pool` → step 03 chunks shifted to (0, 0) → shapely convex hull → `concave_hull(ratio=concave_ratio)` over **every point of every chunk** (deduplicated). Reads raw sessions itself (no 01–03 needed). Outputs `hulls/<user>.json`, `hulls/summary.csv`, `figures/hulls/`.
+- First result (5 training sessions, ratio 0.1): hulls are roughly screen-sized rectangles, 3.1–7.7M px² convex. Their extent tracks each user's screen resolution (±1920×±1080 for user15/16, ±1280×±800 for user23), so hull size mostly measures the monitor, not behaviour; the shape of the dense core near (0, 0) is where users differ.
+
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.

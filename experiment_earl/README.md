@@ -1,6 +1,6 @@
 # How to run the EARL experiment
 
-This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
+This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, the per-user hulls, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
 
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -110,6 +110,17 @@ shapes/<legitimate|impostor>/<user>/
 
 Each image shows the real screen path: green dot = start, red dot = end, blue = mouse move, orange = drag (button held). The title gives the shape's number, length in pixels and duration. A session has hundreds to over a thousand shapes, so all users can mean tens of thousands of images (about 25 minutes for 10 users × 5 sessions); `--user` and `--limit` keep it small.
 
+### E. Convex and concave hulls per user
+
+Pipeline: raw data → chunks → convex hull → concave hull. For each of the 10 users, it takes their first `sessions_per_user` sessions (same order as the notebook), cuts them into chunks with step 03's rules, shifts every chunk so it starts at (0, 0), and draws a convex hull and then a concave hull around **every point of every chunk**. `concave_ratio` sets how tight the concave hull is.
+
+```bash
+.venv/bin/python experiment_earl/src/09_build_hulls.py                 # all 10 users, ~15 seconds
+.venv/bin/python experiment_earl/src/09_build_hulls.py --user user9    # one user
+```
+
+It reads the raw sessions itself, so it does not need steps 01–03 first. Outputs, inside the run folder: `hulls/<user>.json` (sessions used, point counts, both areas and outlines), `hulls/summary.csv` (one row per user) and `figures/hulls/<user>.png` plus `figures/hulls/all_users.png` (all users side by side).
+
 ### Working with an older run
 
 Every script takes `--run <run folder name>`. It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
@@ -132,7 +143,8 @@ experiment_earl/runs/<run name>/
 │   ├── session_progression.png          bar graph: impostors matched per session step   (A)
 │   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users            (A)
 │   ├── sweep_heatmaps.png               one heatmap per session count                   (B)
-│   └── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
+│   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
+│   └── hulls/<user>.png, all_users.png   points, convex and concave hull per user        (E)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                      (A)
@@ -141,6 +153,7 @@ experiment_earl/runs/<run name>/
 │   ├── sweep/saturation.csv             where each curve flattens and jumps             (B)
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)
 │   └── summary.csv                      threshold of the single trial                   (C)
+├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
 ```
@@ -164,6 +177,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Notebook, same, 1 draw | under a minute |
 | Sweep, 1–5 sessions, 20 draws, first time | about 30 minutes; reruns that only redraw the figures take seconds |
 | Single trial 01–05 | a few minutes (step 04 also scores the held-out sessions) |
+| Hulls (E), 10 users × 5 sessions | about 15 seconds |
 | Shape PNGs (D) for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.

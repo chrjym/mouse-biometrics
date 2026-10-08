@@ -38,6 +38,7 @@ runs/baseline_2707e0/
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
 08_run_notebook      executes the notebook and saves the copy in the run folder
+09_build_hulls       per user: raw data -> chunks at (0, 0) -> convex hull -> concave hull
 ```
 
 Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
@@ -88,6 +89,12 @@ The threshold is `matched impostor users / total impostor users`. 0 is best: imp
 | `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean threshold by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
 
 The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legitimate users (1 to 9) and impostor users (1 to 10 minus legitimate users).
+
+## Hulls (script 09)
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `concave_ratio` | 0.1 | Tightness of the concave hull around each user's chunk points: 0 follows the points as closely as possible, 1 gives the convex hull. The hulls use `sessions_per_user` sessions per user and step 03's chunking settings. |
 
 ## When you change a setting
 
