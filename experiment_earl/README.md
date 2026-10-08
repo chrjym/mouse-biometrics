@@ -1,6 +1,6 @@
 # How to run the EARL experiment
 
-This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
+This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
 
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -68,12 +68,47 @@ One draw of `n_legitimate` + `n_impostor` users with `sessions_per_user` session
 .venv/bin/python experiment_earl/src/03_chunk_shapes.py      # cut into chunks   -> shapes/<class>/<user>/*.npz
 .venv/bin/python experiment_earl/src/04_match_shapes.py      # compare chunks    -> results/trial_0.json
 .venv/bin/python experiment_earl/src/05_threshold.py         # threshold         -> results/summary.csv
-.venv/bin/python experiment_earl/src/07_plot_shapes.py       # optional: one PNG per chunk -> shapes/.../<session>/
 ```
 
 Step 04 also scores each legitimate user's own **held-out** sessions (the ones not drawn) against their profile, as a sanity check: they should match better than the impostors do. With test files that is up to about 250 sessions per user.
 
-`07_plot_shapes.py` draws whatever step 03 saved. It writes one image per chunk (tens of thousands for 5 sessions × 10 users), so `--user user21` and `--limit 50` keep it small.
+### D. Export the shapes (lines) as images
+
+Every chunk that step 03 cut out is one shape: a continuous mouse line between two pauses or clicks. Step 03 saves them as data (`.npz`); `07_plot_shapes.py` draws each one as a PNG, in a folder per user and session.
+
+It needs the shapes of step 03, so run steps 01–03 first (once per config), then export:
+
+```bash
+.venv/bin/python experiment_earl/src/01_sample_users.py
+.venv/bin/python experiment_earl/src/02_sample_sessions.py
+.venv/bin/python experiment_earl/src/03_chunk_shapes.py      # saves the shapes as .npz
+
+.venv/bin/python experiment_earl/src/07_plot_shapes.py       # draws every shape as a PNG
+```
+
+Useful options:
+
+```bash
+.venv/bin/python experiment_earl/src/07_plot_shapes.py --user user21              # one user only
+.venv/bin/python experiment_earl/src/07_plot_shapes.py --user user21 --user user9 # several users
+.venv/bin/python experiment_earl/src/07_plot_shapes.py --limit 50                 # at most 50 shapes per session
+.venv/bin/python experiment_earl/src/07_plot_shapes.py --no-overview              # skip the overview grid
+.venv/bin/python experiment_earl/src/07_plot_shapes.py --run baseline_2707e0      # shapes of an older run
+```
+
+What it writes, inside the run folder:
+
+```
+shapes/<legitimate|impostor>/<user>/
+├── session_0041905381.npz          the shapes as data (from step 03)
+└── session_0041905381/
+    ├── chunk_0000_move.png         one image per shape
+    ├── chunk_0001_drag.png
+    ├── ...
+    └── overview.png                grid of the session's first 100 shapes
+```
+
+Each image shows the real screen path: green dot = start, red dot = end, blue = mouse move, orange = drag (button held). The title gives the shape's number, length in pixels and duration. A session has hundreds to over a thousand shapes, so all users can mean tens of thousands of images (about 25 minutes for 10 users × 5 sessions); `--user` and `--limit` keep it small.
 
 ### Working with an older run
 
@@ -106,7 +141,7 @@ experiment_earl/runs/<run name>/
 │   ├── sweep/saturation.csv             where each curve flattens and jumps             (B)
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)
 │   └── summary.csv                      threshold of the single trial                   (C)
-├── shapes/              chunks (.npz) and chunk PNGs                                (C)
+├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
 ```
 
@@ -129,7 +164,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Notebook, same, 1 draw | under a minute |
 | Sweep, 1–5 sessions, 20 draws, first time | about 30 minutes; reruns that only redraw the figures take seconds |
 | Single trial 01–05 | a few minutes (step 04 also scores the held-out sessions) |
-| Chunk PNGs for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
+| Shape PNGs (D) for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.
 
