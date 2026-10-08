@@ -42,6 +42,7 @@ runs/baseline_2707e0/
 10_hull_anomaly      windows of strokes outside a user's concave hull: own sessions (FRR) vs other users (FAR)
 11_ocsvm_anomaly     the same test with a per-user One-Class SVM on several features per stroke
 12_dtw_anomaly       the same test with DTW shape matching against a per-user shape library
+13_enroll_sweep      reruns 10, 11 and 12 with 1 up to anomaly_enroll_sessions registered sessions
 ```
 
 Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
@@ -103,7 +104,7 @@ The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legi
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `anomaly_enroll_sessions` | 4 | Training sessions that build each user's concave hull. Must be lower than the user's training session count (5–7), so at least one is left to test. |
+| `anomaly_enroll_sessions` | 4 | Training sessions that build each user's concave hull (and SVM model, and DTW library). Must be lower than the user's training session count (5–7), so at least one is left to test. Script 13 tries 1 up to this many. |
 | `anomaly_window` | 30 | Strokes (chunks) per window. Each session is checked window by window, sliding one stroke at a time. |
 | `anomaly_outside_share` | 0.2 | A window is an anomaly when more than this share of its strokes end outside the hull. Higher = fewer own sessions flagged, but more impostors missed. |
 

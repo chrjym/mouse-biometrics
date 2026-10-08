@@ -87,7 +87,13 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 ### DTW shape-matching anomaly test (`src/12_dtw_anomaly.py`)
 
 - Same protocol and enrollment draws as 10 and 11. Library = normalized chunks of the enrolled sessions, capped at `dtw_max_library` (random), split by move/drag; a stroke is anomalous when `04.has_match` finds no library shape within `dtw_tolerance`. Same window/flag rule as 10; EER on the worst window. Saves finished users to `results/dtw/progress.pkl` and resumes. ~1 min per user.
-- First result (tol 0.02, library 4000): EER 43.7%, the same as the hull (43.8%) and worse than the One-Class SVM (29.6%). ~75% of every stroke has no match, own or impostor (74.1% vs 77.7%), so at the fixed 20% rule every session is flagged (FRR 100%, FAR 0%): compare methods by EER, not by FRR/FAR at that rule. Per user it is uneven: user9 0%, user20 17.5%, user16 73%.
+- First result (tol 0.02, library 4000): EER 43.7%, the same as the hull (43.8%) and worse than the One-Class SVM (29.6%). ~75% of every stroke has no match, own or impostor (74.1% vs 77.7%), so at the fixed 20% rule every session is flagged (FRR 100%, FAR 0%): compare methods by EER, not by FRR/FAR at that rule. Per user it is uneven: user9 0%, user20 17.5%, user16 73%. Removing the cap (user12: 4,000 → ~5,100 shapes) moves user12's EER only 59.9% → 57.9%, so the cap stays.
+
+### Registered sessions sweep (`src/13_enroll_sweep.py`)
+
+- Reruns 10, 11 and 12 (method table `METHODS`, reusing their functions) with 1 … `anomaly_enroll_sessions` registered sessions. `random.sample` on these small lists returns a prefix of the same draw for any k, so step k registers exactly what scripts 10–12 would with k sessions (step 4 reproduces their EERs). `--method` limits methods; progress per (method, k, user) in `results/enroll_sweep/progress.pkl`. ~30 s for hull + SVM, ~25 min for DTW.
+- Outputs: `results/enroll_sweep/{sessions,summary}.csv`, `figures/enroll_sweep_lines.png` (FRR/FAR/EER vs sessions, line per method), `figures/enroll_sweep_heatmap.png` (EER method × sessions, 0–1 in 0.1 steps).
+- Result (1 → 4 sessions): EER barely moves for any method: hull 44.9/48.4/48.2/43.8%, SVM 28.0/29.4/28.0/29.6%, DTW 44.5/39.9/42.9/43.7%. More sessions trade FRR for FAR (hull FRR 90.8 → 24.6%, FAR 19.5 → 59.2%; SVM FRR 32.3 → 7.7%, FAR 26.8 → 37.4%) without separating users better.
 
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
