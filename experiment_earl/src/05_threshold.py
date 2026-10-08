@@ -18,8 +18,10 @@ def compute_threshold(records: list[dict], n_impostor: int) -> tuple[int, float]
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.parse_args()
-    results = cfg_mod.ROOT / "results"
+    cfg_mod.add_run_argument(parser)
+    args = parser.parse_args()
+    _, run = cfg_mod.open_run(args.run)
+    results = run / "results"
     rows = {}
     for path in sorted(results.glob("trial_*.json"), key=lambda p: int(p.stem.split("_")[1])):
         trial = json.loads(path.read_text())

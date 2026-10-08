@@ -14,7 +14,7 @@ chunk_mod = import_module("03_chunk_shapes")
 
 _PAIRS: dict = {}     # (query session, library session, settings) -> {kind: bool array per query chunk}
 _SESSIONS: dict = {}  # (dataset path, segmentation) -> Session, so sweeps chunk each file once
-CACHE_PATH = cfg_mod.ROOT / "results" / "cache" / "pairs.pkl"
+CACHE_PATH = cfg_mod.CACHE_DIR / "pairs.pkl"
 
 
 @njit(cache=True)
@@ -131,9 +131,9 @@ def save_cache() -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trial", type=int, default=0, help="trial number used in the output file name")
+    cfg_mod.add_run_argument(parser)
     args = parser.parse_args()
-    config = cfg_mod.load_config()
-    root = cfg_mod.ROOT
+    config, root = cfg_mod.open_run(args.run)
     manifest = json.loads((root / "temp" / "manifest.json").read_text())
     load_cache()
 

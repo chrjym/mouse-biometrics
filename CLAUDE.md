@@ -52,24 +52,26 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 
 ## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
 
-Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`), 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03; settings in `experiment_earl/config.yaml`.
+Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/CONFIG.md`. Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`): 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03, 08 executes the notebook; settings in `experiment_earl/config.yaml`.
 
-- Scripts are numbered, so modules load with `import_module("00_config")`. `06_sweep.py` reuses `dataset_session` and `matched_chunks` from `04_match_shapes.py`; pair results are cached in `results/cache/pairs.pkl`.
+**Runs:** nothing writes into fixed folders. `00_config.open_run()` maps the current config (all values except `run_name`, hashed) to `experiment_earl/runs/<name>_<hash>/`, creating it with a `config.yaml` snapshot and `run.json` on first use. `results/`, `figures/`, `shapes/`, `temp/` and `notebooks/` (executed notebook) live inside it. Any config change → new folder, so earlier results are never overwritten. Every script takes `--run <folder>` (the notebook reads `EARL_RUN`) to reuse an old run with its own settings. Only `shapes/` and `temp/` are git-ignored; the DTW cache is shared in `experiment_earl/cache/`.
+
+- Scripts are numbered, so modules load with `import_module("00_config")`. `06_sweep.py` reuses `dataset_session` and `matched_chunks` from `04_match_shapes.py`; pair results are cached in `experiment_earl/cache/pairs.pkl` (shared by all runs).
 - Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
 - **Known result:** chunk matching does not discriminate. At `dtw_tolerance` 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
 
 ### Full sweep (`src/06_sweep.py`)
 
-- Every (sessions 1..`sweep_sessions_max`) × (legitimate users) × (impostor users) cell with L + I ≤ 10, over `n_trials` draws. Per draw the 10 users are shuffled once: legitimate = front of the list, impostors = back, sessions = prefix of a shuffled order, so cells are nested and comparable. It scores every (impostor, legitimate) pair once (`results/sweep/pairs.csv`) and builds all cells from that.
+- Every (sessions 1..`sweep_sessions_max`) × (legitimate users) × (impostor users) cell with L + I ≤ 10, over `n_trials` draws. Per draw the 10 users are shuffled once: legitimate = front of the list, impostors = back, sessions = prefix of a shuffled order, so cells are nested and comparable. It scores every (impostor, legitimate) pair once (`runs/<run>/results/sweep/pairs.csv`) and builds all cells from that.
 - Resumable: seeds already in `pairs.csv` are skipped, so a rerun only redraws the figures. First run ~30 min (fills the DTW cache).
-- Outputs: `results/sweep/{summary,saturation}.csv`, `figures/sweep_{heatmaps,lines}.png`. `saturation.csv` gives, per curve, where changes drop below `sweep_delta` and the biggest jump.
+- Outputs (inside the run folder): `results/sweep/{summary,saturation}.csv`, `figures/sweep_{heatmaps,lines}.png`. `saturation.csv` gives, per curve, where changes drop below `sweep_delta` and the biggest jump.
 - Result (tol 0.02, 20 draws): sessions per user drive the threshold (1→2 sessions jumps ~0.2, flat from ~4); legitimate users add a slow rise (0.16 → 0.27 over 1 → 9); impostor count barely matters (the threshold is already a share).
 
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
 - Experiment: 3 legitimate + 2 impostor users, sessions per user 1 → 2 → 3 (nested: step k+1 reuses step k's sessions), 20 seeded draws; the heatmap columns reuse each draw with the first 1/2/3 legitimate users (draw order, not sorted). Runs in ~4–5 min.
-- Outputs: `results/session_progression{,_trials,_heatmap}.csv`, `figures/session_progression.png` (bar: mean **impostors matched**, not the threshold, as requested) and `figures/session_progression_heatmap.png` (colour = threshold 0–1 in 0.1 steps, cells also show impostors matched).
+- Outputs (inside the run folder): `results/session_progression{,_trials,_heatmap}.csv`, `figures/session_progression.png` (bar: mean **impostors matched**, not the threshold, as requested) and `figures/session_progression_heatmap.png` (colour = threshold 0–1 in 0.1 steps, cells also show impostors matched).
 
 ## Thesis-writing workflow
 

@@ -2,6 +2,27 @@
 
 `experiment_earl/config.yaml` is the single settings file for every script in `experiment_earl/src/`. To change how an experiment behaves, edit the value here instead of the code. Each script loads it through `00_config.py`.
 
+## Every config gets its own folder
+
+Nothing is overwritten when you change a setting. The scripts store everything for a config under `experiment_earl/runs/<name>_<hash>/`:
+
+```
+runs/baseline_2707e0/
+├── config.yaml     snapshot of the settings used (with comments)
+├── run.json        when the folder was created and the git commit
+├── results/        trial_0.json, summary.csv, session_progression*.csv, sweep/
+├── figures/        sweep_heatmaps.png, sweep_lines.png, session_progression*.png
+├── notebooks/      executed copy of session_progression.ipynb (08_run_notebook.py)
+├── shapes/         chunks as .npz and, after 07, the PNGs   (git-ignored, regenerable)
+└── temp/           manifest.json and the copied sessions    (git-ignored, regenerable)
+```
+
+- **Name:** `run_name` (the label at the top of `config.yaml`) plus a 6-character hash of all the other settings. If `run_name` is empty, the label is built from the tolerance, pause gap and `resample_n`.
+- **Same settings, same folder:** running again with an unchanged config reuses its folder, so the sweep resumes. **Any change gives a new folder**, and the old one stays as it was.
+- **Pick an old run:** every script takes `--run <folder name>`, for example `07_plot_shapes.py --run baseline_2707e0`. The notebook helper takes it too; the notebook itself reads the `EARL_RUN` environment variable.
+- **Shared cache:** `experiment_earl/cache/pairs.pkl` holds DTW results for all runs. Its keys contain the chunking, band and tolerance settings, so a new run reuses whatever is still valid.
+- **Git:** results, figures, the snapshot and the executed notebook are committed; `shapes/`, `temp/` and `cache/` are ignored because they are large and can be regenerated.
+
 ## How the pipeline uses it
 
 ```
@@ -12,6 +33,7 @@
 05_threshold         threshold = impostors matched / total impostors
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
+08_run_notebook      executes the notebook and saves the copy in the run folder
 ```
 
 Scripts 01–05 run **one trial**. Script 06 runs the **full sweep** and ignores the three "one trial" settings below (`n_legitimate`, `n_impostor`, `sessions_per_user`).
@@ -20,6 +42,7 @@ Scripts 01–05 run **one trial**. Script 06 runs the **full sweep** and ignores
 
 | Setting | Default | Used by | Meaning |
 |---|---|---|---|
+| `run_name` | `baseline` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
 | `seed` | 42 | 01, 02, 06 | Starting number for every random choice (which users, which sessions). The same seed gives the same draw, so a result can be repeated. The sweep uses `seed`, `seed + 1`, ... for its draws. |
 | `dataset_dir` | `datasets/balabit/training_files` | all | Folder with the raw Balabit sessions, relative to `experiment_earl/`. Only the training files are used. |
 | `n_legitimate` | 3 | 01 | How many users are "legitimate" in a single trial. Their shapes form the library that impostors are compared against. |
@@ -62,13 +85,14 @@ The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legi
 
 ## When you change a setting
 
-- **Changing chunking or matching** (`pause_gap_s`, `min_points`, `min_length_px`, `resample_n`, `dtw_band`, `dtw_tolerance`, `match_shape_ratio`): delete `results/sweep/pairs.csv` before re-running the sweep. It stores scores computed with the old values, and the sweep resumes from it. `results/cache/pairs.pkl` needs no cleanup: its keys include the chunking, band and tolerance settings.
-- **Changing `match_session_ratio`, `sweep_delta` or `sweep_sessions_max` downward:** no recompute is needed, only a re-run of `06_sweep.py` to rebuild the tables and figures.
-- **Changing `seed` or `n_trials`:** the sweep keeps draws it already has and only computes the missing seeds.
-- **Changing the single-trial settings** (`n_legitimate`, `n_impostor`, `sessions_per_user`, and `seed` for one trial): run 01 → 05 again.
+Any change to a value (except `run_name`) makes the next script run create a new folder under `runs/`, so nothing needs deleting or resetting. Then:
+
+- **Single trial:** run 01 → 05 again (or the sweep, or the notebook). The new folder starts empty.
+- **Speed:** DTW results are shared through `cache/pairs.pkl`. Changing only `match_session_ratio`, `sweep_delta`, `sweep_sessions_max`, `n_trials` or `seed` reuses all of them; changing chunking, band or tolerance recomputes what it must.
+- **Going back:** run the scripts with `--run <old folder>` to read or extend an older run with its own saved settings, whatever `config.yaml` says now.
 
 ## Limits to remember
 
 - Balabit has only 10 users, so the total of legitimate and impostor users can never go above 10.
-- The notebook `notebooks/session_progression.ipynb` reads this file too, but sets its own user and session counts (3 legitimate, 2 impostor, 1–3 sessions).
+- The notebook `notebooks/session_progression.ipynb` reads this file too, but sets its own user and session counts (3 legitimate, 2 impostor, 1–3 sessions). Its outputs go to the current run folder.
 - The tolerance of 0.02 is a baseline, not a validated value: in earlier tuning, a user's own held-out sessions never matched more than impostors did.

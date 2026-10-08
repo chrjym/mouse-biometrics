@@ -128,11 +128,12 @@ def plot_lines(summary: pd.DataFrame, path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trials", type=int, help="override n_trials from config.yaml")
+    cfg_mod.add_run_argument(parser)
     args = parser.parse_args()
-    config = cfg_mod.load_config()
+    config, run = cfg_mod.open_run(args.run)
     n_trials = args.trials or config["n_trials"]
     sessions_max, delta = config["sweep_sessions_max"], config["sweep_delta"]
-    out = cfg_mod.ROOT / "results" / "sweep"
+    out = run / "results" / "sweep"
     out.mkdir(parents=True, exist_ok=True)
     pairs_path = out / "pairs.csv"
     match_mod.load_cache()
@@ -177,7 +178,7 @@ def main() -> None:
     report.to_csv(out / "saturation.csv", index=False)
 
     n_users = len(users_by_seed[seeds[0]])
-    figures = cfg_mod.ROOT / "figures"
+    figures = run / "figures"
     figures.mkdir(exist_ok=True)
     plot_heatmaps(summary, figures / "sweep_heatmaps.png", n_users)
     plot_lines(summary, figures / "sweep_lines.png")

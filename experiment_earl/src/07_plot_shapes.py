@@ -68,9 +68,11 @@ def main() -> None:
     parser.add_argument("--limit", type=int, default=0, help="max chunks per session (0 = all)")
     parser.add_argument("--no-overview", action="store_true", help="skip the per-session overview.png grid")
     parser.add_argument("--workers", type=int, default=4)
+    cfg_mod.add_run_argument(parser)
     args = parser.parse_args()
+    _, run = cfg_mod.open_run(args.run)
 
-    shapes = cfg_mod.ROOT / "shapes"
+    shapes = run / "shapes"
     jobs = [
         (npz, npz.with_suffix(""), args.limit, not args.no_overview)
         for npz in sorted(shapes.glob("*/*/session_*.npz"))

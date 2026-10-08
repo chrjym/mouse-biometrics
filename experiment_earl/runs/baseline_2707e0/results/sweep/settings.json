@@ -22,6 +22,7 @@
     61
   ],
   "config": {
+    "run_name": "baseline",
     "seed": 42,
     "dataset_dir": "datasets/balabit/training_files",
     "n_legitimate": 3,

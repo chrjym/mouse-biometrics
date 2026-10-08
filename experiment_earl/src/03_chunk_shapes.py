@@ -78,9 +78,9 @@ def load_chunks(path: Path) -> list[tuple[np.ndarray, int]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.parse_args()
-    config = cfg_mod.load_config()
-    root = cfg_mod.ROOT
+    cfg_mod.add_run_argument(parser)
+    args = parser.parse_args()
+    config, root = cfg_mod.open_run(args.run)
     for label in ("legitimate", "impostor"):
         library = {}
         for user_dir in sorted((root / "temp" / label).iterdir()):

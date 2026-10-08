@@ -23,9 +23,10 @@ def draw_sessions(config: dict, seed: int, users: list[str]) -> dict[str, dict[s
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.parse_args()
-    config = cfg_mod.load_config()
-    temp = cfg_mod.ROOT / "temp"
+    cfg_mod.add_run_argument(parser)
+    args = parser.parse_args()
+    config, run = cfg_mod.open_run(args.run)
+    temp = run / "temp"
     manifest_path = temp / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
 
