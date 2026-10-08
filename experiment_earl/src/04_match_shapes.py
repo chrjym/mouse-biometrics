@@ -110,11 +110,15 @@ def sanity_check(legit: dict[str, list], held_out: dict[str, list], config: dict
     }
 
 
-def dataset_session(user: str, name: str, config: dict) -> chunk_mod.Session:
-    path = cfg_mod.ROOT / config["dataset_dir"] / user / name
+def dataset_session(user: str, name: str, config: dict, folder: str | None = None) -> chunk_mod.Session:
+    """A session from `folder` (default `dataset_dir`). Sessions outside `dataset_dir` get the folder in their
+    cache key, so a test session can never be confused with a training session."""
+    folder = folder or config["dataset_dir"]
+    path = cfg_mod.ROOT / folder / user / name
     if (path, segmentation(config)) not in _SESSIONS:
+        key = f"{user}/{name}" if folder == config["dataset_dir"] else f"{folder}/{user}/{name}"
         chunks = chunk_mod.segment(cfg_mod.load_session(path), config)
-        _SESSIONS[(path, segmentation(config))] = chunk_mod.describe(f"{user}/{name}", chunks, config)
+        _SESSIONS[(path, segmentation(config))] = chunk_mod.describe(key, chunks, config)
     return _SESSIONS[(path, segmentation(config))]
 
 

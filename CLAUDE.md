@@ -67,7 +67,12 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Outputs (inside the run folder): `results/sweep/{summary,saturation}.csv`, `figures/sweep_{heatmaps,lines}.png`. `saturation.csv` gives, per curve, where changes drop below `sweep_delta` and the biggest jump.
 - Result (tol 0.02, 20 draws): sessions per user drive the threshold (1→2 sessions jumps ~0.2, flat from ~4); legitimate users add a slow rise (0.16 → 0.27 over 1 → 9); impostor count barely matters (the threshold is already a share).
 
-### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
+### Test-set evaluation (`src/09_evaluate_test.py`)
+
+- Enrolls each user on their training sessions, scores every **labeled** test session in that user's `test_files` folder (score = share of chunks matching the profile), and reports FAR/FRR at `match_shape_ratio` plus EER per user and pooled, for each value in `test_tolerances`. Test sessions are cached under keys prefixed with `test_dir` (`dataset_session(..., folder=...)`).
+- First result (all training sessions enrolled): pooled EER 39–42% at every tolerance 0.01–0.05; genuine scores are only slightly above impostor scores (0.29 vs 0.22 at 0.02). Per user it ranges from ~3% (user9) to 64% (user21, whose genuine sessions score *below* impostors).
+
+
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
 - Experiment (all from `config.yaml`, nothing hardcoded): `n_legitimate` legitimate + `n_impostor` impostor users, sessions per user 1 → `sessions_per_user` (nested: step k+1 reuses step k's sessions), `n_trials` seeded draws; the heatmap columns reuse each draw with the first 1…`n_legitimate` legitimate users (draw order, not sorted). Default config: 3 + 2 users, 1–3 sessions, 20 draws; runs in ~5 min.

@@ -3,13 +3,13 @@
 # Changing any value (except run_name) creates a new folder under runs/, so older results are kept.
 # Every setting is explained in CONFIG.md.
 
-run_name: earl_experiment1         # label for this config's folder under runs/ (a short hash of the settings is appended)
+run_name: earl_experiment_with_10_sessions         # label for this config's folder under runs/ (a short hash of the settings is appended)
 
 # --- Experiment size (single trial 01-05 and the notebook) ---
 seed: 38                   # starting number of every random draw; the same seed gives the same draw
 n_legitimate: 3            # users whose shapes form the legitimate profiles
 n_impostor: 2              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
-sessions_per_user: 3       # sessions per user; the notebook tests 1, 2, ... up to this (max 5: smallest user has 5)
+sessions_per_user: 5       # sessions per user; the notebook tests 1, 2, ... up to this (max 5: smallest user has 5)
 n_trials: 20                # random draws each result is averaged over (the notebook and the sweep)
 
 # --- Data ---
@@ -30,3 +30,9 @@ match_session_ratio: 0.5   # an impostor user is "matched" when at least this sh
 # --- Full sweep (06): every sessions x legitimate x impostor combination that fits in 10 users ---
 sweep_sessions_max: 5      # tries 1 up to this many sessions per user (max 5)
 sweep_delta: 0.05          # a step that changes the mean threshold by less than this counts as "flat" (saturated)
+
+# --- Test-set evaluation (09): enroll on training files, verify the labeled test sessions ---
+test_dir: datasets/balabit/test_files            # each user's folder mixes genuine and impostor sessions
+labels_file: datasets/balabit/public_labels.csv  # is_illegal: 0 = genuine, 1 = impostor (unlabeled sessions are skipped)
+test_enroll_sessions: 0    # training sessions per user in the profile (0 = all of them, 5-7)
+test_tolerances: [0.01, 0.02, 0.03, 0.05]   # dtw_tolerance values to evaluate; FAR, FRR and EER are reported for each

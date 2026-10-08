@@ -34,6 +34,7 @@ runs/baseline_2707e0/
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
 08_run_notebook      executes the notebook and saves the copy in the run folder
+09_evaluate_test     scores labeled test sessions against training profiles: FAR, FRR, EER
 ```
 
 Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
@@ -82,6 +83,17 @@ The threshold is `matched impostor users / total impostor users`. 0 is best: imp
 | `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean threshold by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
 
 The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legitimate users (1 to 9) and impostor users (1 to 10 minus legitimate users).
+
+## Test-set evaluation (script 09)
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `test_dir` | `datasets/balabit/test_files` | Balabit test sessions. A user's folder mixes that user's own (genuine) sessions with impostors posing as them. |
+| `labels_file` | `datasets/balabit/public_labels.csv` | Which test sessions are impostors (`is_illegal = 1`). Only 816 of 1,611 are labeled; the rest are skipped. |
+| `test_enroll_sessions` | 0 | Training sessions per user in the profile. 0 uses all of them (5–7). |
+| `test_tolerances` | `[0.01, 0.02, 0.03, 0.05]` | `dtw_tolerance` values to test. Each gives its own FAR, FRR and EER. |
+
+A test session is **accepted** when its score (share of its chunks that match the profile) is at least `match_shape_ratio`. FAR = impostor sessions accepted / impostor sessions; FRR = genuine sessions rejected / genuine sessions; EER = the error where FAR and FRR are equal when the cut is moved.
 
 ## When you change a setting
 

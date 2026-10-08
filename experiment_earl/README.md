@@ -48,6 +48,17 @@ Tries 1 up to `sweep_sessions_max` sessions per user, and every mix of legitimat
 
 It ignores `n_legitimate`, `n_impostor` and `sessions_per_user` (it tries them all). If it stops halfway, run it again: it continues from the last finished draw.
 
+### D. Test-set evaluation: FAR, FRR and EER
+
+The real authentication test. Each user's profile is built from their training sessions; then every **labeled** session in that user's `test_files` folder is scored by the share of its chunks that match the profile. Genuine sessions should score high and impostor sessions low. It reports FAR (impostors accepted), FRR (genuine users rejected) and EER (where the two are equal) for every tolerance in `test_tolerances`.
+
+```bash
+.venv/bin/python experiment_earl/src/09_evaluate_test.py          # all 10 users, ~5 minutes
+.venv/bin/python experiment_earl/src/09_evaluate_test.py --user user9
+```
+
+It uses `test_dir`, `labels_file`, `test_enroll_sessions`, `test_tolerances` and `match_shape_ratio` (the accept/reject cut for FAR and FRR). Unlabeled test sessions are skipped.
+
 ### C. Single trial, step by step (file-based)
 
 One draw of `n_legitimate` + `n_impostor` users with `sessions_per_user` sessions each, with every intermediate file saved. Run the steps in order; each uses the files of the one before.
@@ -85,13 +96,17 @@ experiment_earl/runs/<run name>/
 │   ├── session_progression.png          bar graph: impostors matched per session step   (A)
 │   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users          (A)
 │   ├── sweep_heatmaps.png               one heatmap per session count               (B)
-│   └── sweep_lines.png                  threshold vs sessions / legitimate / impostors (B)
+│   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors (B)
+│   ├── test_far_frr.png                 FAR and FRR curves with the EER point        (D)
+│   └── test_scores.png                  genuine vs impostor score histograms         (D)
 ├── results/
 │   ├── session_progression.csv          one row per session step                    (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                  (A)
 │   ├── session_progression_heatmap.csv  the heatmap's numbers                       (A)
 │   ├── sweep/summary.csv                every combination: matched and threshold     (B)
 │   ├── sweep/saturation.csv             where each curve flattens and jumps         (B)
+│   ├── test_eval/scores.csv             every labeled test session's score          (D)
+│   ├── test_eval/summary.csv            FAR, FRR, EER per user and tolerance        (D)
 │   ├── trial_0.json                     per-impostor match ratios                   (C)
 │   └── summary.csv                      threshold of the single trial               (C)
 ├── shapes/              chunks (.npz) and chunk PNGs                    (C)
@@ -116,6 +131,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Notebook, same, 1 draw | about 20 seconds |
 | Sweep, 20 draws, first time | about 30 minutes; reruns that only redraw the figures take seconds |
 | Single trial 01–05 | about 1–2 minutes |
+| Test-set evaluation, 4 tolerances | about 5 minutes |
 | Chunk PNGs for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 ## 6. Common problems
