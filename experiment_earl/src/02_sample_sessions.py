@@ -3,21 +3,20 @@
 
 import argparse
 import json
-import random
 import shutil
 from importlib import import_module
 
 cfg_mod = import_module("00_config")
 
 
-def draw_sessions(config: dict, seed: int, users: list[str]) -> dict[str, dict[str, list[str]]]:
-    """Per user, the chosen session names plus the rest as held-out sessions."""
+def draw_sessions(config: dict, seed: int, users: list[str]) -> dict[str, dict[str, list[list[str]]]]:
+    """Per user, the first `sessions_per_user` sessions of their shuffled pool (training first, then genuine test
+    sessions) and the rest as held-out sessions, each as [folder, name]."""
     drawn = {}
     for user in users:
-        names = [path.name for path in cfg_mod.list_sessions(config, user)]
-        rng = random.Random(f"{seed}-{user}")
-        chosen = sorted(rng.sample(names, min(config["sessions_per_user"], len(names))))
-        drawn[user] = {"sessions": chosen, "held_out": [n for n in names if n not in chosen]}
+        pool = [list(entry) for entry in cfg_mod.session_pool(config, user, seed)]
+        k = config["sessions_per_user"]
+        drawn[user] = {"sessions": pool[:k], "held_out": pool[k:]}
     return drawn
 
 
@@ -26,6 +25,10 @@ def main() -> None:
     cfg_mod.add_run_argument(parser)
     args = parser.parse_args()
     config, run = cfg_mod.open_run(args.run)
+    print(cfg_mod.describe_data(config))
+    if config["sessions_per_user"] > cfg_mod.max_sessions(config):
+        raise SystemExit(f"sessions_per_user = {config['sessions_per_user']} but some user has only "
+                         f"{cfg_mod.max_sessions(config)} sessions; lower it in config.yaml")
     temp = run / "temp"
     manifest_path = temp / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
@@ -39,8 +42,8 @@ def main() -> None:
         for user, info in drawn.items():
             target = temp / label / user
             target.mkdir(parents=True, exist_ok=True)
-            for name in info["sessions"]:
-                shutil.copy2(cfg_mod.ROOT / config["dataset_dir"] / user / name, target / name)
+            for folder, name in info["sessions"]:
+                shutil.copy2(cfg_mod.ROOT / folder / user / name, target / name)
             print(f"{label:10} {user:7} {len(info['sessions'])} sessions ({len(info['held_out'])} held out)")
         manifest["sessions"][label] = drawn
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")

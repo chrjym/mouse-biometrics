@@ -1,8 +1,10 @@
 """Shared config and Balabit session loader for the EARL shape-matching experiment."""
 
+import csv
 import hashlib
 import json
 import os
+import random
 import shutil
 import subprocess
 from datetime import datetime
@@ -68,7 +70,62 @@ def list_users(config: dict) -> list[str]:
 
 
 def list_sessions(config: dict, user: str) -> list[Path]:
+    """The user's training sessions only."""
     return sorted(p for p in (ROOT / config["dataset_dir"] / user).iterdir() if p.is_file())
+
+
+_LABELS: dict = {}
+
+
+def load_labels(config: dict) -> dict[str, int]:
+    """Test session name -> is_illegal (0 = genuine, 1 = impostor). Unlabeled sessions are missing."""
+    path = ROOT / config["labels_file"]
+    if path not in _LABELS:
+        with path.open(newline="") as handle:
+            _LABELS[path] = {row["filename"]: int(row["is_illegal"]) for row in csv.DictReader(handle)}
+    return _LABELS[path]
+
+
+def _test_sessions(config: dict, user: str, label: int) -> list[str]:
+    labels = load_labels(config)
+    folder = ROOT / config["test_dir"] / user
+    return sorted(p.name for p in folder.iterdir() if labels.get(p.name) == label) if folder.exists() else []
+
+
+def session_pool(config: dict, user: str, seed: int | None = None) -> list[tuple[str, str]]:
+    """(folder, session name) of every session known to be `user`'s: training sessions first, then, with
+    `test_genuine_sessions`, the test sessions Balabit labels genuine. With `seed`, each part is shuffled on its
+    own, so the first sessions of the pool are always the long training ones and step k+1 contains step k."""
+    train = [p.name for p in list_sessions(config, user)]
+    test = _test_sessions(config, user, 0) if config.get("test_genuine_sessions") else []
+    if seed is not None:
+        random.Random(f"{seed}-{user}").shuffle(train)
+        random.Random(f"{seed}-{user}-test").shuffle(test)
+    return [(config["dataset_dir"], n) for n in train] + [(config["test_dir"], n) for n in test]
+
+
+def impostor_attempts(config: dict, user: str) -> list[str]:
+    """Test sessions in `user`'s folder that Balabit labels impostor: someone else posing as `user`
+    (empty unless `test_impostor_attempts`)."""
+    return _test_sessions(config, user, 1) if config.get("test_impostor_attempts") else []
+
+
+def max_sessions(config: dict) -> int:
+    """Largest session count every user can supply."""
+    return min(len(session_pool(config, user)) for user in list_users(config))
+
+
+def describe_data(config: dict) -> str:
+    users = list_users(config)
+    train = sum(len(list_sessions(config, u)) for u in users)
+    genuine = sum(len(_test_sessions(config, u, 0)) for u in users)
+    impostor = sum(len(_test_sessions(config, u, 1)) for u in users)
+    total = sum(len(list((ROOT / config["test_dir"] / u).iterdir())) for u in users)
+    used = lambda key: "used" if config.get(key) else "not used"
+    return (f"Data (labels from {config['labels_file']}): {len(users)} users, {train} training sessions; "
+            f"test files: {genuine} labeled genuine ({used('test_genuine_sessions')}), "
+            f"{impostor} labeled impostor ({used('test_impostor_attempts')}), "
+            f"{total - genuine - impostor} unlabeled (left out); at most {max_sessions(config)} sessions per user")
 
 
 def load_session(path: Path) -> pd.DataFrame:

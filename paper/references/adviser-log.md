@@ -20,6 +20,22 @@ Suggested format per entry:
 
 ---
 
+## [2026-10-08] — Use all the data in the experiments
+
+**Context:** The EARL shape-matching experiment (`experiment_earl/`) used only Balabit's `training_files` to build and compare user profiles; `test_files` were used only in a separate FAR/FRR/EER evaluation (`09_evaluate_test.py`). Relayed by a group member.
+
+**Feedback:** Adviser instructed: use all the data and run the experiments on all of it.
+
+**Decisions:**
+- Balabit `test_files` must be part of the experiments, not only training files.
+- Test sessions can only be used where their label allows it: `public_labels.csv` marks 411 genuine and 405 impostor test sessions; 795 are unlabeled, so their true user is unknown.
+
+**Open questions:**
+- Does "all data" also mean SapiMouse (120 users), or only all of Balabit?
+- How to use the 795 unlabeled test sessions, which cannot be counted as genuine or impostor.
+
+---
+
 ## [2026-08-31] — Scope narrowing: user mannerisms, short mouse signals & tentative title
 
 **Context:** Guidance on narrowing down the operational scope of the study and establishing the formal thesis direction.
