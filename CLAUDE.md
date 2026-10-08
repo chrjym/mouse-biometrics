@@ -52,7 +52,7 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 
 ## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
 
-Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/CONFIG.md`. Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`): 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03, 08 executes the notebook; settings in `experiment_earl/config.yaml`.
+Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/CONFIG.md`, and `experiment_earl/README.md` is the user-facing run guide (keep it in sync when commands or outputs change). Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`): 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03, 08 executes the notebook; settings in `experiment_earl/config.yaml`.
 
 **Runs:** nothing writes into fixed folders. `00_config.open_run()` maps the current config (all values except `run_name`, hashed) to `experiment_earl/runs/<name>_<hash>/`, creating it with a `config.yaml` snapshot and `run.json` on first use. `results/`, `figures/`, `shapes/`, `temp/` and `notebooks/` (executed notebook) live inside it. Any config change → new folder, so earlier results are never overwritten. Every script takes `--run <folder>` (the notebook reads `EARL_RUN`) to reuse an old run with its own settings. The whole `runs/` folder and the shared DTW cache (`experiment_earl/cache/`) are git-ignored: results stay on disk for reference but are not committed.
 

@@ -1,6 +1,6 @@
 # config.yaml: what each setting does
 
-`experiment_earl/config.yaml` is the single settings file for every script in `experiment_earl/src/`. To change how an experiment behaves, edit the value here instead of the code. Each script loads it through `00_config.py`.
+`experiment_earl/config.yaml` is the single settings file for every script in `experiment_earl/src/`. To change how an experiment behaves, edit the value here instead of the code. Each script loads it through `00_config.py`. For how to run the scripts and the notebook, see [README.md](README.md).
 
 ## Every config gets its own folder
 
