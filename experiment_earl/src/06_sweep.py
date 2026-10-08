@@ -26,18 +26,13 @@ def draw(config: dict, seed: int) -> tuple[list[str], dict[str, list[tuple[str, 
     return users, {user: cfg_mod.session_pool(config, user, seed) for user in users}
 
 
-def pair_scores(config: dict, seed: int, sessions_max: int) -> tuple[list[dict], list[dict]]:
+def pair_scores(config: dict, seed: int, sessions_max: int) -> list[dict]:
     """For every session count and every (impostor, legitimate) user pair: the share of the impostor's
-    sessions that match the legitimate profile, and their mean chunk match ratio. Also, per legitimate
-    user, the share of Balabit impostor attempts on them that their profile accepts."""
+    sessions that match the legitimate profile, and their mean chunk match ratio."""
     users, order = draw(config, seed)
-    rows, attempt_rows = [], []
+    rows = []
     for k in range(1, sessions_max + 1):
         picked = {u: [match_mod.dataset_session(u, n, config, folder=f) for f, n in order[u][:k]] for u in users}
-        for legit, ratios in match_mod.attempt_scores(picked, config).items():
-            if ratios:
-                attempt_rows.append({"seed": seed, "sessions": k, "legit": legit, "attempts": len(ratios),
-                                     "accept_rate": float(np.mean([r >= config["match_shape_ratio"] for r in ratios]))})
         for impostor in users:
             for legit in users:
                 if impostor == legit:
@@ -49,15 +44,12 @@ def pair_scores(config: dict, seed: int, sessions_max: int) -> tuple[list[dict],
                     "session_share": float(np.mean([r >= config["match_shape_ratio"] for r in ratios])),
                     "mean_chunk_ratio": float(np.mean(ratios)),
                 })
-    return rows, attempt_rows
+    return rows
 
 
-def cell_results(pairs: pd.DataFrame, attempts: pd.DataFrame, config: dict,
-                 users_by_seed: dict[int, list[str]]) -> pd.DataFrame:
-    """matched_detected and threshold for every (seed, sessions, n_legit, n_impostor) with n_legit + n_impostor <= users,
-    plus the mean share of Balabit impostor attempts accepted by the cell's legitimate users (NaN without test files)."""
+def cell_results(pairs: pd.DataFrame, config: dict, users_by_seed: dict[int, list[str]]) -> pd.DataFrame:
+    """matched_detected and threshold for every (seed, sessions, n_legit, n_impostor) with n_legit + n_impostor <= users."""
     share = pairs.set_index(["seed", "sessions", "impostor", "legit"])["session_share"]
-    accept = attempts.set_index(["seed", "sessions", "legit"])["accept_rate"] if len(attempts) else pd.Series(dtype=float)
     rows = []
     for (seed, k), _ in pairs.groupby(["seed", "sessions"]):
         users = users_by_seed[seed]
@@ -68,10 +60,8 @@ def cell_results(pairs: pd.DataFrame, attempts: pd.DataFrame, config: dict,
                 matched = sum(
                     max(share[(seed, k, v, u)] for u in legit) >= config["match_session_ratio"] for v in impostors
                 )
-                rates = [accept[(seed, k, u)] for u in legit if (seed, k, u) in accept.index]
                 rows.append({"seed": seed, "sessions": k, "n_legit": n_legit, "n_impostor": n_impostor,
-                             "matched_detected": matched, "threshold": matched / n_impostor,
-                             "attempt_accept_rate": float(np.mean(rates)) if rates else np.nan})
+                             "matched_detected": matched, "threshold": matched / n_impostor})
     return pd.DataFrame(rows)
 
 
@@ -144,34 +134,27 @@ def main() -> None:
                          f"{cfg_mod.max_sessions(config)} sessions; lower it in config.yaml")
     out = run / "results" / "sweep"
     out.mkdir(parents=True, exist_ok=True)
-    pairs_path, attempts_path = out / "pairs.csv", out / "attempts.csv"
+    pairs_path = out / "pairs.csv"
     match_mod.load_cache()
 
     # Resume: seeds already in pairs.csv are skipped.
     pairs = pd.read_csv(pairs_path) if pairs_path.exists() else pd.DataFrame()
-    attempts = pd.read_csv(attempts_path) if attempts_path.exists() else pd.DataFrame()
     done = set(pairs["seed"]) if len(pairs) else set()
     seeds = [config["seed"] + t for t in range(n_trials)]
     for t, seed in enumerate(seeds, 1):
         if seed in done:
             continue
-        new_pairs, new_attempts = pair_scores(config, seed, sessions_max)
-        pairs = pd.concat([pairs, pd.DataFrame(new_pairs)], ignore_index=True)
-        attempts = pd.concat([attempts, pd.DataFrame(new_attempts)], ignore_index=True)
+        pairs = pd.concat([pairs, pd.DataFrame(pair_scores(config, seed, sessions_max))], ignore_index=True)
         pairs.to_csv(pairs_path, index=False)
-        attempts.to_csv(attempts_path, index=False)
         match_mod.save_cache()
         print(f"draw {t}/{n_trials} (seed {seed}) done", flush=True)
     pairs = pairs[pairs["seed"].isin(seeds) & (pairs["sessions"] <= sessions_max)]
-    if len(attempts):
-        attempts = attempts[attempts["seed"].isin(seeds) & (attempts["sessions"] <= sessions_max)]
 
     users_by_seed = {seed: draw(config, seed)[0] for seed in seeds}
-    cells = cell_results(pairs, attempts, config, users_by_seed)
+    cells = cell_results(pairs, config, users_by_seed)
     summary = (cells.groupby(["sessions", "n_legit", "n_impostor"])
                .agg(matched_mean=("matched_detected", "mean"), matched_std=("matched_detected", "std"),
-                    threshold_mean=("threshold", "mean"), threshold_std=("threshold", "std"),
-                    attempt_accept_mean=("attempt_accept_rate", "mean"))
+                    threshold_mean=("threshold", "mean"), threshold_std=("threshold", "std"))
                .round(3).reset_index())
     summary.to_csv(out / "summary.csv", index=False)
 
@@ -204,10 +187,6 @@ def main() -> None:
         print(f"{axis}: flat (changes < {delta}) from a median of {group['flat_from'].median():g}; "
               f"biggest jump most often at {group['biggest_jump_at'].mode().iloc[0]:g} "
               f"(median size {group['biggest_jump'].median():.2f})")
-    if summary["attempt_accept_mean"].notna().any():
-        by_k = summary.groupby("sessions")["attempt_accept_mean"].mean()
-        print("Balabit impostor attempts accepted, by sessions per user: "
-              + ", ".join(f"{k}: {v:.0%}" for k, v in by_k.items()))
     print(f"Cells: {len(summary)}  Draws: {len(seeds)}")
     print(f"Output: {out}, {figures / 'sweep_heatmaps.png'}, {figures / 'sweep_lines.png'}")
 

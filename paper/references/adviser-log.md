@@ -29,11 +29,10 @@ Suggested format per entry:
 **Decisions:**
 - Balabit `test_files` must be part of the experiments, not only training files.
 - "All data" means all of Balabit (training + test files), not SapiMouse.
-- Labeled test sessions follow `public_labels.csv`: 411 genuine sessions join their user's sessions, 405 impostor sessions are scored as impostor attempts.
-- Group decision: the 795 unlabeled test sessions are assumed to belong to the user whose folder they are in (`test_unlabeled_sessions`). This is an assumption, not a label: among labeled test sessions about half are impostors, so results that use unlabeled sessions should say so.
+- Group decision: use the raw data only. A session belongs to the user whose folder it is in, for training and test files alike (1,676 sessions, 114–254 per user). Balabit's `public_labels.csv` is not used. A label-based version (genuine/impostor/unlabeled test sessions, and the FAR/FRR/EER test evaluation built on it) was tried the same day and dropped.
 
 **Open questions:**
-- Whether the adviser accepts the folder-owner assumption for unlabeled test sessions, or prefers them reported separately.
+- Balabit published the test folders as "sessions claimed to be this user", and its public labels mark about half of the labeled ones as someone else. If the adviser asks how the folder-owner rule handles this, the label-based version is in git history (commits `a5a170c`–`35781ab`).
 
 ---
 

@@ -2,6 +2,10 @@
 
 `experiment_earl/config.yaml` is the single settings file for every script in `experiment_earl/src/`. To change how an experiment behaves, edit the value here instead of the code. Each script loads it through `00_config.py`. For how to run the scripts and the notebook, see [README.md](README.md).
 
+## The data
+
+All of Balabit is used, raw (adviser, 2026-10-08): 65 training sessions and 1,611 test sessions for 10 users. A session belongs to the user whose folder it is in; no label file is used. Every script prints the counts and the session limit when it starts.
+
 ## Every config gets its own folder
 
 Nothing is overwritten when you change a setting. The scripts store everything for a config under `experiment_earl/runs/<name>_<hash>/`:
@@ -34,7 +38,6 @@ runs/baseline_2707e0/
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
 08_run_notebook      executes the notebook and saves the copy in the run folder
-09_evaluate_test     scores labeled test sessions against training profiles: FAR, FRR, EER
 ```
 
 Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
@@ -45,13 +48,12 @@ Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `session
 |---|---|---|---|
 | `run_name` | `baseline` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
 | `seed` | 42 | 01, 02, 06 | Starting number for every random choice (which users, which sessions). The same seed gives the same draw, so a result can be repeated. The sweep uses `seed`, `seed + 1`, ... for its draws. |
-| `dataset_dir` | `datasets/balabit/training_files` | all | Balabit training sessions, relative to `experiment_earl/`. Every session in a user's folder is that user (genuine). Do not point it at `test_files`: those folders mix in impostors. |
-| `test_genuine_sessions` | true | 02, 06, notebook | Test sessions that Balabit labels genuine (`is_illegal = 0` in `labels_file`) join their user's sessions, after the training ones. Raises the session limit from 5 to 30 per user (87 with `test_unlabeled_sessions`). |
-| `test_unlabeled_sessions` | true | 02, 06, notebook | Unlabeled test sessions are assumed to belong to the user whose folder they are in and join that user's sessions after the labeled ones (up to 87 per user). Unverified: among labeled test sessions, about half are impostors. |
-| `test_impostor_attempts` | true | 04, 06, notebook | Test sessions that Balabit labels impostor (`is_illegal = 1`) are scored as impostor attempts against the profile of the user whose folder they are in. |
+| `dataset_dir` | `datasets/balabit/training_files` | all | Balabit training sessions, relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
+| `test_dir` | `datasets/balabit/test_files` | all | Balabit test sessions, relative to `experiment_earl/`. Also counted by folder: every session in `test_files/user12/` is user12. |
+| `use_test_files` | true | all | Adds each user's `test_files` sessions after their training sessions (up to 114 per user instead of 5). |
 | `n_legitimate` | 3 | 01, notebook | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
 | `n_impostor` | 2 | 01, notebook | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
-| `sessions_per_user` | 3 | 02, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 87 with all test sessions (user9: 7 training + 23 labeled genuine + 57 unlabeled), 30 without the unlabeled ones, 5 with training files only. Steps up to the user's training count use training sessions; later steps add test sessions. |
+| `sessions_per_user` | 5 | 02, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. A user's sessions are ordered training first, then test, so steps up to 5 use training sessions only. At most 114 with `use_test_files` (user20 has 7 + 107), 5 without; every script prints the limit. |
 
 ## Chunking (script 03)
 
@@ -86,30 +88,6 @@ The threshold is `matched impostor users / total impostor users`. 0 is best: imp
 | `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean threshold by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
 
 The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legitimate users (1 to 9) and impostor users (1 to 10 minus legitimate users).
-
-## Which data is genuine and which is impostor
-
-The code never decides this. Balabit does, through `public_labels.csv`:
-
-| Data | Count | How it is used |
-|---|---|---|
-| Training sessions | 65 | Always genuine: the folder's own user. |
-| Test sessions labeled genuine (`is_illegal = 0`) | 411 | Join their user's sessions when `test_genuine_sessions` is true. |
-| Test sessions labeled impostor (`is_illegal = 1`) | 405 | Impostor attempts on the folder's user when `test_impostor_attempts` is true. |
-| Unlabeled test sessions | 795 | Assumed to be the folder's user and join their sessions when `test_unlabeled_sessions` is true; left out when false. |
-
-Every script prints these counts and the resulting session limit when it starts. A user's sessions are always ordered training, then labeled genuine, then unlabeled, so the first steps use verified data only. Set all three settings to false to use training files only (the earlier behaviour).
-
-## Test-set evaluation (script 09)
-
-| Setting | Default | Meaning |
-|---|---|---|
-| `test_dir` | `datasets/balabit/test_files` | Balabit test sessions (also read by the two `test_*` data settings above). A user's folder mixes that user's own (genuine) sessions with impostors posing as them. |
-| `labels_file` | `datasets/balabit/public_labels.csv` | Which test sessions are impostors (`is_illegal = 1`). Only 816 of 1,611 are labeled; the rest are skipped. |
-| `test_enroll_sessions` | 0 | Training sessions per user in the profile. 0 uses all of them (5–7). |
-| `test_tolerances` | `[0.01, 0.02, 0.03, 0.05]` | `dtw_tolerance` values to test. Each gives its own FAR, FRR and EER. |
-
-A test session is **accepted** when its score (share of its chunks that match the profile) is at least `match_shape_ratio`. FAR = impostor sessions accepted / impostor sessions; FRR = genuine sessions rejected / genuine sessions; EER = the error where FAR and FRR are equal when the cut is moved.
 
 ## When you change a setting
 

@@ -48,7 +48,7 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 - Some Balabit rows have **x = y = 65535** (logging glitches, not positions). Drop them before any spatial computation or they create ~60,000 px jumps.
 - Balabit `record timestamp` has ~0.1 s resolution, so ~90% of rows tie with a neighbor; `client timestamp` is ~16 ms and steps backward in one session (sort stably, or use `np.maximum.accumulate`). Don't re-sort: pandas' default sort is unstable and reorders ties. Use file order or a stable sort.
 - Sampling rate and screen size differ by user: user7/9/20 log every ~16 ms, the rest every ~110 ms; screens range from 1280×800 (user23) to 1920×1080 (user15/16). Per-point features and hull extents partly measure these rather than behavior. Resample/normalize before claiming user differences.
-- **All of Balabit is used** (adviser, 2026-10-08). `00_config.session_pool(config, user, seed)` = the user's training sessions (shuffled) followed by the test sessions labeled genuine (shuffled) when `test_genuine_sessions`; `impostor_attempts(config, user)` = test sessions in that folder labeled impostor when `test_impostor_attempts`. Labels come only from `public_labels.csv`. With `test_unlabeled_sessions` (group decision, 2026-10-08) the 795 unlabeled test sessions are assumed to be their folder's user and appended after the labeled ones; this is unverified, since ~half of labeled test sessions are impostors. Pool order is training → labeled genuine → unlabeled; pools reach 87 for user9, so `sessions_per_user`/`sweep_sessions_max` can reach 87 (30 without unlabeled). Never point `dataset_dir` at `test_files`. `09_evaluate_test.py` still enrolls on training sessions only.
+- **All of Balabit is used, raw** (adviser + group decision, 2026-10-08): a session belongs to the user whose folder it is in, for training and test files alike. `public_labels.csv` is **not** used (a label-based design was tried and dropped the same day). `00_config.session_pool(config, user, seed)` = the user's training sessions (shuffled) followed by their whole `test_files` folder (shuffled) when `use_test_files`; pools are 114–254 sessions, so `sessions_per_user`/`sweep_sessions_max` can reach 114. Never point `dataset_dir` at `test_files`.
 - Earl's old prototype example session (`user15/session_0003960194`) is a **test** session labelled impostor, not user15's genuine data. Don't build profiles from it.
 
 ## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
@@ -68,12 +68,7 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Outputs (inside the run folder): `results/sweep/{summary,saturation}.csv`, `figures/sweep_{heatmaps,lines}.png`. `saturation.csv` gives, per curve, where changes drop below `sweep_delta` and the biggest jump.
 - Result (tol 0.02, 20 draws): sessions per user drive the threshold (1→2 sessions jumps ~0.2, flat from ~4); legitimate users add a slow rise (0.16 → 0.27 over 1 → 9); impostor count barely matters (the threshold is already a share).
 
-### Test-set evaluation (`src/09_evaluate_test.py`)
-
-- Enrolls each user on their training sessions, scores every **labeled** test session in that user's `test_files` folder (score = share of chunks matching the profile), and reports FAR/FRR at `match_shape_ratio` plus EER per user and pooled, for each value in `test_tolerances`. Test sessions are cached under keys prefixed with `test_dir` (`dataset_session(..., folder=...)`).
-- First result (all training sessions enrolled): pooled EER 39–42% at every tolerance 0.01–0.05; genuine scores are only slightly above impostor scores (0.29 vs 0.22 at 0.02). Per user it ranges from ~3% (user9) to 64% (user21, whose genuine sessions score *below* impostors).
-
-
+### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
 - Experiment (all from `config.yaml`, nothing hardcoded): `n_legitimate` legitimate + `n_impostor` impostor users, sessions per user 1 → `sessions_per_user` (nested: step k+1 reuses step k's sessions), `n_trials` seeded draws; the heatmap columns reuse each draw with the first 1…`n_legitimate` legitimate users (draw order, not sorted). Default config: 3 + 2 users, 1–3 sessions, 20 draws; runs in ~5 min.

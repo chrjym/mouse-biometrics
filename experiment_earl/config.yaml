@@ -12,13 +12,11 @@ n_impostor: 2              # other users compared against them (n_legitimate + n
 sessions_per_user: 5       # sessions per user; the notebook tests 1, 2, ... up to this (max: printed by every script)
 n_trials: 20                # random draws each result is averaged over (the notebook and the sweep)
 
-# --- Data: all of Balabit (adviser, 2026-10-08) ---
-# Who is genuine or impostor is decided by Balabit's labels (labels_file, is_illegal), never by the code.
-dataset_dir: datasets/balabit/training_files   # relative to experiment_earl/; every training session is its folder's user
-test_genuine_sessions: true    # test sessions labeled genuine (is_illegal 0) join their user's sessions (up to 30 per user)
-test_impostor_attempts: true   # test sessions labeled impostor (is_illegal 1) are scored as attempts on that folder's user
-test_unlabeled_sessions: true  # unlabeled test sessions are assumed to be their folder's user and join it after the labeled
-                               # ones (unverified: about half of the labeled test sessions turned out to be impostors)
+# --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
+# A session belongs to the user whose folder it is in. No label file is used.
+dataset_dir: datasets/balabit/training_files   # relative to experiment_earl/
+test_dir: datasets/balabit/test_files          # relative to experiment_earl/
+use_test_files: true       # add each user's test_files sessions after their training sessions
 
 # --- Chunking (03): cut a session into strokes ---
 pause_gap_s: 0.5           # a pause longer than this many seconds starts a new chunk (clicks also split chunks)
@@ -33,13 +31,5 @@ match_shape_ratio: 0.3     # a session matches a profile when at least this shar
 match_session_ratio: 0.5   # an impostor user is "matched" when at least this share of their sessions match
 
 # --- Full sweep (06): every sessions x legitimate x impostor combination that fits in 10 users ---
-sweep_sessions_max: 5      # tries 1 up to this many sessions per user (max 5)
+sweep_sessions_max: 5      # tries 1 up to this many sessions per user (max: printed by every script)
 sweep_delta: 0.05          # a step that changes the mean threshold by less than this counts as "flat" (saturated)
-
-# --- Test files and their labels (used by the two settings above, and always by 09) ---
-test_dir: datasets/balabit/test_files            # each user's folder mixes genuine and impostor sessions
-labels_file: datasets/balabit/public_labels.csv  # is_illegal: 0 = genuine, 1 = impostor (unlabeled sessions are skipped)
-
-# --- Test-set evaluation (09): enroll on training files, verify the labeled test sessions ---
-test_enroll_sessions: 0    # training sessions per user in the profile (0 = all of them, 5-7)
-test_tolerances: [0.01, 0.02, 0.03, 0.05]   # dtw_tolerance values to evaluate; FAR, FRR and EER are reported for each

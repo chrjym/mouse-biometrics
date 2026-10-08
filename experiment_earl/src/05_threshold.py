@@ -8,8 +8,7 @@ from importlib import import_module
 
 cfg_mod = import_module("00_config")
 
-COLUMNS = ["trial", "n_legit", "n_sessions", "n_impostor", "matched_detected", "threshold",
-           "attempts", "attempts_accepted", "attempt_accept_rate"]
+COLUMNS = ["trial", "n_legit", "n_sessions", "n_impostor", "matched_detected", "threshold"]
 
 
 def compute_threshold(records: list[dict], n_impostor: int) -> tuple[int, float]:
@@ -27,14 +26,10 @@ def main() -> None:
     for path in sorted(results.glob("trial_*.json"), key=lambda p: int(p.stem.split("_")[1])):
         trial = json.loads(path.read_text())
         detected, threshold = compute_threshold(trial["records"], trial["n_impostor"])
-        ratios = [r for rs in trial.get("impostor_attempts", {}).values() for r in rs]
-        accepted = sum(r >= trial["config"]["match_shape_ratio"] for r in ratios)
         rows[trial["trial"]] = {
             "trial": trial["trial"], "n_legit": len(trial["legitimate"]),
             "n_sessions": trial["config"]["sessions_per_user"], "n_impostor": trial["n_impostor"],
             "matched_detected": detected, "threshold": round(threshold, 4),
-            "attempts": len(ratios), "attempts_accepted": accepted,
-            "attempt_accept_rate": round(accepted / len(ratios), 4) if ratios else None,
         }
     with (results / "summary.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=COLUMNS)
@@ -42,8 +37,7 @@ def main() -> None:
         writer.writerows(rows.values())
     for row in rows.values():
         print(f"trial {row['trial']}: {row['matched_detected']}/{row['n_impostor']} impostors matched, "
-              f"threshold {row['threshold']:.2f}; Balabit impostor attempts accepted "
-              f"{row['attempts_accepted']}/{row['attempts']}")
+              f"threshold {row['threshold']:.2f}")
     print(f"Output: {results / 'summary.csv'}")
 
 

@@ -110,17 +110,6 @@ def sanity_check(legit: dict[str, list], held_out: dict[str, list], config: dict
     }
 
 
-def attempt_scores(legit: dict[str, list], config: dict) -> dict[str, list[float]]:
-    """Balabit impostor attempts (test sessions labeled impostor in a legitimate user's folder) against that
-    user's profile: the share of each attempt's chunks that match. Empty unless test_impostor_attempts."""
-    return {
-        user: [round(matched_chunks(dataset_session(user, name, config, folder=config["test_dir"]), library, config)
-                     / max(dataset_session(user, name, config, folder=config["test_dir"]).n_chunks, 1), 4)
-               for name in cfg_mod.impostor_attempts(config, user)]
-        for user, library in legit.items()
-    }
-
-
 def dataset_session(user: str, name: str, config: dict, folder: str | None = None) -> chunk_mod.Session:
     """A session from `folder` (default `dataset_dir`). Sessions outside `dataset_dir` get the folder in their
     cache key, so a test session can never be confused with a training session."""
@@ -163,7 +152,6 @@ def main() -> None:
                 for u in manifest["legitimate"]}
     records = match_trial(legit, impostor, config)
     sanity = sanity_check(legit, held_out, config)
-    attempts = attempt_scores(legit, config)
     save_cache()
 
     out = root / "results" / f"trial_{args.trial}.json"
@@ -171,16 +159,12 @@ def main() -> None:
     out.write_text(json.dumps({
         "trial": args.trial, "seed": manifest["seed"], "legitimate": manifest["legitimate"],
         "n_impostor": len(impostor), "config": config, "records": records, "sanity": sanity,
-        "impostor_attempts": attempts,
     }, indent=2) + "\n")
     for record in records:
         print(f"{record['impostor']:7} matched={record['matched']!s:5} vs {record['matched_against']:7} "
               f"session ratios {record['session_ratios']}")
     for user, ratios in sanity.items():
         print(f"sanity {user}: held-out own-session ratios {ratios}")
-    for user, ratios in attempts.items():
-        accepted = sum(r >= config["match_shape_ratio"] for r in ratios)
-        print(f"impostor attempts on {user}: {accepted}/{len(ratios)} accepted")
     print(f"Output: {out}")
 
 

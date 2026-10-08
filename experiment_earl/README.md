@@ -2,7 +2,7 @@
 
 This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
 
-It uses **all of Balabit** (adviser, 2026-10-08): training files, plus test files according to Balabit's own labels. Test sessions labeled genuine add to their user's sessions; unlabeled ones are assumed to belong to the user whose folder they are in and are added after them (up to 87 sessions per user); test sessions labeled impostor are scored as impostor attempts. Three settings in `config.yaml`, `test_genuine_sessions`, `test_unlabeled_sessions` and `test_impostor_attempts`, switch each part on or off.
+It uses **all of Balabit, raw** (adviser, 2026-10-08): training files and test files. A session belongs to the user whose folder it is in; no label file is used. With `use_test_files: true` in `config.yaml`, each user has their training sessions followed by their test sessions, up to 114 per user.
 
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -50,17 +50,6 @@ Tries 1 up to `sweep_sessions_max` sessions per user, and every mix of legitimat
 
 It ignores `n_legitimate`, `n_impostor` and `sessions_per_user` (it tries them all). If it stops halfway, run it again: it continues from the last finished draw.
 
-### D. Test-set evaluation: FAR, FRR and EER
-
-The real authentication test. Each user's profile is built from their training sessions; then every **labeled** session in that user's `test_files` folder is scored by the share of its chunks that match the profile. Genuine sessions should score high and impostor sessions low. It reports FAR (impostors accepted), FRR (genuine users rejected) and EER (where the two are equal) for every tolerance in `test_tolerances`.
-
-```bash
-.venv/bin/python experiment_earl/src/09_evaluate_test.py          # all 10 users, ~5 minutes
-.venv/bin/python experiment_earl/src/09_evaluate_test.py --user user9
-```
-
-It uses `test_dir`, `labels_file`, `test_enroll_sessions`, `test_tolerances` and `match_shape_ratio` (the accept/reject cut for FAR and FRR). Unlabeled test sessions are skipped.
-
 ### C. Single trial, step by step (file-based)
 
 One draw of `n_legitimate` + `n_impostor` users with `sessions_per_user` sessions each, with every intermediate file saved. Run the steps in order; each uses the files of the one before.
@@ -98,19 +87,14 @@ experiment_earl/runs/<run name>/
 │   ├── session_progression.png          bar graph: impostors matched per session step   (A)
 │   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users          (A)
 │   ├── sweep_heatmaps.png               one heatmap per session count               (B)
-│   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors (B)
-│   ├── test_far_frr.png                 FAR and FRR curves with the EER point        (D)
-│   └── test_scores.png                  genuine vs impostor score histograms         (D)
+│   └── sweep_lines.png                  threshold vs sessions / legitimate / impostors (B)
+
 ├── results/
 │   ├── session_progression.csv          one row per session step                    (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                  (A)
 │   ├── session_progression_heatmap.csv  the heatmap's numbers                       (A)
-│   ├── session_progression_attempts.csv Balabit impostor attempts accepted per step  (A)
-│   ├── sweep/attempts.csv               impostor attempts accepted per draw and user (B)
 │   ├── sweep/summary.csv                every combination: matched and threshold     (B)
 │   ├── sweep/saturation.csv             where each curve flattens and jumps         (B)
-│   ├── test_eval/scores.csv             every labeled test session's score          (D)
-│   ├── test_eval/summary.csv            FAR, FRR, EER per user and tolerance        (D)
 │   ├── trial_0.json                     per-impostor match ratios                   (C)
 │   └── summary.csv                      threshold of the single trial               (C)
 ├── shapes/              chunks (.npz) and chunk PNGs                    (C)
@@ -135,7 +119,6 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Notebook, same, 1 draw | about 20 seconds |
 | Sweep, 20 draws, first time | about 30 minutes; reruns that only redraw the figures take seconds |
 | Single trial 01–05 | about 1–2 minutes |
-| Test-set evaluation, 4 tolerances | about 5 minutes |
 | Chunk PNGs for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 ## 6. Common problems
@@ -143,7 +126,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Message | Fix |
 |---|---|
 | `... users do not fit in the 10 Balabit users` | Lower `n_legitimate` or `n_impostor`: they must add up to 10 or less. |
-| `sessions_per_user = N but some user has only M sessions` | Lower `sessions_per_user` to M or less (87 with all test sessions, 30 without unlabeled ones, 5 with training files only). |
+| `sessions_per_user = N but some user has only M sessions` | Lower `sessions_per_user` to M or less (114 with `use_test_files`, 5 without). |
 | `KeyError` in the notebook or sweep right after the draws | `n_trials` is 0; set it to at least 1. |
 | `No run '...' under .../runs` | The `--run` name is wrong; the message lists the existing runs. |
 | `ModuleNotFoundError: numba` (or `nbformat`) | Use `.venv/bin/python`, or redo the setup in section 1. |
