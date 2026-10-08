@@ -13,15 +13,15 @@ runs/baseline_2707e0/
 ├── results/        trial_0.json, summary.csv, session_progression*.csv, sweep/
 ├── figures/        sweep_heatmaps.png, sweep_lines.png, session_progression*.png
 ├── notebooks/      executed copy of session_progression.ipynb (08_run_notebook.py)
-├── shapes/         chunks as .npz and, after 07, the PNGs   (git-ignored, regenerable)
-└── temp/           manifest.json and the copied sessions    (git-ignored, regenerable)
+├── shapes/         chunks as .npz and, after 07, the PNGs   (regenerable)
+└── temp/           manifest.json and the copied sessions    (regenerable)
 ```
 
 - **Name:** `run_name` (the label at the top of `config.yaml`) plus a 6-character hash of all the other settings. If `run_name` is empty, the label is built from the tolerance, pause gap and `resample_n`.
 - **Same settings, same folder:** running again with an unchanged config reuses its folder, so the sweep resumes. **Any change gives a new folder**, and the old one stays as it was.
 - **Pick an old run:** every script takes `--run <folder name>`, for example `07_plot_shapes.py --run baseline_2707e0`. The notebook helper takes it too; the notebook itself reads the `EARL_RUN` environment variable.
 - **Shared cache:** `experiment_earl/cache/pairs.pkl` holds DTW results for all runs. Its keys contain the chunking, band and tolerance settings, so a new run reuses whatever is still valid.
-- **Git:** results, figures, the snapshot and the executed notebook are committed; `shapes/`, `temp/` and `cache/` are ignored because they are large and can be regenerated.
+- **Git:** the whole `runs/` folder and `cache/` are git-ignored. Runs stay on your disk for reference but are not committed, so copy a run folder somewhere safe if you need to share it.
 
 ## How the pipeline uses it
 

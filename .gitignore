@@ -4,11 +4,9 @@ __pycache__/
 .ipynb_checkpoints/
 venv/
 
-# EARL shape-matching experiment: each config has a folder under experiment_earl/runs/.
-# Results, figures, the config snapshot and the executed notebook are kept; the big regenerable
-# folders (copied sessions, per-chunk shapes and PNGs) and the shared DTW cache are not.
-experiment_earl/runs/*/temp/
-experiment_earl/runs/*/shapes/
+# EARL shape-matching experiment: every config gets a folder under experiment_earl/runs/
+# (results, figures, shapes, executed notebook). Kept on disk for reference, not in git.
+experiment_earl/runs/
 experiment_earl/cache/
 
 # Local scratch prompt (see CLAUDE.md)

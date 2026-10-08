@@ -1,4 +1,0 @@
-sessions,matched_detected_mean,matched_detected_std,threshold_mean,n_legit,n_impostor,n_trials
-1,0.15,0.366,0.075,3,2,20
-2,0.5,0.513,0.25,3,2,20
-3,0.55,0.605,0.275,3,2,20
