@@ -41,3 +41,11 @@ concave_ratio: 0.1         # concave hull tightness: 0 = tightest outline, 1 = s
 anomaly_enroll_sessions: 4   # sessions that build a user's concave hull (Balabit users have 5-7 training sessions)
 anomaly_window: 30           # strokes per window; each session is checked window by window
 anomaly_outside_share: 0.2   # a window is an anomaly when more than this share of its strokes end outside the hull
+
+# --- One-Class SVM anomaly test (11): same sessions, window and enrollment as 10 ---
+ocsvm_features: [dx, dy, path_length, straightness, mean_speed, duration]   # per-stroke features; see CONFIG.md
+ocsvm_nu: 0.05               # about this share of the user's own training strokes may fall outside the learned region
+ocsvm_gamma: scale           # RBF kernel reach: "scale" (automatic), "auto", or a number (larger = tighter, wigglier region)
+ocsvm_max_train: 4000        # random training strokes per model (the SVM slows down fast with more); 0 = all
+ocsvm_resample_ms: 0         # 0 = raw points; e.g. 125 = path on a 125 ms grid, so ~16 ms and ~110 ms loggers compare fairly
+ocsvm_flag_score: 0.0        # a window is an anomaly when its mean SVM score is below this (0 = the learned boundary)

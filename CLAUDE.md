@@ -79,6 +79,11 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Training sessions only. Hull from `anomaly_enroll_sessions` sessions; sliding windows of `anomaly_window` chunk end points; a window is flagged when > `anomaly_outside_share` are outside; a session is flagged if any window is. Genuine = leave-one-out over the user's own training sessions (FRR); impostor = all other users' training sessions vs the user's hull (FAR); EER on the worst-window score.
 - First result (4 sessions, window 30, 20%): FRR 24.6%, FAR 59.2%, EER 43.8% overall; best user9 (EER 15.8%) and user21 (20.9%); user15/16 have FAR ~97–100% because their large-screen hulls contain other users' strokes. Own sessions have ~3.7% of strokes outside vs 6.2% for others.
 
+### One-Class SVM anomaly test (`src/11_ocsvm_anomaly.py`)
+
+- Same protocol and enrollment draws as script 10, but one sklearn pipeline per user (`RobustScaler` → `OneClassSVM(rbf)`) on `ocsvm_features` per chunk; window score = mean `decision_function`, flagged below `ocsvm_flag_score`; EER on the worst window. Needs scikit-learn in `.venv`.
+- First result (6 features, nu 0.05): EER 29.6% overall vs 43.8% for the hull (FRR 7.7%, FAR 37.4%); best user9 (2.6%), user29 (11.5%), user7 (14.0%); worst user16 (52.1%). On dx, dy alone the SVM is no better than the hull (~49%): the gain comes from the extra features, not the model. `ocsvm_resample_ms: 125` gives the same 29.6%, so the fast loggers' (user7/9/20) results are not just a logging-rate effect.
+
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.

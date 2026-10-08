@@ -40,6 +40,7 @@ runs/baseline_2707e0/
 08_run_notebook      executes the notebook and saves the copy in the run folder
 09_build_hulls       per user: raw data -> chunk end points at (0, 0) -> convex hull -> concave hull
 10_hull_anomaly      windows of strokes outside a user's concave hull: own sessions (FRR) vs other users (FAR)
+11_ocsvm_anomaly     the same test with a per-user One-Class SVM on several features per stroke
 ```
 
 Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
@@ -106,6 +107,19 @@ The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legi
 | `anomaly_outside_share` | 0.2 | A window is an anomaly when more than this share of its strokes end outside the hull. Higher = fewer own sessions flagged, but more impostors missed. |
 
 The hull also uses `concave_ratio` and the chunking settings.
+
+## One-Class SVM anomaly test (script 11)
+
+Uses `anomaly_enroll_sessions` and `anomaly_window` from the hull test, so both scripts test the same sessions.
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `ocsvm_features` | `[dx, dy, path_length, straightness, mean_speed, duration]` | Numbers per stroke the SVM learns from. `dx`, `dy`: net movement (the hull's end point). `path_length`: distance travelled (log). `straightness`: net movement / path length. `mean_speed`: path length / duration (log). `duration`: seconds. Remove a name to test without it. |
+| `ocsvm_nu` | 0.05 | About this share of the user's own training strokes may fall outside the learned region. Larger = tighter region: more own sessions flagged, fewer impostors missed. |
+| `ocsvm_gamma` | `scale` | How far one training stroke's influence reaches. `scale` is automatic; a number such as 0.1 (smooth) to 10 (tight, can overfit). |
+| `ocsvm_max_train` | 4000 | Random training strokes per model; the SVM slows down quickly with more. 0 = all. |
+| `ocsvm_resample_ms` | 0 | 0 = raw points. 125 = each stroke's path on a 125 ms grid before measuring length, straightness and speed, so users who log every ~16 ms and every ~110 ms compare fairly. |
+| `ocsvm_flag_score` | 0.0 | A window is an anomaly when its mean SVM score is below this. 0 is the learned boundary; lower = fewer flags. |
 
 ## When you change a setting
 

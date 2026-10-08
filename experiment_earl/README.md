@@ -136,6 +136,17 @@ Builds each user's concave hull from `anomaly_enroll_sessions` training sessions
 
 Only training sessions are used, so every session's owner is certain. Outputs, inside the run folder: `results/anomaly/sessions.csv` (every session scored), `results/anomaly/summary.csv` (FRR, FAR, EER per user and overall) and `figures/hull_anomaly.png`.
 
+### G. One-Class SVM anomaly test
+
+The same test as F (same sessions, windows and number of registered sessions), but each user is modelled by a **One-Class SVM** instead of a concave hull. The SVM learns the region where the user's strokes usually fall, from several numbers per stroke (`ocsvm_features`: end point dx, dy, path length, straightness, speed, duration), and gives every new stroke a score: above 0 inside the user's region, below 0 outside. A window of `anomaly_window` strokes is an anomaly when its mean score is below `ocsvm_flag_score` (default 0).
+
+```bash
+.venv/bin/python experiment_earl/src/11_ocsvm_anomaly.py               # all users, ~15 seconds
+.venv/bin/python experiment_earl/src/11_ocsvm_anomaly.py --user user9
+```
+
+It needs scikit-learn in `.venv` (`.venv/bin/pip install scikit-learn`). Outputs, inside the run folder: `results/ocsvm/sessions.csv`, `results/ocsvm/summary.csv` (FRR, FAR, EER per user and overall) and `figures/ocsvm_anomaly.png`. Compare its EER with F's to see which model separates users better.
+
 ### Working with an older run
 
 Every script takes `--run <run folder name>`. It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
@@ -160,7 +171,8 @@ experiment_earl/runs/<run name>/
 │   ├── sweep_heatmaps.png               one heatmap per session count                   (B)
 │   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
 │   ├── hulls/<user>.png, all_users.png   end points, convex and concave hull per user    (E)
-│   └── hull_anomaly.png                 own vs other sessions, FRR and FAR per user     (F)
+│   ├── hull_anomaly.png                 own vs other sessions, FRR and FAR per user     (F)
+│   └── ocsvm_anomaly.png                same, One-Class SVM                             (G)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                      (A)
@@ -170,6 +182,7 @@ experiment_earl/runs/<run name>/
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)
 │   └── summary.csv                      threshold of the single trial                   (C)
 ├── results/anomaly/   sessions.csv, summary.csv: hull anomaly test                (F)
+├── results/ocsvm/     sessions.csv, summary.csv: One-Class SVM anomaly test       (G)
 ├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
@@ -196,6 +209,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Single trial 01–05 | a few minutes (step 04 also scores the held-out sessions) |
 | Hulls (E), 10 users × 5 sessions | about 15 seconds |
 | Hull anomaly test (F) | about 5 seconds |
+| One-Class SVM anomaly test (G) | about 15 seconds |
 | Shape PNGs (D) for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.
@@ -209,6 +223,7 @@ More sessions per user means more shapes to compare, so runs beyond 5 sessions t
 | `sweep_sessions_max = N but some user has only M sessions` | Same for the sweep's `sweep_sessions_max`. |
 | `KeyError` in the notebook or sweep right after the draws | `n_trials` is 0; set it to at least 1. |
 | `No run '...' under .../runs` | The `--run` name is wrong; the message lists the existing runs. |
+| `ModuleNotFoundError: sklearn` | `.venv/bin/pip install scikit-learn`. |
 | `ModuleNotFoundError: numba` (or `nbformat`) | Use `.venv/bin/python`, or redo the setup in section 1. |
 | `'RcParams' object has no attribute '_get'` | Run `.venv/bin/pip install "matplotlib-inline<0.2"`. |
 | `Run ... has no shapes yet` from `07_plot_shapes.py` | That run only has notebook results. Run steps 01–03 with the same `--run` (the message prints the commands), then export. |
