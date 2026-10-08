@@ -70,8 +70,9 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 
 ### Hulls (`src/09_build_hulls.py`)
 
-- Per user (all 10): first `sessions_per_user` sessions of `session_pool` → step 03 chunks shifted to (0, 0) → shapely convex hull → `concave_hull(ratio=concave_ratio)` over **every point of every chunk** (deduplicated). Reads raw sessions itself (no 01–03 needed). Outputs `hulls/<user>.json`, `hulls/summary.csv`, `figures/hulls/`.
-- First result (5 training sessions, ratio 0.1): hulls are roughly screen-sized rectangles, 3.1–7.7M px² convex. Their extent tracks each user's screen resolution (±1920×±1080 for user15/16, ±1280×±800 for user23), so hull size mostly measures the monitor, not behaviour; the shape of the dense core near (0, 0) is where users differ.
+- Per user (all 10): first `sessions_per_user` sessions of `session_pool` → step 03 chunks → each chunk's **end point** after shifting its start to (0, 0) (one point per chunk, its net movement dx, dy; Earl's original idea) → shapely convex hull → `concave_hull(ratio=concave_ratio)`. Reads raw sessions itself; no need for 01–03. Outputs `runs/<run>/hulls/{<user>.json,summary.csv}` and `figures/hulls/`.
+- An earlier version (commits `359adb5`, `078c06c`) hulled **every point** of every chunk; it was replaced at the user's request.
+- First result (5 training sessions, ratio 0.1): convex 3.0–7.2M px², concave 59–81% of convex, median chunk movement 169–475 px. Hull extents still follow screen size (user15/16 widest), so don't read area differences as behaviour without normalizing.
 
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 

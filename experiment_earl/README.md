@@ -1,6 +1,6 @@
 # How to run the EARL experiment
 
-This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, the per-user hulls, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
+This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, the convex and concave hulls, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
 
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -112,17 +112,14 @@ Each image shows the real screen path: green dot = start, red dot = end, blue = 
 
 ### E. Convex and concave hulls per user
 
-Pipeline: raw data → chunks → convex hull → concave hull. For each of the 10 users, it takes their first `sessions_per_user` sessions (same order as the notebook), cuts them into chunks with step 03's rules, shifts every chunk so it starts at (0, 0), and draws a convex hull and then a concave hull around **every point of every chunk**. `concave_ratio` sets how tight the concave hull is.
+Pipeline: raw data → chunks → chunk end points → convex hull → concave hull. For each of the 10 users it takes their first `sessions_per_user` sessions (same order as the notebook) and cuts them into chunks with step 03's rules. Each chunk is moved so it starts at (0, 0), and only its **end point** is kept: one point per chunk, its net movement (dx, dy). The convex hull wraps all of a user's end points; the concave hull (`concave_ratio`) follows them more tightly. Together they show the range of directions and distances the user moves in one stroke.
 
 ```bash
 .venv/bin/python experiment_earl/src/09_build_hulls.py                 # all 10 users, ~15 seconds
 .venv/bin/python experiment_earl/src/09_build_hulls.py --user user9    # one user
-.venv/bin/python experiment_earl/src/09_build_hulls.py --highlight 60  # more chunks in colour (default 30, 0 = none)
 ```
 
-In the figures every chunk is a thin gray line starting at the black ×; a random sample of chunks (`--highlight`, the same ones on every rerun) is drawn in bold colours with a dot where each one ends, so single lines can be followed. The dashed outline is the convex hull, the orange area the concave hull.
-
-It reads the raw sessions itself, so it does not need steps 01–03 first. Outputs, inside the run folder: `hulls/<user>.json` (sessions used, point counts, both areas and outlines), `hulls/summary.csv` (one row per user) and `figures/hulls/<user>.png` plus `figures/hulls/all_users.png` (all users side by side).
+It reads the raw sessions itself, so it does not need steps 01–03 first. Outputs, inside the run folder: `hulls/<user>.json` (sessions used, chunk count, median movement, both areas and outlines), `hulls/summary.csv`, and `figures/hulls/<user>.png` plus `figures/hulls/all_users.png`.
 
 ### Working with an older run
 
@@ -147,7 +144,7 @@ experiment_earl/runs/<run name>/
 │   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users            (A)
 │   ├── sweep_heatmaps.png               one heatmap per session count                   (B)
 │   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
-│   └── hulls/<user>.png, all_users.png   points, convex and concave hull per user        (E)
+│   └── hulls/<user>.png, all_users.png   end points, convex and concave hull per user    (E)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                      (A)
