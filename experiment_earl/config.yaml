@@ -34,5 +34,10 @@ match_session_ratio: 0.5   # an impostor user is "matched" when at least this sh
 sweep_sessions_max: 5      # tries 1 up to this many sessions per user (max: printed by every script)
 sweep_delta: 0.05          # a step that changes the mean threshold by less than this counts as "flat" (saturated)
 
-# --- Hulls (09): raw data -> chunks shifted to (0, 0) -> convex hull -> concave hull, per user ---
+# --- Hulls (09): raw data -> chunk end points at (0, 0) -> convex hull -> concave hull, per user ---
 concave_ratio: 0.1         # concave hull tightness: 0 = tightest outline, 1 = same as the convex hull
+
+# --- Hull anomaly test (10): training sessions only ---
+anomaly_enroll_sessions: 4   # sessions that build a user's concave hull (Balabit users have 5-7 training sessions)
+anomaly_window: 30           # strokes per window; each session is checked window by window
+anomaly_outside_share: 0.2   # a window is an anomaly when more than this share of its strokes end outside the hull

@@ -121,6 +121,21 @@ Pipeline: raw data → chunks → chunk end points → convex hull → concave h
 
 It reads the raw sessions itself, so it does not need steps 01–03 first. Outputs, inside the run folder: `hulls/<user>.json` (sessions used, chunk count, median movement, both areas and outlines), `hulls/summary.csv`, and `figures/hulls/<user>.png` plus `figures/hulls/all_users.png`.
 
+### F. Hull anomaly test: can an own session be flagged?
+
+Builds each user's concave hull from `anomaly_enroll_sessions` training sessions (default 4) and checks sessions window by window: a window of `anomaly_window` strokes (default 30) is an **anomaly** when more than `anomaly_outside_share` of its strokes (default 20%) end outside the hull. A session is flagged when any of its windows is.
+
+- **Own sessions:** each training session is left out in turn and tested against a hull built from 4 of the user's other sessions. A flag here is a **false rejection** (FRR).
+- **Other users' sessions:** every training session of the other 9 users against the user's hull. A session never flagged is a **missed impostor** (FAR).
+- **EER:** the error where both are equal, scoring each session by its worst window.
+
+```bash
+.venv/bin/python experiment_earl/src/10_hull_anomaly.py               # all users, ~5 seconds
+.venv/bin/python experiment_earl/src/10_hull_anomaly.py --user user9
+```
+
+Only training sessions are used, so every session's owner is certain. Outputs, inside the run folder: `results/anomaly/sessions.csv` (every session scored), `results/anomaly/summary.csv` (FRR, FAR, EER per user and overall) and `figures/hull_anomaly.png`.
+
 ### Working with an older run
 
 Every script takes `--run <run folder name>`. It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
@@ -144,7 +159,8 @@ experiment_earl/runs/<run name>/
 │   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users            (A)
 │   ├── sweep_heatmaps.png               one heatmap per session count                   (B)
 │   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
-│   └── hulls/<user>.png, all_users.png   end points, convex and concave hull per user    (E)
+│   ├── hulls/<user>.png, all_users.png   end points, convex and concave hull per user    (E)
+│   └── hull_anomaly.png                 own vs other sessions, FRR and FAR per user     (F)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                      (A)
@@ -153,6 +169,7 @@ experiment_earl/runs/<run name>/
 │   ├── sweep/saturation.csv             where each curve flattens and jumps             (B)
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)
 │   └── summary.csv                      threshold of the single trial                   (C)
+├── results/anomaly/   sessions.csv, summary.csv: hull anomaly test                (F)
 ├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
@@ -178,6 +195,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Sweep, 1–5 sessions, 20 draws, first time | about 30 minutes; reruns that only redraw the figures take seconds |
 | Single trial 01–05 | a few minutes (step 04 also scores the held-out sessions) |
 | Hulls (E), 10 users × 5 sessions | about 15 seconds |
+| Hull anomaly test (F) | about 5 seconds |
 | Shape PNGs (D) for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.

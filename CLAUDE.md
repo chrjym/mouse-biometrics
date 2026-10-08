@@ -74,6 +74,11 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - An earlier version (commits `359adb5`, `078c06c`) hulled **every point** of every chunk; it was replaced at the user's request.
 - First result (5 training sessions, ratio 0.1): convex 3.0–7.2M px², concave 59–81% of convex, median chunk movement 169–475 px. Hull extents still follow screen size (user15/16 widest), so don't read area differences as behaviour without normalizing.
 
+### Hull anomaly test (`src/10_hull_anomaly.py`)
+
+- Training sessions only. Hull from `anomaly_enroll_sessions` sessions; sliding windows of `anomaly_window` chunk end points; a window is flagged when > `anomaly_outside_share` are outside; a session is flagged if any window is. Genuine = leave-one-out over the user's own training sessions (FRR); impostor = all other users' training sessions vs the user's hull (FAR); EER on the worst-window score.
+- First result (4 sessions, window 30, 20%): FRR 24.6%, FAR 59.2%, EER 43.8% overall; best user9 (EER 15.8%) and user21 (20.9%); user15/16 have FAR ~97–100% because their large-screen hulls contain other users' strokes. Own sessions have ~3.7% of strokes outside vs 6.2% for others.
+
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
