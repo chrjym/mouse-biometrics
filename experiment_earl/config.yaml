@@ -49,3 +49,6 @@ ocsvm_gamma: scale           # RBF kernel reach: "scale" (automatic), "auto", or
 ocsvm_max_train: 4000        # random training strokes per model (the SVM slows down fast with more); 0 = all
 ocsvm_resample_ms: 0         # 0 = raw points; e.g. 125 = path on a 125 ms grid, so ~16 ms and ~110 ms loggers compare fairly
 ocsvm_flag_score: 0.0        # a window is an anomaly when its mean SVM score is below this (0 = the learned boundary)
+
+# --- DTW shape-matching anomaly test (12): same sessions, window and enrollment as 10 and 11 ---
+dtw_max_library: 4000        # random shapes per user library (same cap as ocsvm_max_train, so all methods see as much data); 0 = all

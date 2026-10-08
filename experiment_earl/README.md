@@ -147,6 +147,17 @@ The same test as F (same sessions, windows and number of registered sessions), b
 
 It needs scikit-learn in `.venv` (`.venv/bin/pip install scikit-learn`). Outputs, inside the run folder: `results/ocsvm/sessions.csv`, `results/ocsvm/summary.csv` (FRR, FAR, EER per user and overall) and `figures/ocsvm_anomaly.png`. Compare its EER with F's to see which model separates users better.
 
+### H. DTW shape-matching anomaly test
+
+The same test as F and G, with shape matching as the model. Each user's **shape library** is built from the chunks of `anomaly_enroll_sessions` training sessions (at most `dtw_max_library` shapes, the same cap as the One-Class SVM). A stroke is anomalous when no shape of the same kind (move or drag) in the library is within `dtw_tolerance` by DTW distance. Windows, flags, FRR, FAR, EER and the figure work exactly as in F, so the three methods compare directly.
+
+```bash
+.venv/bin/python experiment_earl/src/12_dtw_anomaly.py               # all users, ~10 minutes
+.venv/bin/python experiment_earl/src/12_dtw_anomaly.py --user user9  # one user, ~1 minute
+```
+
+It saves each finished user, so an interrupted run continues where it stopped. Outputs, inside the run folder: `results/dtw/sessions.csv`, `results/dtw/summary.csv` and `figures/dtw_anomaly.png`.
+
 ### Working with an older run
 
 Every script takes `--run <run folder name>`. It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
@@ -172,7 +183,8 @@ experiment_earl/runs/<run name>/
 │   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
 │   ├── hulls/<user>.png, all_users.png   end points, convex and concave hull per user    (E)
 │   ├── hull_anomaly.png                 own vs other sessions, FRR and FAR per user     (F)
-│   └── ocsvm_anomaly.png                same, One-Class SVM                             (G)
+│   ├── ocsvm_anomaly.png                same, One-Class SVM                             (G)
+│   └── dtw_anomaly.png                  same, DTW shape matching                        (H)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                      (A)
@@ -183,6 +195,7 @@ experiment_earl/runs/<run name>/
 │   └── summary.csv                      threshold of the single trial                   (C)
 ├── results/anomaly/   sessions.csv, summary.csv: hull anomaly test                (F)
 ├── results/ocsvm/     sessions.csv, summary.csv: One-Class SVM anomaly test       (G)
+├── results/dtw/       sessions.csv, summary.csv: DTW shape-matching anomaly test  (H)
 ├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
@@ -210,6 +223,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Hulls (E), 10 users × 5 sessions | about 15 seconds |
 | Hull anomaly test (F) | about 5 seconds |
 | One-Class SVM anomaly test (G) | about 15 seconds |
+| DTW shape-matching anomaly test (H) | about 10 minutes |
 | Shape PNGs (D) for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.

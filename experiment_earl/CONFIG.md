@@ -41,6 +41,7 @@ runs/baseline_2707e0/
 09_build_hulls       per user: raw data -> chunk end points at (0, 0) -> convex hull -> concave hull
 10_hull_anomaly      windows of strokes outside a user's concave hull: own sessions (FRR) vs other users (FAR)
 11_ocsvm_anomaly     the same test with a per-user One-Class SVM on several features per stroke
+12_dtw_anomaly       the same test with DTW shape matching against a per-user shape library
 ```
 
 Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself.
@@ -120,6 +121,14 @@ Uses `anomaly_enroll_sessions` and `anomaly_window` from the hull test, so both 
 | `ocsvm_max_train` | 4000 | Random training strokes per model; the SVM slows down quickly with more. 0 = all. |
 | `ocsvm_resample_ms` | 0 | 0 = raw points. 125 = each stroke's path on a 125 ms grid before measuring length, straightness and speed, so users who log every ~16 ms and every ~110 ms compare fairly. |
 | `ocsvm_flag_score` | 0.0 | A window is an anomaly when its mean SVM score is below this. 0 is the learned boundary; lower = fewer flags. |
+
+## DTW shape-matching anomaly test (script 12)
+
+Uses `anomaly_enroll_sessions`, `anomaly_window` and `anomaly_outside_share` like the hull test, and the matching settings `resample_n`, `dtw_band` and `dtw_tolerance` to decide whether a stroke has a matching shape.
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `dtw_max_library` | 4000 | Random shapes kept in each user's library, the same cap as `ocsvm_max_train`, so all methods learn from the same amount of data and the run takes minutes. 0 = every shape (much slower). |
 
 ## When you change a setting
 

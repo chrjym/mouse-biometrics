@@ -84,6 +84,11 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Same protocol and enrollment draws as script 10, but one sklearn pipeline per user (`RobustScaler` → `OneClassSVM(rbf)`) on `ocsvm_features` per chunk; window score = mean `decision_function`, flagged below `ocsvm_flag_score`; EER on the worst window. Needs scikit-learn in `.venv`.
 - First result (6 features, nu 0.05): EER 29.6% overall vs 43.8% for the hull (FRR 7.7%, FAR 37.4%); best user9 (2.6%), user29 (11.5%), user7 (14.0%); worst user16 (52.1%). On dx, dy alone the SVM is no better than the hull (~49%): the gain comes from the extra features, not the model. `ocsvm_resample_ms: 125` gives the same 29.6%, so the fast loggers' (user7/9/20) results are not just a logging-rate effect.
 
+### DTW shape-matching anomaly test (`src/12_dtw_anomaly.py`)
+
+- Same protocol and enrollment draws as 10 and 11. Library = normalized chunks of the enrolled sessions, capped at `dtw_max_library` (random), split by move/drag; a stroke is anomalous when `04.has_match` finds no library shape within `dtw_tolerance`. Same window/flag rule as 10; EER on the worst window. Saves finished users to `results/dtw/progress.pkl` and resumes. ~1 min per user.
+- First result (tol 0.02, library 4000): EER 43.7%, the same as the hull (43.8%) and worse than the One-Class SVM (29.6%). ~75% of every stroke has no match, own or impostor (74.1% vs 77.7%), so at the fixed 20% rule every session is flagged (FRR 100%, FAR 0%): compare methods by EER, not by FRR/FAR at that rule. Per user it is uneven: user9 0%, user20 17.5%, user16 73%.
+
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
