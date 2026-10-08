@@ -9,13 +9,13 @@ An undergraduate thesis (4-member group): **"Measuring Behavioral Fingerprints o
 - `paper/` — the written research: literature, survey, chapter drafts, adviser log, and writing tools.
 - `experiment_earl/` — YAML config, numbered scripts in `src/`, a notebook, raw datasets (`datasets/`), and generated results/figures. This is the **only** experiments folder. Two earlier code bases are gone from the working tree but live in git history: the old `experiments/` folder (first-movement capture, stroke extraction; removed in `d10f50c`, e.g. `f36850c`) and Earl's 1-second-chunk prototype (`experiment_earl/scripts/` hull profiles + One-Class SVM benchmark, `configs/ocsvm.toml`, `temp/` reference CSVs; last present in `ab09dad`).
 
-The originally proposed method (5 stages: short-stroke segmentation → closed-form geometry → convex hull bounding → Discrete Fréchet distance → dynamic trust threshold) is **not implemented**. What exists now is the EARL shape-matching experiment (see `EARL_EXECUTION_PLAN.md` and the section below): pause-based chunks, resampled and compared with banded DTW against legitimate-user libraries. `EARL_IDEA.md` holds Earl's notes (burn-in, 1-second chunks shifted to (0, 0), convex → concave hull, One-Class SVM article).
+The originally proposed method (5 stages: short-stroke segmentation → closed-form geometry → convex hull bounding → Discrete Fréchet distance → dynamic trust threshold) is **not implemented**. What exists now is the EARL shape-matching experiment (see `EARL_EXECUTION_PLAN.md` and the section below): pause-based chunks, resampled and compared with banded DTW against legitimate-user libraries. `EARL_IDEA.md` is Earl's numbered idea list, which `EARL_EXECUTION_PLAN.md` turns into steps; `image.png` is the whiteboard sketch behind the session-progression notebook (legitimate set L, impostor set I, sessions × users heatmap on a 0–1 scale).
 
 `README.md` still describes the deleted `experiments/` layout and is out of date; trust this file and the code.
 
 ## Commands
 
-Run from the repo root. There is no build, test suite, or linter. Use the git-ignored `.venv` (it has numba, nbconvert).
+Run from the repo root. There is no build, test suite, or linter. Use the git-ignored `.venv`: it was made with `python3 -m venv --system-site-packages .venv` and adds numba, nbformat, nbconvert and ipykernel on top of the system packages. With the system matplotlib 3.6, `matplotlib-inline` must stay `<0.2` or notebook plots fail with `'RcParams' object has no attribute '_get'`.
 
 ```bash
 pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupyter, ipykernel, scikit-learn, numba, pyyaml
@@ -56,6 +56,12 @@ Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/N
 - Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
 - **Known result:** chunk matching does not discriminate. At `dtw_tolerance` 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
 
+### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
+
+- Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
+- Experiment: 3 legitimate + 2 impostor users, sessions per user 1 → 2 → 3 (nested: step k+1 reuses step k's sessions), 20 seeded draws; the heatmap columns reuse each draw with the first 1/2/3 legitimate users (draw order, not sorted). Runs in ~4–5 min.
+- Outputs: `results/session_progression{,_trials,_heatmap}.csv`, `figures/session_progression.png` (bar: mean **impostors matched**, not the threshold, as requested) and `figures/session_progression_heatmap.png` (colour = threshold 0–1 in 0.1 steps, cells also show impostors matched).
+
 ## Thesis-writing workflow
 
 - **Read `paper/references/adviser-log.md` first** before giving thesis direction; the newest entry (top) wins. Scope as of 2026-08-31: capture user mannerisms from **short** mouse signals/trajectories, not long sessions. "Short signal" and which mannerisms to prioritize are still open questions.
@@ -65,11 +71,12 @@ Plan: `EARL_EXECUTION_PLAN.md`. Run with `.venv/bin/python experiment_earl/src/N
 - `paper/references/plan.md` logs completed task plans; append a new plan section when finishing a sizable paper task.
 - `paper/references/annotated-bibliography.md` was **deleted** in commit `571a828`, but the skills and `example-rrl-fetch.py` still reference it (the fetcher warns and continues without filtering known papers). `paper/references/pipeline.md` is referenced but never existed. Tell the user if a task depends on them; don't invent their contents.
 - `example-rrl-fetch.py` resolves its bibliography and `new-candidates.md` relative to its own directory — keep it inside `paper/references/`.
-- `EARL_IDEA.md` holds Earl's pipeline notes plus a pasted peer-reviewer persona prompt; `temp.md` is a local scratch prompt, not project content.
+- `temp.md` is a local scratch prompt (git-ignored), not project content.
 
 ## Git and CI
 
 - Remote: `github.com/chrjym/thesis-mouse-biometrics`. Default branch `main`; feature work happens on branches (e.g. `chrjym1`).
 - `.github/workflows/literature-checker.yml` runs every Monday 00:00 UTC (and on manual dispatch) and **pushes commits to `main`** from `github-actions[bot]` updating `paper/references/new-candidates.md`. Pull before pushing to `main`, and expect conflicts in that file. If you move `example-rrl-fetch.py` or `new-candidates.md`, update the workflow paths too.
 - Commit locally after every completed change with a descriptive message; never push unless asked.
+- Commit messages must contain **no names**: no `Co-Authored-By` trailer, no tool or person attribution (user instruction, 2026-10-08).
 - Don't commit `__pycache__/`, `.venv/`/`venv/`, or notebook checkpoints (see root `.gitignore`).
