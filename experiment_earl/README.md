@@ -191,6 +191,7 @@ experiment_earl/runs/<run name>/
 ├── notebooks/           executed notebook with all tables and plots                (A)
 ├── figures/
 │   ├── session_progression.png          bar graph: impostors matched per session step   (A)
+│   ├── session_progression_users.png    one bar graph per legitimate user               (A)
 │   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users            (A)
 │   ├── sweep_heatmaps.png               one heatmap per session count                   (B)
 │   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
@@ -204,6 +205,7 @@ experiment_earl/runs/<run name>/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                      (A)
 │   ├── session_progression_heatmap.csv  the heatmap's numbers                           (A)
+│   ├── session_progression_users.csv    impostors matched per legitimate user and step  (A)
 │   ├── sweep/summary.csv                every combination: matched and threshold         (B)
 │   ├── sweep/saturation.csv             where each curve flattens and jumps             (B)
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)

@@ -100,7 +100,7 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.
 - Experiment (all from `config.yaml`, nothing hardcoded): `n_legitimate` legitimate + `n_impostor` impostor users, sessions per user 1 → `sessions_per_user` (nested: step k+1 reuses step k's sessions), `n_trials` seeded draws; the heatmap columns reuse each draw with the first 1…`n_legitimate` legitimate users (draw order, not sorted). Default config: 3 + 2 users, 1–3 sessions, 20 draws; runs in ~5 min.
-- Outputs (inside the run folder): `results/session_progression{,_trials,_heatmap}.csv`, `figures/session_progression.png` (bar: mean **impostors matched**, not the threshold, as requested) and `figures/session_progression_heatmap.png` (colour = threshold 0–1 in 0.1 steps, cells also show impostors matched).
+- Outputs (inside the run folder): `results/session_progression{,_trials,_heatmap,_users}.csv`, `figures/session_progression.png` (bar: mean **impostors matched**, not the threshold, as requested), `figures/session_progression_users.png` (same count split into one panel per legitimate user, tallest bar red; `matched_by` in the trials CSV lists every profile an impostor matched) and `figures/session_progression_heatmap.png` (colour = threshold 0–1 in 0.1 steps, cells also show impostors matched).
 
 ## Thesis-writing workflow
 
