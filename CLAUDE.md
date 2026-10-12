@@ -96,6 +96,11 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Outputs: `results/enroll_sweep/{sessions,summary,draws}.csv`, `figures/enroll_sweep_lines.png` (FRR/FAR/EER vs sessions, line per method), `figures/enroll_sweep_heatmap.png` (EER method × sessions, 0–1 in 0.1 steps, mean ± std over draws).
 - Result, 3 legit + 2 impostors, 20 draws (1 → 4 sessions): EER barely moves for any method: hull 44.6/49.6/46.3/44.5%, SVM 24.8/26.4/25.1/27.7%, DTW 45.7/41.8/44.3/46.5%, each ± 13–20% between draws (all-users pooled before draws: hull 44.9/48.4/48.2/43.8%, SVM 28.0/29.4/28.0/29.6%, DTW 44.5/39.9/42.9/43.7%). More sessions trade FRR for FAR (hull FRR 89.8 → 27.5%, FAR 14.5 → 56.5%; SVM FRR 33.4 → 8.2%, FAR 24.2 → 34.2%) without separating users better.
 
+### Matched shapes (`src/14_plot_matches.py`)
+
+- Reproduces the notebook's draw (`seed + --trial`, legitimate users in draw order, not script 01's sorted draw) and, per legitimate user and session step, finds for every impostor stroke the first matching stroke in the user's first k sessions (`first_match`, same banded DTW search as `04.has_match`). Draws matched pairs (impostor red dashed on the user's stroke) to `figures/matches/<user>_sessions<k>.png`, all pairs to `results/matches.csv`. Titles repeat the bar graph's per-impostor verdict; on `oct12_test2_d4015c` all 30 agree with `session_progression_users.csv`. ~2 min for 6 users × 5 steps.
+- Seen so far: matched pairs are mostly near-straight lines, which is why shapes match across users.
+
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.

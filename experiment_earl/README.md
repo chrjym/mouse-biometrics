@@ -171,6 +171,18 @@ Reruns F, G and H with 1, 2, ... up to `anomaly_enroll_sessions` registered sess
 
 It saves each finished (method, sessions, user) cell, so an interrupted run continues. Outputs, inside the run folder: `results/enroll_sweep/sessions.csv`, `results/enroll_sweep/summary.csv` (FRR, FAR, EER per method, session count and user; the last row of each block is the configured experiment), `results/enroll_sweep/draws.csv`, `figures/enroll_sweep_lines.png` (FRR, FAR and EER against registered sessions, one line per method) and `figures/enroll_sweep_heatmap.png` (EER per method × sessions, 0–1 in 0.1 steps, mean ± std over the draws). Compare methods by **EER**: FRR and FAR depend on each method's fixed flag rule (DTW flags nearly every session at the 20% rule).
 
+### J. Matched shapes behind the per-user bar graphs
+
+Shows which impostor strokes matched which strokes of each legitimate user in the notebook (A): the same draw, users and sessions, one figure per legitimate user and session step. Each panel is one matched pair after normalization (what DTW compares): the impostor stroke (red dashed) on the user's stroke it matched (blue), with both session ids, chunk numbers and the DTW cost per point. The figure title repeats the bar graph's verdict per impostor (strokes matched, sessions at or above `match_shape_ratio`, matched or not). Run the notebook first so the run folder exists.
+
+```bash
+.venv/bin/python experiment_earl/src/14_plot_matches.py --run oct12_test2_d4015c                  # all users and steps, ~2 minutes
+.venv/bin/python experiment_earl/src/14_plot_matches.py --run oct12_test2_d4015c --user user9 --sessions 2
+.venv/bin/python experiment_earl/src/14_plot_matches.py --max 60 --trial 3                         # more pairs, another draw
+```
+
+Outputs, inside the run folder: `figures/matches/<user>_sessions<k>.png` (at most `--max` pairs, random sample) and `results/matches.csv` (every matched stroke of the drawn users and steps).
+
 ### Working with an older run
 
 Every script takes `--run <run folder name>`. It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
@@ -200,7 +212,8 @@ experiment_earl/runs/<run name>/
 │   ├── ocsvm_anomaly.png                same, One-Class SVM                             (G)
 │   ├── dtw_anomaly.png                  same, DTW shape matching                        (H)
 │   ├── enroll_sweep_lines.png           FRR, FAR, EER vs registered sessions, per method (I)
-│   └── enroll_sweep_heatmap.png         EER per method × registered sessions            (I)
+│   ├── enroll_sweep_heatmap.png         EER per method × registered sessions            (I)
+│   └── matches/<user>_sessions<k>.png   matched impostor strokes on the user's strokes  (J)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_trials.csv   every draw, every impostor                      (A)
@@ -214,6 +227,7 @@ experiment_earl/runs/<run name>/
 ├── results/ocsvm/     sessions.csv, summary.csv, draws.csv: One-Class SVM test    (G)
 ├── results/dtw/       sessions.csv, summary.csv, draws.csv: DTW anomaly test      (H)
 ├── results/enroll_sweep/  sessions.csv, summary.csv, draws.csv: all three, 1–4 sessions (I)
+├── results/matches.csv    every matched stroke behind the per-user bar graphs      (J)
 ├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
