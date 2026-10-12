@@ -29,3 +29,17 @@
 - [x] Built consolidated deduplicated comparison survey at [measurement-comparison-survey.md] focusing on decision mechanisms ("how systems decide same user or not").
 - [x] Added visually distinct closing section for "Our Proposed Approach" (closed-form chord deviation, discrete Menger curvature, straightness ratio, convex hull + Fréchet distance + continuous trust score).
 - [x] Updated [SKILL.md]to index the new survey document.
+
+---
+
+# Thesis Task Plan: Chapter 3 Methodology Draft
+
+**Task:** Draft the methodology chapter from what `experiment_earl/` implements (commit `6827a6e`).
+**Status:** Done (draft)
+**Completed Date:** 2026-10-12
+
+## Deliverables & Actions Taken
+- [x] Read the chunking, DTW matching, hull, One-Class SVM and DTW anomaly scripts, `config.yaml` and `CONFIG.md`.
+- [x] Wrote [chapter3-methodology.md](../chapters/chapter3-methodology.md): research design, dataset and ownership rule, notation, preprocessing and segmentation, Experiment 1 (cross-user DTW shape matching and sweep), Experiment 2 (hull, OC-SVM and DTW one-class models under one leave-one-out protocol, draws, enrollment-size study), metrics, implementation, threats to validity.
+- [x] Cited only papers in `rrl-candidate-papers.md`; marked the Balabit dataset, DTW band, One-Class SVM and concave hull sources as [CITATION NEEDED].
+- [x] Ran `paper/tools/audit_writing.py` (verdict: ready; four paragraphs flagged for low burstiness).
