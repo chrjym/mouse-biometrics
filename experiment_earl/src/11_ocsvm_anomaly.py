@@ -122,13 +122,12 @@ def main() -> None:
         print(f"{user} done", flush=True)
 
     sessions = pd.DataFrame(rows)
-    summary, draws = hull_mod.summarize(sessions, config, "worst_window_score", equal_error_rate)
+    summary = hull_mod.summarize(sessions, config, "worst_window_score", equal_error_rate)
 
     out = run / "results" / "ocsvm"
     out.mkdir(parents=True, exist_ok=True)
     sessions.to_csv(out / "sessions.csv", index=False)
     summary.to_csv(out / "summary.csv", index=False)
-    draws.to_csv(out / "draws.csv", index=False)
 
     figures = run / "figures"
     figures.mkdir(exist_ok=True)
@@ -155,7 +154,7 @@ def main() -> None:
     axes[1].set_title("Per user (profile vs all other users)")
     pooled = summary.iloc[-1]
     fig.suptitle(f"One-Class SVM anomaly test ({', '.join(config['ocsvm_features'])}): model from {k} sessions, "
-                 f"window {config['anomaly_window']}; {pooled['profile']}: EER {pooled['eer']:.1%} ± {pooled['eer_std']:.1%}")
+                 f"window {config['anomaly_window']}; {pooled['profile']}: EER {pooled['eer']:.1%}")
     fig.tight_layout()
     fig.savefig(figures / "ocsvm_anomaly.png", dpi=130)
     plt.close(fig)

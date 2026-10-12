@@ -109,10 +109,9 @@ def main() -> None:
         print(f"{user} done", flush=True)
 
     sessions = pd.DataFrame([row for user in targets for row in done[user]])
-    summary, draws = hull_mod.summarize(sessions, config, "max_window_outside", hull_mod.equal_error_rate)
+    summary = hull_mod.summarize(sessions, config, "max_window_outside", hull_mod.equal_error_rate)
     sessions.to_csv(out / "sessions.csv", index=False)
     summary.to_csv(out / "summary.csv", index=False)
-    draws.to_csv(out / "draws.csv", index=False)
 
     figures = run / "figures"
     figures.mkdir(exist_ok=True)
@@ -139,7 +138,7 @@ def main() -> None:
     axes[1].set_title("Per user (profile vs all other users)")
     pooled = summary.iloc[-1]
     fig.suptitle(f"DTW shape-matching anomaly test (tolerance {config['dtw_tolerance']}): library from {k} sessions, "
-                 f"window {config['anomaly_window']}; {pooled['profile']}: EER {pooled['eer']:.1%} ± {pooled['eer_std']:.1%}")
+                 f"window {config['anomaly_window']}; {pooled['profile']}: EER {pooled['eer']:.1%}")
     fig.tight_layout()
     fig.savefig(figures / "dtw_anomaly.png", dpi=130)
     plt.close(fig)

@@ -48,8 +48,9 @@ def dtw_cost(a, b, band):
     return cost[n, n]
 
 
-def draw_trial(config: dict, seed: int) -> tuple[list[str], list[str], dict[str, list[tuple[str, str]]]]:
-    """The notebook's draw: legitimate users in draw order, sorted impostors, each user's shuffled session pool."""
+def draw_users(config: dict, seed: int) -> tuple[list[str], list[str], dict[str, list[tuple[str, str]]]]:
+    """The notebook's draw, made once from `seed` and fixed for the whole run: legitimate users in draw order, sorted
+    impostors, each user's shuffled session pool."""
     users = cfg_mod.list_users(config)
     rng = random.Random(seed)
     legit = rng.sample(users, config["n_legitimate"])
@@ -136,20 +137,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--user", action="append", help="legitimate users to draw (repeatable; default all)")
     parser.add_argument("--sessions", type=int, action="append", help="session steps to draw (repeatable; default all)")
-    parser.add_argument("--trial", type=int, default=0, help="draw of the notebook to show (seed + trial)")
     parser.add_argument("--max", type=int, default=36, help="matched pairs per figure (random sample)")
     cfg_mod.add_run_argument(parser)
     args = parser.parse_args()
     config, run = cfg_mod.open_run(args.run)
-    if args.trial >= config["n_trials"]:
-        raise SystemExit(f"Run {run.name} has n_trials = {config['n_trials']}; --trial must be lower")
-
-    legit, impostor, order = draw_trial(config, config["seed"] + args.trial)
+    legit, impostor, order = draw_users(config, config["seed"])
     profiles = [u for u in legit if not args.user or u in args.user]
     if not profiles:
-        raise SystemExit(f"None of {args.user} is legitimate in draw {args.trial}; legitimate users: {', '.join(legit)}")
+        raise SystemExit(f"None of {args.user} is legitimate in this run; legitimate users: {', '.join(legit)}")
     steps = [k for k in range(1, config["sessions_per_user"] + 1) if not args.sessions or k in args.sessions]
-    print(f"Draw {args.trial} (seed {config['seed'] + args.trial}): legitimate {', '.join(legit)}; "
+    print(f"Seed {config['seed']}: legitimate {', '.join(legit)}; "
           f"impostors {', '.join(impostor)}; session steps {steps}")
 
     out = run / "figures" / "matches"
@@ -159,7 +156,7 @@ def main() -> None:
         for k in steps:
             rows = step_matches(profile, impostor, order, k, config, pairs)
             verdicts = session_verdicts(rows, impostor, order, k, config)
-            table += [{c: v for c, v in r.items() if c not in ("query", "match")} | {"trial": args.trial} for r in rows]
+            table += [{c: v for c, v in r.items() if c not in ("query", "match")} for r in rows]
             shown = plot_step(rows, verdicts, profile, k, args.max, out / f"{profile}_sessions{k}.png") if rows else 0
             print(f"{profile} {k} sessions: {len(rows):,} matched strokes, {shown} drawn | " + " | ".join(verdicts),
                   flush=True)

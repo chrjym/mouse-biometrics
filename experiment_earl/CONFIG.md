@@ -43,21 +43,22 @@ runs/baseline_2707e0/
 11_ocsvm_anomaly     the same test with a per-user One-Class SVM on several features per stroke
 12_dtw_anomaly       the same test with DTW shape matching against a per-user shape library
 13_enroll_sweep      reruns 10, 11 and 12 with 1 up to anomaly_enroll_sessions registered sessions
+14_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
 ```
 
-Scripts 01–05 run **one trial** with `n_legitimate`, `n_impostor` and `sessions_per_user`. The **notebook** uses the same three settings plus `n_trials`: it tests 1, 2, ... up to `sessions_per_user` sessions per user, repeated over `n_trials` draws. Script 06 runs the **full sweep** and ignores `n_legitimate`, `n_impostor` and `sessions_per_user`; it tries every combination itself. The **anomaly tests** (10–13) use `n_legitimate`, `n_impostor` and `n_trials`: each draw picks the legitimate users (profiles) and impostor users, and the headline FRR, FAR and EER are the mean ± std over the draws.
+**One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 14 and the **anomaly tests** (10–13) make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw; the anomaly tests report FRR, FAR and EER for it. Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
 
 ## Data and sampling
 
 | Setting | Default | Used by | Meaning |
 |---|---|---|---|
 | `run_name` | `experiment1` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
-| `seed` | 934 | 01, 02, 06, 10–13 | Starting number for every random choice (which users, which sessions). The same seed gives the same draw, so a result can be repeated. The sweep and the anomaly tests use `seed`, `seed + 1`, ... for their draws (draw 0 = script 01's draw). |
+| `seed` | 934 | 01, 02, 06, 10–14, notebook | Picks the users and sessions once (which users are legitimate, which are impostors, the order of each user's sessions). The same seed gives the same users and sessions, so a result can be repeated. Only the sweep makes more draws, with `seed`, `seed + 1`, ... |
 | `dataset_dir` | `datasets/balabit/training_files` | all | Balabit training sessions, relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
 | `test_dir` | `datasets/balabit/test_files` | all | Balabit test sessions, relative to `experiment_earl/`. Also counted by folder: every session in `test_files/user12/` is user12. |
 | `use_test_files` | true | all | Adds each user's `test_files` sessions after their training sessions (up to 114 per user instead of 5). |
-| `n_legitimate` | 3 | 01, notebook, 10–13 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. In the anomaly tests (10–13) they are the profiles of each draw: FRR comes from their own held-out sessions. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
-| `n_impostor` | 2 | 01, notebook, 10–13 | How many other users act as impostors in a single trial. In the anomaly tests (10–13) only these users' sessions count for FAR in each draw. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
+| `n_legitimate` | 3 | 01, notebook, 10–13 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. In the anomaly tests (10–13) they are the profiles of the headline row: FRR comes from their own held-out sessions. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
+| `n_impostor` | 2 | 01, notebook, 10–13 | How many other users act as impostors in a single trial. In the anomaly tests (10–13) only these users' sessions count for FAR in the headline row. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
 | `sessions_per_user` | 5 | 02, 09, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. A user's sessions are ordered training first, then test, so steps up to 5 use training sessions only. At most 114 with `use_test_files` (user20 has 7 + 107), 5 without; every script prints the limit. |
 
 ## Chunking (script 03)
@@ -88,7 +89,7 @@ The threshold is `matched impostor users / total impostor users`. 0 is best: imp
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `n_trials` | 20 | Random draws of users and sessions that every sweep cell (and every notebook step) is averaged over. It does not change what is tested, only how steady the averages are: more draws give steadier numbers but take longer. |
+| `n_trials` | 20 | Sweep only: random draws of users and sessions that every sweep cell is averaged over. It does not change what is tested, only how steady the averages are: more draws give steadier numbers but take longer. The notebook, 14 and the anomaly tests ignore it: they use one fixed draw from `seed`. |
 | `sweep_sessions_max` | 5 | The sweep tries 1 up to this many sessions per user. Every Balabit user has at least 5. |
 | `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean threshold by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
 

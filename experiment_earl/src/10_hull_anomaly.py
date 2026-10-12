@@ -49,38 +49,24 @@ def equal_error_rate(genuine: np.ndarray, impostor: np.ndarray) -> float:
     return float(rates[i].mean())
 
 
-def simulate(sessions: pd.DataFrame, config: dict, worst: str, eer) -> pd.DataFrame:
-    """The experiment as configured: in each of `n_trials` draws (seed, seed + 1, ...; draw 0 = script 01's draw),
-    `n_legitimate` users are the profiles and `n_impostor` other users the impostors. FRR from the legitimate users'
-    own held-out sessions, FAR from the drawn impostors' sessions against those profiles, EER on `worst`, all pooled
-    over the legitimate users of the draw. Every profile already scored every other user, so a draw only picks rows."""
-    if config["n_trials"] < 1:
-        raise SystemExit("n_trials must be at least 1")
-    rows = []
-    for trial in range(config["n_trials"]):
-        legitimate, impostors = sample_mod.draw_users(config, config["seed"] + trial)
-        g = sessions[sessions["profile"].isin(legitimate)
-                     & ((sessions["kind"] == "genuine") | sessions["session_user"].isin(impostors))]
-        gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
-        rows.append({"trial": trial, "legitimate": " ".join(legitimate), "impostor": " ".join(impostors),
-                     "genuine_sessions": len(gen), "impostor_sessions": len(imp),
-                     "frr": gen["session_flagged"].mean(), "far": 1 - imp["session_flagged"].mean(),
-                     "eer": eer(gen[worst].to_numpy(), imp[worst].to_numpy())})
-    return pd.DataFrame(rows)
+def experiment_row(sessions: pd.DataFrame, config: dict, worst: str, eer) -> dict:
+    """The experiment as configured: one draw from `seed` (script 01's draw) fixes the `n_legitimate` profiles and the
+    `n_impostor` impostors for the whole run. FRR from the legitimate users' own held-out sessions, FAR from the impostors'
+    sessions against those profiles, EER on `worst`, all pooled over the legitimate users. Every profile already scored
+    every other user, so the draw only picks rows."""
+    legitimate, impostors = sample_mod.draw_users(config, config["seed"])
+    g = sessions[sessions["profile"].isin(legitimate)
+                 & ((sessions["kind"] == "genuine") | sessions["session_user"].isin(impostors))]
+    gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
+    return {"profile": f"{len(legitimate)} legit + {len(impostors)} impostors, seed {config['seed']}",
+            "legitimate": " ".join(legitimate), "impostor": " ".join(impostors),
+            "genuine_sessions": len(gen), "impostor_sessions": len(imp),
+            "frr": round(gen["session_flagged"].mean(), 4), "far": round(1 - imp["session_flagged"].mean(), 4),
+            "eer": round(eer(gen[worst].to_numpy(), imp[worst].to_numpy()), 4)}
 
 
-def draws_row(draws: pd.DataFrame, config: dict) -> dict:
-    """Mean and spread over the draws; the std is NaN with one draw."""
-    row = {"profile": f"{config['n_legitimate']} legit + {config['n_impostor']} impostors, {len(draws)} draws",
-           "genuine_sessions": round(draws["genuine_sessions"].mean(), 1),
-           "impostor_sessions": round(draws["impostor_sessions"].mean(), 1)}
-    for rate in ("frr", "far", "eer"):
-        row[rate], row[f"{rate}_std"] = round(draws[rate].mean(), 4), round(draws[rate].std(), 4)
-    return row
-
-
-def summarize(sessions: pd.DataFrame, config: dict, worst: str, eer) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Per user: the profile against all other users' sessions. Last row: the configured experiment (mean over draws)."""
+def summarize(sessions: pd.DataFrame, config: dict, worst: str, eer) -> pd.DataFrame:
+    """Per user: the profile against all other users' sessions. Last row: the configured experiment (one fixed draw)."""
     summary = []
     for user, g in sessions.groupby("profile"):
         gen, imp = g[g["kind"] == "genuine"], g[g["kind"] == "impostor"]
@@ -92,8 +78,7 @@ def summarize(sessions: pd.DataFrame, config: dict, worst: str, eer) -> tuple[pd
             "far": round(1 - imp["session_flagged"].mean(), 4),    # impostor session never flagged
             "eer": round(eer(gen[worst].to_numpy(), imp[worst].to_numpy()), 4),
         })
-    draws = simulate(sessions, config, worst, eer)
-    return pd.DataFrame(summary + [draws_row(draws, config)]), draws
+    return pd.DataFrame(summary + [experiment_row(sessions, config, worst, eer)])
 
 
 def print_summary(summary: pd.DataFrame, what: str) -> None:
@@ -102,8 +87,8 @@ def print_summary(summary: pd.DataFrame, what: str) -> None:
               f"{r['far']:6.1%} of {int(r['impostor_sessions']):3} | strokes {what}: own {r['genuine_outside']:.1%}, "
               f"impostor {r['impostor_outside']:.1%} | EER {r['eer']:.1%}")
     r = summary.iloc[-1]
-    print(f"{r['profile']}: FRR {r['frr']:.1%} ± {r['frr_std']:.1%} | FAR {r['far']:.1%} ± {r['far_std']:.1%} | "
-          f"EER {r['eer']:.1%} ± {r['eer_std']:.1%}")
+    print(f"{r['profile']} (legitimate {r['legitimate']}; impostors {r['impostor']}): "
+          f"FRR {r['frr']:.1%} | FAR {r['far']:.1%} | EER {r['eer']:.1%}")
 
 
 def main() -> None:
@@ -140,13 +125,12 @@ def main() -> None:
                           **score(hull, ends[(other, n)], config)} for n in names[other]]
 
     sessions = pd.DataFrame(rows)
-    summary, draws = summarize(sessions, config, "max_window_outside", equal_error_rate)
+    summary = summarize(sessions, config, "max_window_outside", equal_error_rate)
 
     out = run / "results" / "anomaly"
     out.mkdir(parents=True, exist_ok=True)
     sessions.to_csv(out / "sessions.csv", index=False)
     summary.to_csv(out / "summary.csv", index=False)
-    draws.to_csv(out / "draws.csv", index=False)
 
     figures = run / "figures"
     figures.mkdir(exist_ok=True)
@@ -172,7 +156,7 @@ def main() -> None:
     pooled = summary.iloc[-1]
     fig.suptitle(f"Concave-hull anomaly test: hull from {k} sessions, window {config['anomaly_window']}, "
                  f"flag > {config['anomaly_outside_share']:.0%} outside; {pooled['profile']}: "
-                 f"EER {pooled['eer']:.1%} ± {pooled['eer_std']:.1%}")
+                 f"EER {pooled['eer']:.1%}")
     fig.tight_layout()
     fig.savefig(figures / "hull_anomaly.png", dpi=130)
     plt.close(fig)

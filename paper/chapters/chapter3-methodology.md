@@ -48,8 +48,8 @@ A session is an ordered sequence of events $e_k = (x_k, y_k, t_k, s_k)$, where $
 | $\theta$ | `anomaly_outside_share` | 0.2 | Outside share that flags a window |
 | $\alpha$ | `concave_ratio` | 0.1 | Concave hull tightness |
 | $\nu$ | `ocsvm_nu` | 0.05 | OC-SVM outlier fraction |
-| $N_L$, $N_I$ | `n_legitimate`, `n_impostor` | 3, 2 | Legitimate and impostor users per draw |
-| $T$ | `n_trials` | 20 | Random draws per result |
+| $N_L$, $N_I$ | `n_legitimate`, `n_impostor` | 3, 2 | Legitimate and impostor users (one fixed draw) |
+| $T$ | `n_trials` | 20 | Random draws per sweep cell (Section 3.5.3 only) |
 
 ## 3.4 Preprocessing and Stroke Extraction
 
@@ -166,9 +166,9 @@ Path length, straightness and speed depend on how often points are logged. As a 
 
 The third model reuses the shape matching of Experiment 1 inside the anomaly protocol. The user's library contains the normalized strokes (Section 3.4.3) of the enrollment sessions, capped at 4,000 shapes chosen at random (the same cap as the OC-SVM) and split by kind. A stroke is anomalous when no library shape of its kind lies within tolerance $\tau$ (Section 3.5.1). Strokes that cannot be normalized are left out. Windowing and flagging follow Section 3.6.1 exactly as for the hull.
 
-### 3.6.5 Draws of legitimate and impostor users
+### 3.6.5 Fixed legitimate and impostor users
 
-Every profile is scored once against every other user's sessions. The configured experiment is then simulated from these scores without recomputation. In draw $t \in \{0, \dots, T-1\}$, with seed $\text{seed} + t$, $N_L = 3$ users are chosen as legitimate profiles and $N_I = 2$ of the remaining users as impostors. The false rejection rate of the draw comes from the legitimate users' own held-out sessions. The false acceptance rate comes only from the drawn impostors' sessions scored against those profiles. Both are pooled over the legitimate users of the draw. Results are reported as the mean and standard deviation over the $T = 20$ draws, alongside per-user rates in which each profile faces all nine other users.
+Every profile is scored once against every other user's sessions. A single seeded draw then fixes $N_L = 3$ users as legitimate profiles and $N_I = 2$ of the remaining users as impostors. Once drawn, these roles never change: every model, enrollment size and figure in a run uses the same users and sessions. The false rejection rate comes from the legitimate users' own held-out sessions. The false acceptance rate comes only from the impostors' sessions scored against those profiles. Both are pooled over the legitimate users. Per-user rates, in which each profile faces all nine other users, are reported alongside.
 
 ### 3.6.6 Enrollment-size study
 
@@ -204,7 +204,7 @@ Every script reads the same configuration file. Each distinct configuration is h
 
 ## 3.9 Threats to Validity
 
-- **Small population.** Balabit has 10 users, so at most 10 legitimate and impostor users can appear in one draw, and per-user results rest on five to seven training sessions. Means over 20 draws are reported with their standard deviations, but they cannot replace a larger cohort.
+- **Small population.** Balabit has 10 users, so at most 10 legitimate and impostor users can appear in one draw, and per-user results rest on five to seven training sessions. The headline results come from one fixed draw of users and sessions, so they describe those users; the sweep's 20 draws (Section 3.5.3) show how results change across user combinations, but neither can replace a larger cohort.
 - **Hardware confounds.** Logging rate and screen size differ by user (Section 3.2.3). Shape normalization removes both from Model C and Experiment 1, and the 125 ms resampling control tests their effect on Model B. Model A works in raw pixels and remains exposed to screen size.
 - **Test-file ownership.** Assigning test sessions to their folder's owner is unverified for about half of the labeled ones. Experiment 2 avoids the issue by using training files only, while Experiment 1 uses test files only when more than five sessions per user are requested.
 - **Parameter selection.** $\tau$, $\theta$, $W$ and $\nu$ were set on the same data that is evaluated, without a separate tuning split. EER limits the effect of the operating rule but not of the other parameters.
