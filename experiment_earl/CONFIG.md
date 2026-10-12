@@ -44,6 +44,7 @@ runs/baseline_2707e0/
 12_dtw_anomaly       the same test with DTW shape matching against a per-user shape library
 13_enroll_sweep      reruns 10, 11 and 12 with 1 up to anomaly_enroll_sessions registered sessions
 14_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
+15_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
 ```
 
 **One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 14 and the **anomaly tests** (10–13) make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw; the anomaly tests report FRR, FAR and EER for it. Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.

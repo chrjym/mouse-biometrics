@@ -101,6 +101,11 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Reproduces the notebook's single draw (`seed`; legitimate users in draw order, the same set as script 01's sorted draw) and, per legitimate user and session step, finds for every impostor stroke the first matching stroke in the user's first k sessions (`first_match`, same banded DTW search as `04.has_match`). Draws matched pairs (impostor red dashed on the user's stroke) to `figures/matches/<user>_sessions<k>.png`, all pairs to `results/matches.csv`. Titles repeat the bar graph's per-impostor verdict; on `oct12_test2_d4015c` and `oct12_test2_e36855` all 30 agree with `session_progression_users.csv`. ~2 min for 6 users × 5 steps.
 - Seen so far: matched pairs are mostly near-straight lines, which is why shapes match across users.
 
+### Genuine check (`src/15_genuine_check.py`)
+
+- Same draw and profiles as the notebook (`14.draw_users`); per legitimate user and step k, scores the user's next `--held-out` (default 2) sessions after the first `sessions_per_user` (never in the profile) and the impostors' first k sessions against the user's first-k-session library with `04.matched_chunks` (shared DTW cache) and the `match_shape_ratio` rule. Outputs `results/genuine_check{,_summary}.csv`, `figures/genuine_check.png`.
+- First result (`oct12_test3_d05fb2`, impostors user16 + user21): own sessions pass only for user9 and user20 (2/2 from 1–2 sessions, 35–57% of strokes matched) and user29 at 4–5 sessions (1/2); user12, user15, user35 never pass (11–21%). Own share beats the impostors' for 5 of 6 users, but user9/user20 are also the users that get through as impostors, so passing tracks a user's straight-stroke style more than identity. user15/user35 held-out sessions include short test files (44–61 strokes).
+
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 
 - Self-contained copy of the 00–05 logic (loader, chunking, numba DTW, per-profile matching): changes to `src/` do **not** reach it, and vice versa. Keep them in sync by hand.

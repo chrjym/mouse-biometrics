@@ -183,6 +183,17 @@ Shows which impostor strokes matched which strokes of each legitimate user in th
 
 Outputs, inside the run folder: `figures/matches/<user>_sessions<k>.png` (at most `--max` pairs, random sample) and `results/matches.csv` (every matched stroke of the drawn users and steps).
 
+### K. Genuine check: own unused sessions against their own profile
+
+The notebook (A) only asks whether impostors get through. This asks the opposite: does a legitimate user's own new session match their own profile? Same draw, same profiles (first 1, 2, ... `sessions_per_user` sessions) and the same 30% rule (`match_shape_ratio`). Each legitimate user's next `--held-out` sessions after the first `sessions_per_user` (default 2; never part of the profile at any step) are tested, next to the impostors' sessions against the same profile.
+
+```bash
+.venv/bin/python experiment_earl/src/15_genuine_check.py --run oct12_test3_d05fb2       # seconds once the DTW cache is warm
+.venv/bin/python experiment_earl/src/15_genuine_check.py --held-out 5                    # more own sessions per user
+```
+
+Outputs, inside the run folder: `results/genuine_check.csv` (every tested session: share of strokes matched, passed or not, train or test file), `results/genuine_check_summary.csv` and `figures/genuine_check.png` (one panel per legitimate user: own sessions blue, impostors red, label = sessions passed / tested). Held-out sessions after a user's training sessions are short test-file sessions (about 50 strokes), whose owner is the folder's user by the raw-data rule only.
+
 ### Working with an older run
 
 Every script takes `--run <run folder name>`. It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
@@ -213,7 +224,8 @@ experiment_earl/runs/<run name>/
 │   ├── dtw_anomaly.png                  same, DTW shape matching                        (H)
 │   ├── enroll_sweep_lines.png           FRR, FAR, EER vs registered sessions, per method (I)
 │   ├── enroll_sweep_heatmap.png         EER per method × registered sessions            (I)
-│   └── matches/<user>_sessions<k>.png   matched impostor strokes on the user's strokes  (J)
+│   ├── matches/<user>_sessions<k>.png   matched impostor strokes on the user's strokes  (J)
+│   └── genuine_check.png                own unused sessions vs impostors, per profile   (K)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_steps.csv    every step, every impostor                      (A)
@@ -228,6 +240,7 @@ experiment_earl/runs/<run name>/
 ├── results/dtw/       sessions.csv, summary.csv: DTW anomaly test                 (H)
 ├── results/enroll_sweep/  sessions.csv, summary.csv: all three, 1–4 sessions      (I)
 ├── results/matches.csv    every matched stroke behind the per-user bar graphs      (J)
+├── results/genuine_check{,_summary}.csv  own unused sessions vs impostors     (K)
 ├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
