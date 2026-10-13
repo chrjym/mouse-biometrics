@@ -1,6 +1,6 @@
 # How to run the EARL experiment
 
-This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, the convex and concave hulls, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md).
+This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, the convex and concave hulls, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md); how each script works (algorithm, formulas, and why) is in [docs/](docs/README.md).
 
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
