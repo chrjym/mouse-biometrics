@@ -1,0 +1,35 @@
+# Chapter 2 – Reference Source Links
+
+Links to the papers/PDFs for the 21 references in Chapter2.md. Matched by title and authors; full texts not read.
+
+| # | Reference | Where to get it | Access |
+|---|---|---|---|
+| 1 | Khan et al., *Mouse dynamics behavioral biometrics: A survey* | [PDF (NSF PAR, ACM version)](https://par.nsf.gov/servlets/purl/10519795) · [arXiv PDF](https://arxiv.org/pdf/2208.09061v2) | Open |
+| 2 | Sadeghpour & Vlajic, *ReMouse dataset* | [MDPI article](https://www.mdpi.com/2624-800X/3/1/7) · [Dataset (IEEE DataPort)](https://ieee-dataport.org/comment/3880) | Open |
+| 3 | Asgarov, *Mathematical feature representations…* | [PDF (JPIT)](https://jpit.az/uploads/article/en/2026_2/MATHEMATICAL_FEATURE_REPRESENTATIONS_OF_MOUSE_DYNAMICS_FOR_CONTINUOUS_USER_AUTHENTICATION.pdf) | Open |
+| 4 | Jin et al., *Mouse-trajectory similarity measurement* | [arXiv PDF](https://arxiv.org/pdf/2312.10273) | Open |
+| 5 | Guan et al., *Multimodal fusion mechanism* | [Wiley page](https://onlinelibrary.wiley.com/doi/10.1155/2021/6669429) | Likely open (Hindawi) |
+| 6 | Zheng et al., CCS 2011 | [PDF (Univ. of Delaware)](https://www.eecis.udel.edu/~hnw/paper/ccs11.pdf) | Open |
+| 7 | Quraishi & Bedi, ICIEM 2022 | Not found (only cited by other papers) | – |
+| 8 | Zargarzadeh & Maghooli, memory game | [Journal page](https://www.biotech-asia.org/vol10no2/a-behavioral-biometric-authentication-system-based-on-memory-game/) | Open |
+| 9 | Hinbarji et al., mouse movement curves | [PDF (DCU)](https://doras.dcu.ie/20248/1/MMM2015_Zaher_Full_(6).pdf) | Open |
+| 10 | Tao et al., spatiotemporal mouse dynamics | [ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S1389128626005141) · [SSRN preprint](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=6193851) | Preprint free |
+| 11 | Antal & Fejér, deep learning user recognition | [Article page](https://reference-global.com/article/10.2478/ausi-2020-0003) | Open (CC BY-NC-ND) |
+| 12 | Betances et al., *Mouse biometric authentication* | Not found | – |
+| 13 | Almalki et al., clickstream analysis | [arXiv PDF](https://arxiv.org/pdf/2312.00802) · [EasyChair preprint](https://easychair.org/publications/preprint/9PWx) | Open |
+| 14 | Yildirim & Anarim, insider threat | [DOI](https://doi.org/10.1007/s10207-021-00544-9) | Not checked |
+| 15 | Ciaramella et al., explainable deep learning | [Univ. of Molise repository](https://iris.unimol.it/handle/11695/128083) | Check |
+| 16 | Li et al., *Wrist in motion* | [Record page](https://pure.ecnu.edu.cn/en/publications/wrist-in-motion-a-seamless-context-aware-continuous-authenticatio/) | IEEE paywalled |
+| 17 | Zou et al., mouse grip pressure | Not found (DOI 10.3389/fcomp.2026.1867907 unverified) | – |
+| 18 | Wang et al., LT-AMouse | [arXiv PDF](https://arxiv.org/pdf/2504.21415) | Open |
+| 19 | Seng et al., edge multimedia processing | [MDPI article](https://www.mdpi.com/2079-9292/11/14/2239) | Open |
+| 20 | Tan et al., adversarial attacks | [arXiv PDF](https://arxiv.org/pdf/1905.11831) | Open |
+| 21 | Wang et al., radial artery P-S curve | [MDPI article](https://www.mdpi.com/2076-3417/12/19/9706) | Open |
+
+## Things to fix or check
+
+- **[10] Tao et al.**: listed as "preprint, under review," but a ScienceDirect version now exists with AUC/EER of 99.45%/2.87% (Balabit) and 99.10%/3.14% (SapiMouse), matching the chapter. Cite the published version after confirming journal name and volume.
+- **[15] Ciaramella et al.**: closest match is titled "Continuous and Silent User Authentication Through Mouse Dynamics and Explainable Deep Learning". Likely the same paper; confirm title and venue.
+- **[6] Zheng et al.**: a journal extension exists (ACM TISSEC 2016, doi 10.1145/2893185). Check which version the 1.3% EER figure comes from.
+- **[13] Almalki et al.**: no venue in the reference list; arXiv and EasyChair preprints are what was found.
+- **[7], [12], [14], [17]**: check manually on Google Scholar, IEEE Xplore, or Frontiers; consider replacing [7], [12], [17] if they can't be accessed.
