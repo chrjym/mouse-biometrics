@@ -20,12 +20,12 @@ import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-# Ensure references directory is importable
+# Load scripts/rrl_fetch.py as a module
 REPO_ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(REPO_ROOT / "references"))
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 import importlib.util
-spec = importlib.util.spec_from_file_location("example_rrl_fetch", REPO_ROOT / "references" / "example-rrl-fetch.py")
+spec = importlib.util.spec_from_file_location("example_rrl_fetch", REPO_ROOT / "scripts" / "rrl_fetch.py")
 rrl = importlib.util.module_from_spec(spec)
 sys.modules["example_rrl_fetch"] = rrl
 spec.loader.exec_module(rrl)

@@ -1,7 +1,7 @@
 # New Literature Candidates Tracker — Mouse Dynamics Biometrics
 
 > [!NOTE]
-> This file tracks newly discovered literature candidates retrieved by `references/example-rrl-fetch.py`.
+> This file tracks newly discovered literature candidates retrieved by `scripts/rrl_fetch.py`.
 > Candidates are cross-checked against `references/annotated-bibliography.md`. Review new candidates
 > here and manually promote relevant ones to the bibliography.
 

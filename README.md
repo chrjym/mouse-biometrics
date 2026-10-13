@@ -51,17 +51,25 @@ $$\text{Short-Signal Capture} \longrightarrow \text{Closed-Form Geometry} \longr
 ## 3. Repository Directory Layout
 
 ```
-thesis-mouse-biometrics/
+mouse-biometrics/
 ├── README.md                                  # Repository overview, architecture, and guide (this file)
-├── references/                                # Academic literature, surveys, and chapter drafts
+├── drafts/                                    # Thesis chapter drafts
+│   └── ch1-background.md                      # Cited Chapter 1 Background of the Study (IEEE format)
+├── references/                                # Academic literature, surveys, and project notes
 │   ├── adviser-log.md                         # Running log of adviser feedback, scope guidance, and decisions
-│   ├── background_pure_paragraphs.md          # Cited Chapter 1 Background of the Study (IEEE format)
 │   ├── measurement-comparison-survey.md       # Consolidated survey of mouse measurements vs. matching methods
-│   ├── rrl-candidate-papers.md                # 20 curated and fact-checked RRL sources (2018–2026)
+│   ├── rrl-2021-2026.md                       # Verified 20-paper RRL for 2021–2026
+│   ├── new-candidates.md                      # Auto-updated by the weekly literature checker
 │   ├── literature-sources.md                  # Academic APIs, queries, and fetch documentation
-│   └── example-rrl-fetch.py                   # Automated literature fetch and deduplication script
+│   └── Literature_Review_Mouse_Biometrics.xlsx # Literature review matrix
+├── data/                                      # Raw datasets (git-ignored; download per data/README.md)
+├── outputs/                                   # Generated first-movement JSON (git-ignored; run scripts/automate_*.py)
 ├── scripts/                                   # Operational command-line utilities
+│   ├── rrl_fetch.py                           # Automated literature fetch and deduplication script
+│   ├── automate_balabit.py                    # Extract first movements from Balabit sessions → outputs/
+│   ├── automate_sapimouse.py                  # Extract first movements from SapiMouse sessions → outputs/
 │   └── audit_writing.py                       # Pre-flight AI writing cadence & Turnitin sensitivity auditor
+├── tests/                                     # Unit tests (python -m unittest discover tests)
 ├── .agents/                                   # Specialized agent workflows and skill configurations
 │   └── skills/
 │       ├── mouse-biometrics-thesis/           # Primary skill for thesis domain, adviser logs, and RRL
@@ -80,13 +88,13 @@ An offline Python utility is provided to audit thesis chapter drafts against Tur
 
 ```powershell
 # Run basic audit on a chapter draft
-python scripts/audit_writing.py references/background_pure_paragraphs.md
+python scripts/audit_writing.py drafts/ch1-background.md
 
 # Run with detailed paragraph-by-paragraph breakdown
-python scripts/audit_writing.py references/background_pure_paragraphs.md -v
+python scripts/audit_writing.py drafts/ch1-background.md -v
 
 # Output results in machine-readable JSON
-python scripts/audit_writing.py references/background_pure_paragraphs.md --json
+python scripts/audit_writing.py drafts/ch1-background.md --json
 ```
 
 ### 4.2 Fetching New Literature Candidates
@@ -94,25 +102,25 @@ To query academic APIs, import manual entries, and cross-check new candidate pap
 
 ```powershell
 # Run literature checker with default queries across all active free sources
-python references/example-rrl-fetch.py
+python scripts/rrl_fetch.py
 
 # Query custom topics with increased limit
-python references/example-rrl-fetch.py --queries '"mouse dynamics" "authentication"' '"curvature" "mouse trajectory"' --limit 15
+python scripts/rrl_fetch.py --queries '"mouse dynamics" "authentication"' '"curvature" "mouse trajectory"' --limit 15
 
 # Enable Philippines scope (queries OpenAlex-PH and DOAJ-PH)
-python references/example-rrl-fetch.py --ph
+python scripts/rrl_fetch.py --ph
 
 # Import manual ResearchGate / ejournals.ph entries (with Crossref verification)
-python references/example-rrl-fetch.py --import-file manual_rrl.txt
+python scripts/rrl_fetch.py --import-file manual_rrl.txt
 
 # Export candidate papers to BibTeX (.bib) and compilable LaTeX skeleton (.tex)
-python references/example-rrl-fetch.py --latex references/rrl_candidates
+python scripts/rrl_fetch.py --latex references/rrl_candidates
 
 # Run specific connectors only
-python references/example-rrl-fetch.py --sources arxiv openalex europepmc pubmed crossref doaj
+python scripts/rrl_fetch.py --sources arxiv openalex europepmc pubmed crossref doaj
 
 # Dry-run report to stdout without writing to new-candidates.md
-python references/example-rrl-fetch.py --dry-run
+python scripts/rrl_fetch.py --dry-run
 ```
 
 #### Supported Connectors & Keys
@@ -121,7 +129,7 @@ python references/example-rrl-fetch.py --dry-run
 * **Enrichment:** Unpaywall (`RRL_EMAIL`) automatically adds legal, free publisher and repository PDF links.
 * **Manual Import:** ResearchGate, ejournals.ph, and HERDIN via text files without violating bot/scraping policies.
 
-See [`references/literature-sources.md`](file:///home/tin/thesis-mouse-biometrics/references/literature-sources.md) for full endpoint specifications, access methods, and policy details.
+See [`references/literature-sources.md`](references/literature-sources.md) for full endpoint specifications, access methods, and policy details.
 
 ---
 

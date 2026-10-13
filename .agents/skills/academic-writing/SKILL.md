@@ -14,9 +14,9 @@ This skill guides the drafting, revision, structural analysis, and mathematical 
 
 For detailed structural blueprints, rhetorical frameworks, and academic phraseology, consult the dedicated references:
 
-- [Academic Style, Tone & Phraseology](file:///c:/Users/tulal/thesis-mouse-biometrics/.agents/skills/academic-writing/references/style-and-tone.md) — Scholarly register, active vs. passive voice balance, epistemic hedging, signposting transitions, and nominalization elimination.
-- [Thesis & Academic Paper Chapter Templates](file:///c:/Users/tulal/thesis-mouse-biometrics/.agents/skills/academic-writing/references/chapter-templates.md) — Structural frameworks for Abstract (5-step formula), Introduction (Swales' CARS model), RRL thematic synthesis, Methodology, Experimental Evaluation, and Discussion/Threats to Validity.
-- [Academic Argumentation & Literature Synthesis Guide](file:///c:/Users/tulal/thesis-mouse-biometrics/.agents/skills/academic-writing/references/argumentation-and-synthesis.md) — Toulmin argumentation model, thematic synthesis matrices, MEAL paragraph architecture, academic critique, and claim-to-evidence proportionality.
+- [Academic Style, Tone & Phraseology](references/style-and-tone.md) — Scholarly register, active vs. passive voice balance, epistemic hedging, signposting transitions, and nominalization elimination.
+- [Thesis & Academic Paper Chapter Templates](references/chapter-templates.md) — Structural frameworks for Abstract (5-step formula), Introduction (Swales' CARS model), RRL thematic synthesis, Methodology, Experimental Evaluation, and Discussion/Threats to Validity.
+- [Academic Argumentation & Literature Synthesis Guide](references/argumentation-and-synthesis.md) — Toulmin argumentation model, thematic synthesis matrices, MEAL paragraph architecture, academic critique, and claim-to-evidence proportionality.
 
 ---
 

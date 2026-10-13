@@ -1,15 +1,18 @@
-# Ignore raw dataset files — download locally, never commit to Git
+# Ignore raw dataset files — download locally, never commit to Git.
+# Patterns here are relative to data/.
+# NOTE: files committed before this fix are still tracked; see data/README.md.
 
-# Balabit
-data/balabit/**/*.csv
-data/balabit/**/*.zip
-
-# SapiMouse
-data/sapimouse/**
-
+balabit/**
+sapimouse/**
+custom/**
 
 # Keep the README and folder structure
-!data/README.md
-!data/balabit/.gitkeep
-!data/sapimouse/.gitkeep
-!data/custom/.gitkeep
+!README.md
+!balabit/
+!sapimouse/
+!custom/
+!balabit/.gitkeep
+!balabit/README.md
+!balabit/public_labels.csv
+!sapimouse/.gitkeep
+!custom/.gitkeep

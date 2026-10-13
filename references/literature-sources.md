@@ -37,29 +37,29 @@ Unpaywall open-access enrichment, manual import with Crossref verification, and 
 
 ## Command-Line Flags & Options
 
-The automated literature tool lives at `references/example-rrl-fetch.py`.
+The automated literature tool lives at `scripts/rrl_fetch.py`.
 
 ```bash
 # Basic run with default queries across all active free sources
-python references/example-rrl-fetch.py
+python scripts/rrl_fetch.py
 
 # Run in parallel with custom queries
-python references/example-rrl-fetch.py --queries '"mouse dynamics" "authentication"' '"curvature" "mouse trajectory"'
+python scripts/rrl_fetch.py --queries '"mouse dynamics" "authentication"' '"curvature" "mouse trajectory"'
 
 # Enable Philippines Scope (queries OpenAlex-PH and DOAJ-PH)
-python references/example-rrl-fetch.py --ph
+python scripts/rrl_fetch.py --ph
 
 # Manual import of ResearchGate / ejournals.ph links/DOIs/titles (with Crossref verification)
-python references/example-rrl-fetch.py --import-file manual_rrl.txt
+python scripts/rrl_fetch.py --import-file manual_rrl.txt
 
 # Export results to BibTeX (.bib) and compilable LaTeX skeleton (.tex)
-python references/example-rrl-fetch.py --latex references/rrl_candidates
+python scripts/rrl_fetch.py --latex references/rrl_candidates
 
 # Query specific connectors only
-python references/example-rrl-fetch.py --sources arxiv openalex europepmc crossref pubmed
+python scripts/rrl_fetch.py --sources arxiv openalex europepmc crossref pubmed
 
 # Dry-run report to stdout without modifying new-candidates.md
-python references/example-rrl-fetch.py --dry-run
+python scripts/rrl_fetch.py --dry-run
 ```
 
 ---

@@ -28,7 +28,7 @@ jobs:
           # Optional: Add SERPAPI_KEY to Repository Secrets to enable Google Scholar querying
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: |
-          python references/example-rrl-fetch.py
+          python scripts/rrl_fetch.py
 
       - name: Commit and push changes if new candidates discovered
         run: |

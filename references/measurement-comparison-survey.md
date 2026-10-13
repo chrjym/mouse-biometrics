@@ -3,7 +3,7 @@
 **Author / Project:** Thesis: *Mouse Dynamics Behavioral Biometrics for Continuous Authentication*  
 **Date:** 2026-08-28  
 **Reference Deliverable:** Response to Adviser Log Entry [2026-08-28]  
-**Source Literature:** [Annotated Bibliography](file:///c:/Users/tulal/thesis-mouse-biometrics/references/annotated-bibliography.md) (~46 compiled sources)
+**Source Literature:** [Annotated Bibliography](references/annotated-bibliography.md) (~46 compiled sources)
 
 ---
 

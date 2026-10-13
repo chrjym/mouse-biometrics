@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Editors / tools
+.obsidian/
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Generated literature exports
+references/rrl_candidates*.bib
+references/rrl_candidates*.tex
+
+# Generated pipeline outputs (regenerate with scripts/automate_*.py)
+outputs/
