@@ -19,7 +19,7 @@ impostor's sessions.
 - **0** = no impostor got through any profile (best).
 - **1** = every impostor got through (worst).
 
-It is the share of impostor **users** wrongly accepted, i.e. a user-level false acceptance rate. It is
+It is the share of impostor **users** wrongly accepted, i.e. a user-level false acceptance rate [[1]](#ref-1). It is
 called "threshold" because Earl's plan (and the whiteboard sketch `image.png`) uses that name. It is the value
 drawn on the 0–1 heatmap.
 
@@ -40,3 +40,7 @@ write one row (trial, n_legit, n_sessions, n_impostor, matched_detected, thresho
 ## Output
 
 `runs/<run>/results/summary.csv`.
+
+## References
+
+<a id="ref-1"></a>[1] A. K. Jain, A. Ross, and S. Prabhakar, "An introduction to biometric recognition," *IEEE Trans. Circuits Syst. Video Technol.*, vol. 14, no. 1, pp. 4–20, Jan. 2004, doi: [10.1109/TCSVT.2003.818349](https://doi.org/10.1109/TCSVT.2003.818349).

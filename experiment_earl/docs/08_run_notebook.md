@@ -4,7 +4,7 @@
 
 ## What it does
 
-Runs `notebooks/session_progression.ipynb` from top to bottom without opening Jupyter, and saves the executed
+Runs `notebooks/session_progression.ipynb` from top to bottom without opening Jupyter [[1]](#ref-1), and saves the executed
 copy (with all outputs and plots) as `runs/<run>/notebooks/session_progression.ipynb`.
 
 ## Algorithm
@@ -38,3 +38,7 @@ each legitimate profile, using the rules of [04](04_match_shapes.md). It draws:
 - a heatmap of the threshold, using the first 1 … `n_legitimate` legitimate users.
 
 Script [14](14_plot_matches.md) and script [15](15_genuine_check.md) reproduce its draw.
+
+## References
+
+<a id="ref-1"></a>[1] Jupyter developers, "Executing notebooks," nbconvert documentation. [Online]. Available: https://nbconvert.readthedocs.io/en/latest/execute_api.html

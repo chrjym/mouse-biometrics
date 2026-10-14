@@ -23,7 +23,7 @@ dictionary. Every number used by the experiment comes from this dictionary. No s
 
 1. Take every setting except `run_name`.
 2. Turn the settings into a JSON string with the keys sorted, so the same settings always give the same string.
-3. Hash the string with **SHA-1** and keep the first 6 hexadecimal characters.
+3. Hash the string with **SHA-1** [[1]](#ref-1), [[2]](#ref-2) and keep the first 6 hexadecimal characters.
 4. The folder is `runs/<run_name>_<hash>/`. If it does not exist yet, create it and save a copy of
    `config.yaml` there, plus `run.json` (creation time and the current git commit).
 5. With `--run <folder>`, or the `EARL_RUN` environment variable, open that existing folder and use **its**
@@ -50,7 +50,7 @@ for training files and test files alike, and `public_labels.csv` is not used.
 
 1. `train` = the user's files in `training_files/<user>/`, sorted by name.
 2. `test` = the user's files in `test_files/<user>/`, but only if `use_test_files` is true.
-3. If a `seed` is given, shuffle each list separately, each with its own random generator:
+3. If a `seed` is given, shuffle each list separately (Python's `shuffle` is the Fisher–Yates shuffle [[3]](#ref-3), [[4]](#ref-4)), each with its own random generator:
    `Random(f"{seed}-{user}")` for training and `Random(f"{seed}-{user}-test")` for test.
 4. Return training sessions first, then test sessions, as `(folder, name)` pairs.
 
@@ -72,7 +72,7 @@ not a different random draw.
 
 ## 4. Loading and cleaning a session (`load_session`)
 
-A raw Balabit row is `record timestamp, client timestamp, button, state, x, y`.
+A raw Balabit [[5]](#ref-5) row is `record timestamp, client timestamp, button, state, x, y`.
 
 **Algorithm**
 
@@ -81,7 +81,7 @@ A raw Balabit row is `record timestamp, client timestamp, button, state, x, y`.
 3. Drop **scroll** rows. They record wheel events, not a pointer path.
 4. Drop **glitch** rows where `x` or `y` is 65535 (`INVALID_COORDINATE`). 65535 = 2¹⁶ − 1, the largest 16-bit
    value. It is a logging error, not a position, and keeping it would create jumps of about 60,000 px.
-5. Sort by `t` with a **stable** sort (`kind="stable"`).
+5. Sort by `t` with a **stable** sort (`kind="stable"`) [[6]](#ref-6).
 6. Shift time so the first event is at $t = 0$: $t_i \leftarrow t_i - t_1$.
 
 **Why a stable sort?** Many Balabit timestamps are equal. A stable sort keeps tied rows in file order, which is
@@ -93,3 +93,17 @@ pieces of the path.
 ## Settings used
 
 `run_name`, `seed`, `dataset_dir`, `test_dir`, `use_test_files`.
+
+## References
+
+<a id="ref-1"></a>[1] National Institute of Standards and Technology, "Secure Hash Standard (SHS)," FIPS PUB 180-4, Aug. 2015, doi: [10.6028/NIST.FIPS.180-4](https://doi.org/10.6028/NIST.FIPS.180-4).
+
+<a id="ref-2"></a>[2] Python Software Foundation, "hashlib — Secure hashes and message digests," Python 3 documentation. [Online]. Available: https://docs.python.org/3/library/hashlib.html
+
+<a id="ref-3"></a>[3] R. Durstenfeld, "Algorithm 235: Random permutation," *Commun. ACM*, vol. 7, no. 7, p. 420, Jul. 1964, doi: [10.1145/364520.364540](https://doi.org/10.1145/364520.364540).
+
+<a id="ref-4"></a>[4] Python Software Foundation, "random — Generate pseudo-random numbers," Python 3 documentation. [Online]. Available: https://docs.python.org/3/library/random.html
+
+<a id="ref-5"></a>[5] Á. Fülöp, L. Kovács, T. Kurics, and E. Windhager-Pokol, "Balabit Mouse Dynamics Challenge data set," 2016. [Online]. Available: https://github.com/balabit/Mouse-Dynamics-Challenge
+
+<a id="ref-6"></a>[6] pandas developers, "pandas.DataFrame.sort_values" (the `kind` parameter: only "stable" keeps tied rows in order), pandas documentation. [Online]. Available: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.sort_values.html

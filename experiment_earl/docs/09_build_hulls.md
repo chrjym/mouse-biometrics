@@ -45,7 +45,7 @@ user's request, because the hull then mostly measured the screen size.
 ### Step 2: convex hull
 
 The **convex hull** is the smallest convex polygon that contains all points: the shape a rubber band takes when
-stretched around them. Shapely computes it with GEOS, which uses the **Graham scan** ($O(N \log N)$):
+stretched around them. Shapely computes it with GEOS, which uses the **Graham scan** [[1]](#ref-1), [[2]](#ref-2) ($O(N \log N)$):
 
 1. Take the lowest point as an anchor.
 2. Sort the other points by angle around it.
@@ -60,20 +60,23 @@ A convex hull also covers large empty areas between groups of points, for exampl
 "down moves". Those empty areas would wrongly count as "typical for this user". The **concave hull** follows the
 points more tightly.
 
-GEOS builds it like this:
+GEOS builds it like this [[3]](#ref-3), [[4]](#ref-4):
 
-1. Compute the **Delaunay triangulation** of the points: triangles whose circumcircles contain no other point.
+1. Compute the **Delaunay triangulation** [[5]](#ref-5) of the points: triangles whose circumcircles contain no other point.
 2. Repeatedly remove **border triangles** whose outer edge is longer than a length threshold:
    $$\ell_\text{max} = \ell_\text{min} + \texttt{concave\_ratio} \times (\ell_\text{longest} - \ell_\text{shortest})$$
    where the lengths are those of the triangulation's edges.
 3. The remaining triangles form the hull.
+
+Removing long boundary edges of a Delaunay triangulation is the χ-shape ("chi-shape") method of Duckham et al.
+[[6]](#ref-6). GEOS expresses the length limit as a ratio, so the same setting works at any scale [[3]](#ref-3).
 
 `concave_ratio = 1` gives the convex hull, and `0` gives the tightest outline. We use 0.1. Duplicate points are
 removed first (`np.unique`), because the triangulation needs distinct points.
 
 ### Step 4: area
 
-Both hull areas come from the polygon's vertices $(x_1, y_1), \dots, (x_K, y_K)$ with the **shoelace formula**:
+Both hull areas come from the polygon's vertices $(x_1, y_1), \dots, (x_K, y_K)$ with the **shoelace formula** [[7]](#ref-7):
 
 $$A = \frac{1}{2}\left|\sum_{i=1}^{K} \big(x_i\, y_{i+1} - x_{i+1}\, y_i\big)\right|, \quad (x_{K+1}, y_{K+1}) = (x_1, y_1)$$
 
@@ -89,3 +92,19 @@ $$A = \frac{1}{2}\left|\sum_{i=1}^{K} \big(x_i\, y_{i+1} - x_{i+1}\, y_i\big)\ri
 - The median stroke movement is 169–475 px.
 - Hull extents still follow **screen size** (user15/16, on 1920×1080 screens, have the widest hulls), so area
   differences should not be read as behaviour without normalizing for the screen.
+
+## References
+
+<a id="ref-1"></a>[1] R. L. Graham, "An efficient algorithm for determining the convex hull of a finite planar set," *Inf. Process. Lett.*, vol. 1, no. 4, pp. 132–133, Jun. 1972, doi: [10.1016/0020-0190(72)90045-2](https://doi.org/10.1016/0020-0190(72)90045-2).
+
+<a id="ref-2"></a>[2] GEOS contributors, "geos::algorithm::ConvexHull class reference" ("Uses the Graham Scan algorithm"), GEOS documentation. [Online]. Available: https://libgeos.org/doxygen/classgeos_1_1algorithm_1_1ConvexHull.html
+
+<a id="ref-3"></a>[3] GEOS contributors, "geos::algorithm::hull::ConcaveHull class reference," GEOS documentation. [Online]. Available: https://libgeos.org/doxygen/classgeos_1_1algorithm_1_1hull_1_1ConcaveHull.html
+
+<a id="ref-4"></a>[4] Shapely contributors, "shapely.concave_hull," Shapely 2 documentation. [Online]. Available: https://shapely.readthedocs.io/en/stable/reference/shapely.concave_hull.html
+
+<a id="ref-5"></a>[5] D. T. Lee and B. J. Schachter, "Two algorithms for constructing a Delaunay triangulation," *Int. J. Comput. Inf. Sci.*, vol. 9, no. 3, pp. 219–242, Jun. 1980, doi: [10.1007/BF00977785](https://doi.org/10.1007/BF00977785).
+
+<a id="ref-6"></a>[6] M. Duckham, L. Kulik, M. Worboys, and A. Galton, "Efficient generation of simple polygons for characterizing the shape of a set of points in the plane," *Pattern Recognit.*, vol. 41, no. 10, pp. 3224–3236, Oct. 2008, doi: [10.1016/j.patcog.2008.03.023](https://doi.org/10.1016/j.patcog.2008.03.023).
+
+<a id="ref-7"></a>[7] B. Braden, "The surveyor's area formula," *College Math. J.*, vol. 17, no. 4, pp. 326–337, Sep. 1986, doi: [10.1080/07468342.1986.11972974](https://doi.org/10.1080/07468342.1986.11972974).

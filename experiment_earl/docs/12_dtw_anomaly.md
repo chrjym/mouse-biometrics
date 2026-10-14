@@ -35,8 +35,8 @@ cap does not hide much.
 
 $$o_i = \begin{cases} 0 & \exists\, b \in \text{library}_{\text{kind}(i)} : \ \text{DTW}(a_i, b)/n \le \texttt{dtw\_tolerance} \\ 1 & \text{otherwise}\end{cases}$$
 
-The test is `has_match` from 04: banded DTW (band $w = \operatorname{round}(0.1 \cdot 64) = 6$), early
-abandoning, stop at the first match. See [04](04_match_shapes.md) for the recurrence and why we use DTW.
+The test is `has_match` from 04: banded DTW [[1]](#ref-1), [[2]](#ref-2) (band $w = \operatorname{round}(0.1 \cdot 64) = 6$), early
+abandoning [[3]](#ref-3), stop at the first match. See [04](04_match_shapes.md) for the recurrence and why we use DTW.
 
 ### 4. Windows and session score (`score`)
 
@@ -54,7 +54,7 @@ Each finished user is saved to `progress.pkl`, and a rerun skips them. It takes 
 
 Scripts 04–06 ask "does an **impostor user** match a profile?", a yes/no decision per user. Here the same matching
 gives a per-session score, an FRR and a FAR on the **same sessions and enrollments** as the hull and the SVM. This
-is the fair comparison: same data, same window rule, same EER, only the stroke test differs.
+is the fair comparison: same data, same window rule, same EER [[4]](#ref-4), only the stroke test differs.
 
 ## Settings used
 
@@ -68,3 +68,13 @@ is the fair comparison: same data, same window rule, same EER, only the stroke t
   every session is therefore flagged (FRR 100%, FAR 0%). This is why methods must be compared by EER, not by FRR
   and FAR at a fixed rule.
 - Results are uneven per user: user9 0%, user20 17.5%, user16 73%.
+
+## References
+
+<a id="ref-1"></a>[1] H. Sakoe and S. Chiba, "Dynamic programming algorithm optimization for spoken word recognition," *IEEE Trans. Acoust., Speech, Signal Process.*, vol. 26, no. 1, pp. 43–49, Feb. 1978, doi: [10.1109/TASSP.1978.1163055](https://doi.org/10.1109/TASSP.1978.1163055).
+
+<a id="ref-2"></a>[2] E. Keogh and C. A. Ratanamahatana, "Exact indexing of dynamic time warping," *Knowl. Inf. Syst.*, vol. 7, no. 3, pp. 358–386, Mar. 2005, doi: [10.1007/s10115-004-0154-9](https://doi.org/10.1007/s10115-004-0154-9).
+
+<a id="ref-3"></a>[3] T. Rakthanmanon, B. Campana, A. Mueen, G. Batista, B. Westover, Q. Zhu, J. Zakaria, and E. Keogh, "Searching and mining trillions of time series subsequences under dynamic time warping," in *Proc. 18th ACM SIGKDD Int. Conf. Knowl. Discov. Data Min. (KDD)*, 2012, pp. 262–270, doi: [10.1145/2339530.2339576](https://doi.org/10.1145/2339530.2339576).
+
+<a id="ref-4"></a>[4] A. K. Jain, A. Ross, and S. Prabhakar, "An introduction to biometric recognition," *IEEE Trans. Circuits Syst. Video Technol.*, vol. 14, no. 1, pp. 4–20, Jan. 2004, doi: [10.1109/TCSVT.2003.818349](https://doi.org/10.1109/TCSVT.2003.818349).

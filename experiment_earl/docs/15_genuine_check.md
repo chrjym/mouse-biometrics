@@ -44,7 +44,7 @@ $$\bar r_\text{genuine} > \bar r_\text{impostor} \quad\text{and}\quad \text{genu
   *after* the first `sessions_per_user` ones guarantees that no step's library ever contains them.
 - **Same sessions at every step:** the genuine test set is fixed, so changes across $k$ come only from the growing
   library.
-- **Same cache:** the matching is identical to 04's (`matched_chunks`, shared `pairs.pkl`), so the numbers can be
+- **Same cache:** the matching is identical to 04's (banded DTW [[1]](#ref-1), [[2]](#ref-2), `matched_chunks`, shared `pairs.pkl`), so the numbers can be
   compared directly with the notebook's.
 
 ## Figure
@@ -62,3 +62,9 @@ the held-out sessions are training or test files: test files can be very short.
   through **as impostors**. Passing therefore tracks a user's tendency to draw straight strokes more than their
   identity.
 - user15's and user35's held-out sessions include short test files (44–61 strokes).
+
+## References
+
+<a id="ref-1"></a>[1] H. Sakoe and S. Chiba, "Dynamic programming algorithm optimization for spoken word recognition," *IEEE Trans. Acoust., Speech, Signal Process.*, vol. 26, no. 1, pp. 43–49, Feb. 1978, doi: [10.1109/TASSP.1978.1163055](https://doi.org/10.1109/TASSP.1978.1163055).
+
+<a id="ref-2"></a>[2] E. Keogh and C. A. Ratanamahatana, "Exact indexing of dynamic time warping," *Knowl. Inf. Syst.*, vol. 7, no. 3, pp. 358–386, Mar. 2005, doi: [10.1007/s10115-004-0154-9](https://doi.org/10.1007/s10115-004-0154-9).

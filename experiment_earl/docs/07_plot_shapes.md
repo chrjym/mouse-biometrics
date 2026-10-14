@@ -31,7 +31,11 @@ in parallel (multiprocessing Pool, --workers processes), per session file:
 - **Inverted y axis.** Screen coordinates grow downward. `invert_yaxis()` makes the picture look like the
   screen.
 - **Equal aspect.** One pixel in x has the same length as one pixel in y, so curves are not distorted.
-- **Parallel workers.** A run can hold tens of thousands of strokes. Each session is independent, so several
+- **Parallel workers** ([[1]](#ref-1)). A run can hold tens of thousands of strokes. Each session is independent, so several
   processes can plot at once.
 
 This script computes nothing new: it is a visual check of segmentation (03).
+
+## References
+
+<a id="ref-1"></a>[1] Python Software Foundation, "multiprocessing — Process-based parallelism," Python 3 documentation. [Online]. Available: https://docs.python.org/3/library/multiprocessing.html

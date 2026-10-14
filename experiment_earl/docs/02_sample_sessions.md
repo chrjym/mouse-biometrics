@@ -26,7 +26,7 @@ for label in (legitimate, impostor):
         manifest["sessions"][label][user] = {sessions, held_out}
 ```
 
-The method is a **prefix of a fixed random permutation**: the pool is shuffled once (seeded), and each user's
+The method is a **prefix of a fixed random permutation** (a Fisher–Yates shuffle [[1]](#ref-1), [[2]](#ref-2)): the pool is shuffled once (seeded), and each user's
 first *k* entries are taken.
 
 ## Why a prefix of one shuffle
@@ -46,3 +46,9 @@ sessions with training files only and 114–253 with `use_test_files`.
 
 - Input: `temp/manifest.json` from 01; `sessions_per_user`, `use_test_files`, `seed`.
 - Output: copied session files in `temp/{legitimate,impostor}/<user>/`, plus the updated manifest.
+
+## References
+
+<a id="ref-1"></a>[1] R. Durstenfeld, "Algorithm 235: Random permutation," *Commun. ACM*, vol. 7, no. 7, p. 420, Jul. 1964, doi: [10.1145/364520.364540](https://doi.org/10.1145/364520.364540).
+
+<a id="ref-2"></a>[2] Python Software Foundation, "random — Generate pseudo-random numbers," Python 3 documentation. [Online]. Available: https://docs.python.org/3/library/random.html

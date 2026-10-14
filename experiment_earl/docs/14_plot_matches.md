@@ -37,13 +37,13 @@ for each impostor, each of their first k sessions, each kind (move/drag):
 
 ### `first_match`: the same search as `has_match`, but returning *which* stroke
 
-`has_match` (04) returns only true/false. `first_match` runs the same loop (same `_dtw_within`, same band, same
+`has_match` (04) returns only true/false. Both use banded DTW [[1]](#ref-1), [[2]](#ref-2). `first_match` runs the same loop (same `_dtw_within`, same band, same
 cap, same order) and returns the **index** of the first library stroke within the cap, or −1. Because the search
 and its order are identical, a stroke counts as matched here exactly when it counts as matched in the notebook.
 
 ### `dtw_cost`: the full DTW value of a matched pair
 
-`_dtw_within` stops early and only answers yes/no. To print the actual cost in each panel, `dtw_cost` fills the
+`_dtw_within` stops early and only answers yes/no. To print the actual cost in each panel (compiled with numba [[3]](#ref-3)), `dtw_cost` fills the
 whole banded DTW table (the recurrence in [04](04_match_shapes.md#the-dtw-recurrence)) and returns $D(n,n)$. The
 plot shows
 
@@ -74,3 +74,11 @@ overlaid strokes did not look alike, the tolerance or the normalization would be
 Matched pairs are mostly **near-straight lines**. After normalization, a straight move from A to B looks the same
 for everyone, which is why shapes match across users and why shape matching alone cannot tell users apart.
 About 2 minutes for 6 users × 5 steps.
+
+## References
+
+<a id="ref-1"></a>[1] H. Sakoe and S. Chiba, "Dynamic programming algorithm optimization for spoken word recognition," *IEEE Trans. Acoust., Speech, Signal Process.*, vol. 26, no. 1, pp. 43–49, Feb. 1978, doi: [10.1109/TASSP.1978.1163055](https://doi.org/10.1109/TASSP.1978.1163055).
+
+<a id="ref-2"></a>[2] E. Keogh and C. A. Ratanamahatana, "Exact indexing of dynamic time warping," *Knowl. Inf. Syst.*, vol. 7, no. 3, pp. 358–386, Mar. 2005, doi: [10.1007/s10115-004-0154-9](https://doi.org/10.1007/s10115-004-0154-9).
+
+<a id="ref-3"></a>[3] S. K. Lam, A. Pitrou, and S. Seibert, "Numba: A LLVM-based Python JIT compiler," in *Proc. 2nd Workshop LLVM Compiler Infrastructure HPC*, 2015, pp. 1–6, doi: [10.1145/2833157.2833162](https://doi.org/10.1145/2833157.2833162).

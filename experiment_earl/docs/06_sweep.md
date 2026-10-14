@@ -20,6 +20,8 @@ Outputs (in the run folder): `results/sweep/{pairs,summary,saturation}.csv`, `re
 
 ### 1. One draw per seed (`draw`)
 
+The shuffle is Python's Fisher–Yates shuffle [[1]](#ref-1), [[2]](#ref-2).
+
 ```
 users ← the 10 users, shuffled with Random(seed)
 legitimate users of a cell with n_L  ← users[0 : n_L]            (from the front)
@@ -73,7 +75,7 @@ $$\text{biggest\_jump\_at} = \arg\max_i |\Delta_i|, \qquad \text{biggest\_jump} 
 
 The code walks backwards from the last step and stops at the first change that is $\ge \delta$.
 
-**Why this rule?** "Saturation" answers a practical question: *after how many sessions (or users) does adding
+This rule is our own; it is not taken from a published method. **Why this rule?** "Saturation" answers a practical question: *after how many sessions (or users) does adding
 more stop changing the result?* That is the smallest enrollment worth asking for. Walking backwards makes sure
 the curve stays flat to the end, not just for one step. The biggest jump shows where adding data matters most.
 It is done for each axis, with the other two fixed (`saturation.csv`).
@@ -101,3 +103,9 @@ takes about 30 minutes, because it fills the shared DTW cache.
 - **Legitimate users** give a slow rise: 0.16 → 0.27 from 1 to 9 users (more profiles = more chances that one
   accepts the impostor).
 - **Impostor count** barely matters, because the threshold is already a share.
+
+## References
+
+<a id="ref-1"></a>[1] R. Durstenfeld, "Algorithm 235: Random permutation," *Commun. ACM*, vol. 7, no. 7, p. 420, Jul. 1964, doi: [10.1145/364520.364540](https://doi.org/10.1145/364520.364540).
+
+<a id="ref-2"></a>[2] Python Software Foundation, "random — Generate pseudo-random numbers," Python 3 documentation. [Online]. Available: https://docs.python.org/3/library/random.html

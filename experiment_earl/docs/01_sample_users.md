@@ -23,13 +23,13 @@ return sorted(legitimate), sorted(impostor)
 ```
 
 `random.sample` picks without replacement: each user is chosen at most once, and every subset of size *n* is
-equally likely.
+equally likely [[1]](#ref-1).
 
 ## Constraint
 
 $$n_\text{legitimate} + n_\text{impostor} \le 10$$
 
-Balabit has only 10 users, and a user cannot be both legitimate and impostor in the same run. This is why the
+Balabit has only 10 users [[2]](#ref-2), and a user cannot be both legitimate and impostor in the same run. This is why the
 original plan's 5/10/15/20 impostors cannot be done here. The script stops with an error when the sum is too large.
 
 ## Why random, and why seeded
@@ -48,3 +48,9 @@ notebook's heatmap columns.
 
 - Input: `config.yaml` (`seed`, `n_legitimate`, `n_impostor`); `--seed` overrides the seed.
 - Output: `runs/<run>/temp/manifest.json` = `{"seed", "legitimate", "impostor"}`.
+
+## References
+
+<a id="ref-1"></a>[1] Python Software Foundation, "random — Generate pseudo-random numbers," Python 3 documentation. [Online]. Available: https://docs.python.org/3/library/random.html
+
+<a id="ref-2"></a>[2] Á. Fülöp, L. Kovács, T. Kurics, and E. Windhager-Pokol, "Balabit Mouse Dynamics Challenge data set," 2016. [Online]. Available: https://github.com/balabit/Mouse-Dynamics-Challenge

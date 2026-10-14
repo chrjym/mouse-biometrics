@@ -40,7 +40,9 @@ $$L = \sum_{i=1}^{m-1} \sqrt{(x_{i+1}-x_i)^2 + (y_{i+1}-y_i)^2} \qquad\text{(pat
 
 **Why pauses and clicks?** Mouse movement comes in bursts. People move toward a target, stop, click, and start
 the next movement. A pause or a click marks where one intention ends and the next begins, so a stroke is roughly
-one aimed movement. This follows the adviser's scope (2026-08-31): capture mannerisms from **short** signals,
+one aimed movement. Earlier mouse-dynamics work cuts the data the same way: Gamboa and Fred define a stroke as
+the movement between two clicks [[1]](#ref-1), and Ahmed and Traore split mouse activity into separate actions such as
+mouse-move, point-and-click and drag-and-drop [[2]](#ref-2). This follows the adviser's scope (2026-08-31): capture mannerisms from **short** signals,
 not whole sessions. A pause threshold is the simplest segmentation rule that needs no labels and no model.
 
 **Why remove click rows from the points?** A press or release usually repeats the last position. It marks a
@@ -50,7 +52,8 @@ boundary, not a movement.
 shape, and as tiny shapes they would match almost anything.
 
 **Why separate move and drag?** Dragging (button held) is a different motor task from free movement: it is
-slower, more careful, and often straight. Comparing a drag with a move would mix two behaviours.
+slower, more careful, and often straight. Comparing a drag with a move would mix two behaviours. Work on the same Balabit data also treats mouse moves,
+point-clicks and drag-and-drops as separate action types [[3]](#ref-3).
 
 ## Step 2: normalization (`normalize`)
 
@@ -66,11 +69,15 @@ sampling rate are removed.
 3. **Resample by arc length**: compute the cumulative distance along the path,
    $$s_1 = 0, \qquad s_i = s_{i-1} + d(p_{i-1}', p_i')$$
    Then place $n$ points at equal distances $s = 0, \tfrac{L}{n-1}, \tfrac{2L}{n-1}, \dots, L$ along the path,
-   using **linear interpolation** (`np.interp`) between the recorded points.
+   using **linear interpolation** (`np.interp` [[4]](#ref-4)) between the recorded points.
 4. Strokes with $D = 0$ or $L = 0$ (all points identical) cannot be normalized and are skipped. They still count
    in `n_chunks`, the denominator of the session's match ratio.
 
 The result is an $n \times 2$ array, the same size for every stroke.
+
+Resampling to $n$ equally spaced points along the path and translating the start follow the preprocessing of the
+\$1 gesture recognizer [[5]](#ref-5). That recognizer also rotates each gesture and scales it to a square; we do
+neither, for the reasons below.
 
 **Why each step:**
 
@@ -106,3 +113,15 @@ $(m, n, 2)$ array per kind). For a legitimate user, `main()` stacks the shapes o
 
 Most strokes, after normalization, are close to a straight line from the start to the target. That makes many
 strokes of different users look alike (see 04 and 14), which is the main limit of shape matching on Balabit.
+
+## References
+
+<a id="ref-1"></a>[1] H. Gamboa and A. Fred, "A behavioral biometric system based on human-computer interaction," in *Proc. SPIE 5404, Biometric Technology for Human Identification*, 2004, pp. 381–392, doi: [10.1117/12.542625](https://doi.org/10.1117/12.542625).
+
+<a id="ref-2"></a>[2] A. A. E. Ahmed and I. Traore, "A new biometric technology based on mouse dynamics," *IEEE Trans. Dependable Secure Comput.*, vol. 4, no. 3, pp. 165–179, Jul.–Sep. 2007, doi: [10.1109/TDSC.2007.70207](https://doi.org/10.1109/TDSC.2007.70207).
+
+<a id="ref-3"></a>[3] M. Antal and E. Egyed-Zsigmond, "Intrusion detection using mouse dynamics," *IET Biometrics*, vol. 8, no. 5, pp. 285–294, 2019, doi: [10.1049/iet-bmt.2018.5126](https://doi.org/10.1049/iet-bmt.2018.5126).
+
+<a id="ref-4"></a>[4] NumPy developers, "numpy.interp," NumPy documentation. [Online]. Available: https://numpy.org/doc/stable/reference/generated/numpy.interp.html
+
+<a id="ref-5"></a>[5] J. O. Wobbrock, A. D. Wilson, and Y. Li, "Gestures without libraries, toolkits or training: A \$1 recognizer for user interface prototypes," in *Proc. 20th Annu. ACM Symp. User Interface Softw. Technol. (UIST)*, 2007, pp. 159–168, doi: [10.1145/1294211.1294238](https://doi.org/10.1145/1294211.1294238).

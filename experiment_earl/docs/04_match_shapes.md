@@ -13,7 +13,7 @@ users' held-out sessions).
 
 ## Level 1: are two strokes the same shape? Dynamic Time Warping (DTW)
 
-Two normalized strokes $a$ and $b$, each $n = 64$ points, are compared with **Dynamic Time Warping**.
+Two normalized strokes $a$ and $b$, each $n = 64$ points, are compared with **Dynamic Time Warping** [[1]](#ref-1).
 
 ### The DTW recurrence
 
@@ -33,7 +33,7 @@ where $d(a_i, b_j)$ is the Euclidean distance between the two points. $D(n, n)$ 
 
 ### The band (Sakoe–Chiba constraint)
 
-Only cells near the diagonal are allowed:
+Only cells near the diagonal are allowed (the Sakoe–Chiba band [[1]](#ref-1), [[2]](#ref-2)):
 
 $$|i - j| \le w, \qquad w = \operatorname{round}(\texttt{dtw\_band} \times n) = \operatorname{round}(0.1 \times 64) = 6$$
 
@@ -54,13 +54,13 @@ $$\min_j D(i, j) > C \;\Rightarrow\; \text{no match, stop now}$$
 
 This is safe because distances are never negative: every later cell is a row-$i$ value plus more non-negative
 costs, so $D(n,n)$ can only be larger. Most stroke pairs are clearly different, so most comparisons stop after a
-few rows.
+few rows. Early abandoning is a standard way to speed up DTW search [[3]](#ref-3).
 
 ### Library search (`has_match`)
 
 For each query stroke, the library strokes are tried one by one, stopping at the **first** one within the cap.
 We only need to know *whether* a match exists, not which match is best. Query strokes are processed in parallel
-with numba (`prange`), and the code is compiled to machine code (`@njit`).
+with numba (`prange`), and the code is compiled to machine code (`@njit`) [[4]](#ref-4), [[5]](#ref-5).
 
 ### Why DTW
 
@@ -71,12 +71,12 @@ with numba (`prange`), and the code is compiled to machine code (`@njit`).
 - A plain point-by-point (Euclidean) distance would punish a small shift along the path as heavily as a
   completely different shape.
 - DTW was the method in Earl's idea list and the execution plan, and it is the standard tool for comparing
-  trajectories and time series.
+  trajectories and time series [[2]](#ref-2), [[3]](#ref-3).
 
 ### Why a band
 
 - **Realism:** without a band, DTW can pair one point with half of the other stroke and make very different
-  shapes look alike ("pathological warping"). A 10% band allows small local shifts only.
+  shapes look alike ("pathological warping") [[1]](#ref-1), [[2]](#ref-2). A 10% band allows small local shifts only.
 - **Speed:** the work per pair drops from $n^2 = 4096$ cells to about $n(2w+1) \approx 830$ cells, five times
   fewer, before early abandoning saves even more.
 
@@ -136,3 +136,15 @@ Chunk matching does **not** discriminate between users:
 
 The value 0.02 is kept only because it gives a non-trivial heatmap. Treat the numbers as a baseline, not as
 evidence of unique shapes.
+
+## References
+
+<a id="ref-1"></a>[1] H. Sakoe and S. Chiba, "Dynamic programming algorithm optimization for spoken word recognition," *IEEE Trans. Acoust., Speech, Signal Process.*, vol. 26, no. 1, pp. 43–49, Feb. 1978, doi: [10.1109/TASSP.1978.1163055](https://doi.org/10.1109/TASSP.1978.1163055).
+
+<a id="ref-2"></a>[2] E. Keogh and C. A. Ratanamahatana, "Exact indexing of dynamic time warping," *Knowl. Inf. Syst.*, vol. 7, no. 3, pp. 358–386, Mar. 2005, doi: [10.1007/s10115-004-0154-9](https://doi.org/10.1007/s10115-004-0154-9).
+
+<a id="ref-3"></a>[3] T. Rakthanmanon, B. Campana, A. Mueen, G. Batista, B. Westover, Q. Zhu, J. Zakaria, and E. Keogh, "Searching and mining trillions of time series subsequences under dynamic time warping," in *Proc. 18th ACM SIGKDD Int. Conf. Knowl. Discov. Data Min. (KDD)*, 2012, pp. 262–270, doi: [10.1145/2339530.2339576](https://doi.org/10.1145/2339530.2339576).
+
+<a id="ref-4"></a>[4] S. K. Lam, A. Pitrou, and S. Seibert, "Numba: A LLVM-based Python JIT compiler," in *Proc. 2nd Workshop LLVM Compiler Infrastructure HPC*, 2015, pp. 1–6, doi: [10.1145/2833157.2833162](https://doi.org/10.1145/2833157.2833162).
+
+<a id="ref-5"></a>[5] Numba developers, "Automatic parallelization with @jit (prange)," Numba documentation. [Online]. Available: https://numba.readthedocs.io/en/stable/user/parallel.html

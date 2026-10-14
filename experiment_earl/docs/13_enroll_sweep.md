@@ -38,7 +38,7 @@ for k in 1 … k_max:
 
 ### Why "first k of a draw of k_max" reproduces scripts 10–12
 
-Scripts 10–12 call `sample(sessions, k)` directly. Python's `random.sample`, on lists this small, picks elements
+Scripts 10–12 call `sample(sessions, k)` directly. Python's `random.sample` [[1]](#ref-1), on lists this small, picks elements
 one at a time with the same random numbers whatever $k$ is, so `sample(x, k)` equals the first $k$ elements of
 `sample(x, k_max)`. Therefore:
 
@@ -65,7 +65,7 @@ take about 30 s; DTW takes about 25 min.
 
 ## Why this experiment
 
-A real system has to choose how long to watch a new user before trusting their profile. If the EER fell clearly
+Error rates are defined as in 10 [[2]](#ref-2). A real system has to choose how long to watch a new user before trusting their profile. If the EER fell clearly
 with $k$, that would show how many sessions are enough. If it does not fall, then more enrollment data does not
 fix the method's weakness.
 
@@ -84,3 +84,9 @@ the profile grows, so fewer own sessions are rejected but more impostors fit ins
 
 - hull: FRR 89.8 → 27.5%, FAR 14.5 → 56.5%
 - SVM: FRR 33.4 → 8.2%, FAR 24.2 → 34.2%
+
+## References
+
+<a id="ref-1"></a>[1] Python Software Foundation, "random — Generate pseudo-random numbers," Python 3 documentation. [Online]. Available: https://docs.python.org/3/library/random.html
+
+<a id="ref-2"></a>[2] A. K. Jain, A. Ross, and S. Prabhakar, "An introduction to biometric recognition," *IEEE Trans. Circuits Syst. Video Technol.*, vol. 14, no. 1, pp. 4–20, Jan. 2004, doi: [10.1109/TCSVT.2003.818349](https://doi.org/10.1109/TCSVT.2003.818349).
