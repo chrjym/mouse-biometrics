@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find the sensitivity: score every experiment in `experiments` (legitimate x impostor user counts, set by hand) at every dtw_tolerance in sensitivity_values."""
+"""Find the sensitivity: score every experiment in `experiments` (legitimate x impostor user counts, set by hand) at every sensitivity (DTW tolerance) in sensitivity_values."""
 
 import argparse
 import random
@@ -48,10 +48,10 @@ def test_part(pool: list[tuple[str, str]], config: dict) -> list[tuple[str, str]
 
 
 def pass_matrix(users: list[str], order: dict, k: int, tolerance: float, config: dict) -> dict[tuple[str, str], bool]:
-    """(profile, user) -> does `user` go through `profile`'s first-k-session library at this dtw_tolerance?
+    """(profile, user) -> does `user` go through `profile`'s first-k-session library at this sensitivity?
     A test session matches when at least `match_shape_ratio` of its strokes match; a user goes through when at
     least `match_session_ratio` of their test sessions match."""
-    config = {**config, "dtw_tolerance": tolerance}
+    config = {**config, "sensitivity": tolerance}
     load = lambda user, part: [match_mod.dataset_session(user, name, config, folder) for folder, name in part]
     tests = {user: load(user, test_part(order[user], config)) for user in users}
     matrix = {}

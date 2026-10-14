@@ -37,7 +37,7 @@ def first_match(queries, library, band, cap):
 
 @njit(cache=True)
 def dtw_cost(a, b, band):
-    """Banded DTW cost between paths a and b (the value has_match compares with dtw_tolerance * resample_n)."""
+    """Banded DTW cost between paths a and b (the value has_match compares with sensitivity * resample_n)."""
     n = a.shape[0]
     cost = np.full((n + 1, n + 1), np.inf)
     cost[0, 0] = 0.0
@@ -61,7 +61,7 @@ def draw_users(config: dict, seed: int) -> tuple[list[str], list[str], dict[str,
 def step_matches(profile: str, impostor: list[str], order: dict, k: int, config: dict, pairs: dict) -> list[dict]:
     """Every impostor stroke (first k sessions) with a matching stroke in the profile's first k sessions."""
     n = config["resample_n"]
-    band, cap = int(round(config["dtw_band"] * n)), config["dtw_tolerance"] * n
+    band, cap = int(round(config["dtw_band"] * n)), config["sensitivity"] * n
     library = [match_mod.dataset_session(profile, name, config, folder) for folder, name in order[profile][:k]]
     rows = []
     for user in impostor:

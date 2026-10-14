@@ -21,6 +21,8 @@ INVALID_COORDINATE = 65535  # Balabit logging glitch, not a position
 def load_config(path: Path | None = None, **overrides) -> dict:
     with (path or ROOT / "config.yaml").open() as handle:
         config = yaml.safe_load(handle)
+    if "dtw_tolerance" in config:  # run snapshots made before 2026-10-14 use the old name
+        config["sensitivity"] = config.pop("dtw_tolerance")
     config.update(overrides)
     return config
 
@@ -29,7 +31,7 @@ def run_folder_name(config: dict) -> str:
     """`<run_name or tol/gap/n>_<hash>`: the same settings always give the same folder, any change gives a new one."""
     settings = {k: v for k, v in config.items() if k != "run_name"}
     digest = hashlib.sha1(json.dumps(settings, sort_keys=True).encode()).hexdigest()[:6]
-    label = config.get("run_name") or f"tol{config['dtw_tolerance']}_gap{config['pause_gap_s']}_n{config['resample_n']}"
+    label = config.get("run_name") or f"sens{config['sensitivity']}_gap{config['pause_gap_s']}_n{config['resample_n']}"
     return f"{label}_{digest}"
 
 

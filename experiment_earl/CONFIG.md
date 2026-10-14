@@ -38,7 +38,7 @@ runs/baseline_2707e0/
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
 08_run_notebook      executes the notebook and saves the copy in the run folder
-09_find_sensitivity  every [legitimate, impostor] experiment set in `experiments` at every sensitivity (dtw_tolerance)
+09_find_sensitivity  every [legitimate, impostor] experiment set in `experiments` at every sensitivity (DTW tolerance)
 10_find_session      each E_k at its chosen sensitivity with 2, 4, ... 10 profile sessions; sensitivity heatmap
 14_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
 15_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
@@ -75,7 +75,7 @@ Chunks that are not comparable (zero length) still count in the denominator of a
 | Setting | Default | Meaning |
 |---|---|---|
 | `dtw_band` | 0.1 | The comparison (banded DTW) may only stretch one shape against the other within this share of `resample_n`. It keeps matching fast and stops absurd alignments. |
-| `dtw_tolerance` | 0.02 | The key setting. Two chunks match when their mean DTW distance per point is at or below this value. Lower is stricter. At 0.15 about 99% of all chunks matched, so the metric told nothing; 0.02 keeps the results from being all 0 or all 1. |
+| `sensitivity` | 0.02 | Formerly `dtw_tolerance` (renamed 2026-10-14; old run snapshots are read with the old name too). The key setting. Two chunks match when their mean DTW distance per point is at or below this value. Lower is stricter. At 0.15 about 99% of all chunks matched, so the metric told nothing; 0.02 keeps the results from being all 0 or all 1. |
 | `match_shape_ratio` | 0.2 | A session matches a legitimate profile when at least this share of its chunks match a chunk of the same kind (move or drag) in that profile. (Assumption A2 in `EARL_EXECUTION_PLAN.md`.) |
 | `match_session_ratio` | 0.5 | An impostor user counts as **matched** when at least this share of their sessions match any single legitimate profile. This decides `matched_detected`. (Assumption A1 in the plan.) |
 
@@ -98,7 +98,7 @@ Adviser, 2026-10-14. One draw from `seed` puts the users in one random order and
 | Setting | Default | Meaning |
 |---|---|---|
 | `experiments` | `[[1, 1], [2, 2], [3, 3], [4, 4]]` | The experiments, set by hand: one `[legitimate, impostor]` pair each (E1, E2, … in this order). Each needs at least 1 of both and at most 10 users in total. Since every experiment starts from the same user order, a larger L reuses the smaller L's legitimate users. In the graphs, experiments with the same L (or I) are averaged into one point. |
-| `sensitivity_values` | `[0.2, 0.4, 0.6, 0.8, 1.0]` | The sensitivities 09 tries. Sensitivity = `dtw_tolerance` (the other matching settings may be tried later). At 0.15 about 99% of all strokes already match, so this grid lets every user through; values around 0.03–0.05 are where users start to differ. |
+| `sensitivity_values` | `[0.2, 0.4, 0.6, 0.8, 1.0]` | The sensitivities 09 tries. Each value replaces `sensitivity` for that score (the other matching settings may be tried later). At 0.15 about 99% of all strokes already match, so this grid lets every user through; values around 0.03–0.05 are where users start to differ. |
 | `sensitivity_sessions` | 2 | Profile sessions per legitimate user while 09 finds the sensitivity. |
 | `session_values` | `[2, 4, 6, 8, 10]` | Profile sessions per legitimate user that 10 tries, each experiment at the sensitivity 09 chose for it (best mean of legitimate and impostor accuracy, ties to the stricter one). |
 | `test_sessions` | 2 | Sessions tested per user (own sessions for legitimate users, all for impostors): the ones right after `max(session_values)`, so they are never part of a profile and stay the same at every step. |

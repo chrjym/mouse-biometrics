@@ -113,7 +113,7 @@ Each image shows the real screen path: green dot = start, red dot = end, blue = 
 
 The adviser's pipeline (2026-10-14): raw → RNG (legitimate users, impostor users, sessions) → strokes (chunk shapes) → **user × user × sensitivity** → user × session × sensitivity → sensitivity → heatmap. Matching uses DTW only.
 
-One draw from `seed` puts the users in one random order and fixes each user's session order. The experiments are set by hand in `experiments`: each `[L, I]` entry (E1, E2, … in list order) takes the first L users of that order as legitimate and the next I as impostors (user change 2026-10-14: the automatic direct-opposite split, I = n − L, was dropped). For example `[[1, 4], [2, 2]]` gives E1 = 1 legitimate + 4 impostors and E2 = 2 + 2. Each experiment is scored at every **sensitivity** in `sensitivity_values` (0.2, 0.4, … 1.0). Sensitivity is the DTW setting `dtw_tolerance`; other matching settings may become sensitivities later.
+One draw from `seed` puts the users in one random order and fixes each user's session order. The experiments are set by hand in `experiments`: each `[L, I]` entry (E1, E2, … in list order) takes the first L users of that order as legitimate and the next I as impostors (user change 2026-10-14: the automatic direct-opposite split, I = n − L, was dropped). For example `[[1, 4], [2, 2]]` gives E1 = 1 legitimate + 4 impostors and E2 = 2 + 2. Each experiment is scored at every **sensitivity** in `sensitivity_values` (0.2, 0.4, … 1.0). Sensitivity is the DTW tolerance, config key `sensitivity` (formerly `dtw_tolerance`); other matching settings may become sensitivities later.
 
 - **Profile:** a legitimate user's first `sensitivity_sessions` sessions (default 2).
 - **Tested sessions:** every user's next `test_sessions` sessions (default 2) after the largest profile (`max(session_values)`), so they are never in a profile at any step.
@@ -210,7 +210,7 @@ experiment_earl/runs/<run name>/
 How to read them:
 
 - **Impostors matched**: how many impostor users looked like a legitimate user. Lower is better.
-- **Sensitivity** (called *threshold* before 2026-10-14) = impostors matched / impostor users, from 0 to 1. 0 is best: no impostor passed. In E and F, *sensitivity* also names the `dtw_tolerance` value being tried; the CSVs call the share `impostor_sensitivity`.
+- **Sensitivity** (called *threshold* before 2026-10-14) = impostors matched / impostor users, from 0 to 1. 0 is best: no impostor passed. In E and F, *sensitivity* also names the DTW tolerance being tried (config key `sensitivity`); the CSVs call the share `impostor_sensitivity`.
 - **Accuracy** (E, F): legitimate = own sessions accepted / legitimate users; impostor = impostors rejected / impostor users.
 - **±** (std, sweep only): how much a sweep cell changes from draw to draw. It is blank (NaN) when `n_trials` is 1, because one draw has no spread. The notebook, E and F use one fixed draw, so they have no ±.
 

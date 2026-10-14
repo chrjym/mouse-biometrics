@@ -26,7 +26,7 @@ resample_n: 64             # every chunk is redrawn with this many evenly spaced
 
 # --- Matching (04): when do two shapes, a session and a user match ---
 dtw_band: 0.1              # DTW may stretch a shape by at most this share of resample_n
-dtw_tolerance: 0.02        # chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
+sensitivity: 0.02          # (formerly dtw_tolerance) chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
 match_shape_ratio: 0.2     # a session matches a profile when at least this share of its chunks match
 match_session_ratio: 0.5   # an impostor user is "matched" when at least this share of their sessions match
 
@@ -38,7 +38,7 @@ sweep_delta: 0.05          # a step that changes the mean sensitivity by less th
 # Set the experiments by hand: each [L, I] is one experiment (E1, E2, ... in this order) with L legitimate and I impostor users.
 # One draw from `seed` orders the users once; every experiment takes the first L of that order as legitimate and the next I as impostors.
 experiments: [[1, 4], [2, 3], [3, 2], [4, 1]]   # [legitimate, impostor] per experiment; L + I <= 10, at least 1 of each
-sensitivity_values: [0.2, 0.4, 0.6, 0.8, 1.0]  # dtw_tolerance values tried by 09 (sensitivity = dtw_tolerance)
+sensitivity_values: [0.2, 0.4, 0.6, 0.8, 1.0]  # sensitivity (DTW tolerance) values tried by 09 and 10
 sensitivity_sessions: 2                        # profile sessions per legitimate user while 09 finds the sensitivity
 session_values: [2, 4, 6, 8, 10]               # profile sessions per legitimate user tried by 10
 test_sessions: 2                               # sessions tested per user, taken after max(session_values); never in a profile

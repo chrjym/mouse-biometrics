@@ -58,9 +58,9 @@ def segmentation(config: dict) -> tuple:
 
 def pair_matches(query: chunk_mod.Session, library: chunk_mod.Session, config: dict) -> dict[int, np.ndarray]:
     n = config["resample_n"]
-    key = (query.key, library.key, segmentation(config), config["dtw_band"], config["dtw_tolerance"])
+    key = (query.key, library.key, segmentation(config), config["dtw_band"], config["sensitivity"])
     if key not in _PAIRS:
-        band, cap = int(round(config["dtw_band"] * n)), config["dtw_tolerance"] * n
+        band, cap = int(round(config["dtw_band"] * n)), config["sensitivity"] * n
         _PAIRS[key] = {
             kind: has_match(paths, library.paths[kind], band, cap) if len(library.paths[kind]) else
             np.zeros(len(paths), dtype=bool)

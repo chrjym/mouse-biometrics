@@ -37,7 +37,7 @@ def heatmap(grid: pd.DataFrame, chosen: dict, title: str, path) -> None:
         ax.set_xticks(range(len(values.columns)),
                       [f"{t:g}*" if t == chosen[experiment] else f"{t:g}" for t in values.columns])
         ax.set_yticks(range(len(values.index)), values.index)
-        ax.set_xlabel("sensitivity (dtw_tolerance; * = chosen by 09)")
+        ax.set_xlabel("sensitivity (DTW tolerance; * = chosen by 09)")
         ax.set_ylabel("profile sessions per legitimate user")
         ax.set_title(f"{experiment}: L={part.n_legit.iloc[0]}, I={part.n_impostor.iloc[0]}", fontsize=10)
     for ax in axes.flat[len(experiments):]:

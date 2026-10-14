@@ -15,7 +15,7 @@ One draw from `seed` puts the users in one random order and fixes each user's se
 are set by hand in `experiments`: entry $i$, $[L_i, I_i]$, is experiment **E_i**, with the first $L_i$ users of
 the order as legitimate and the next $I_i$ as impostors. (The first version split $n$ drawn users into all
 "direct-opposite" pairs $[k, n - k]$; that was dropped the same day.) Every experiment is scored at each **sensitivity**
-in `sensitivity_values`. The sensitivity is the DTW setting `dtw_tolerance` (script 04); matching uses DTW only.
+in `sensitivity_values`. The sensitivity is the DTW tolerance of script 04, config key `sensitivity` (formerly `dtw_tolerance`); matching uses DTW only.
 
 Outputs: `runs/<run>/results/sensitivity/experiments.csv`, `results/sensitivity/chosen.csv`,
 `figures/find_sensitivity.png`.

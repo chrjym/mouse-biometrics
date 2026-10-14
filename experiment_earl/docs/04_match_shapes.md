@@ -123,7 +123,7 @@ If shape matching captured identity, these ratios should be higher than the impo
 
 ## Settings used
 
-`resample_n`, `dtw_band` (0.1), `dtw_tolerance` (0.02), `match_shape_ratio`, `match_session_ratio` (0.5),
+`resample_n`, `dtw_band` (0.1), `sensitivity` (0.02; formerly `dtw_tolerance`), `match_shape_ratio`, `match_session_ratio` (0.5),
 plus the segmentation settings in the cache key.
 
 ## What we learned
