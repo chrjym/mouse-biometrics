@@ -37,6 +37,7 @@ Suggested format per entry:
 - Implemented as `experiment_earl/src/09_find_sensitivity.py` and `10_find_session.py`; data merged into `experiment_earl/datasets/balabit/users/`. The hull, One-Class SVM and DTW anomaly tests and the enroll sweep (old scripts 09–13) were removed along with the OCSVM (group decision).
 - Accuracy (group decision): legitimate = share of legitimate users whose own unseen sessions pass their own profile; impostor = share of impostors rejected by every legitimate profile. The chosen sensitivity per E_k maximizes the mean of the two.
 - Changed the same day (group decision): the direct-opposite split is dropped. The legitimate/impostor counts of each experiment are set by hand in `config.yaml` (`experiments: [[L, I], ...]`); the seed still picks which users and sessions.
+- Later the same day (group decision): 09 and 10 have no settings of their own any more. They use the main configuration (`seed`, `n_legitimate`, `n_impostor`, `sessions_per_user`, and `sensitivity`, which is the renamed `dtw_tolerance`); a different sensitivity is tried by editing `sensitivity` and rerunning. Graphs show accuracy per user.
 - First run (`oct14_test1`, still with the direct-opposite split): at every sensitivity 0.2–1.0 and every session count 2–10, all legitimate users pass and all impostors get through (heatmap all 1.0). Users only start to differ around `dtw_tolerance` 0.03–0.05.
 
 **Open questions:**

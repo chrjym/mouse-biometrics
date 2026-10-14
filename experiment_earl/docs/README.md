@@ -18,7 +18,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    │   07 draw the strokes   08 run the notebook   14 draw matched pairs   15 genuine check   │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
    ┌──────────────────────────────────────────────────────────────────────────────────────────┐
-   │ B. Adviser pipeline (2026-10-14): experiments [L, I] set by hand in config.yaml          │
+   │ B. Adviser pipeline (2026-10-14), main configuration (seed, L, I, sessions, sensitivity) │
    │   09 user × user × sensitivity   →   10 user × session × sensitivity → heatmap           │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -34,8 +34,8 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 06 | [06_sweep.md](06_sweep.md) | Full factorial sweep with nested draws; saturation (flat-from) and biggest-jump detection |
 | 07 | [07_plot_shapes.md](07_plot_shapes.md) | Plot every raw stroke (parallel workers) |
 | 08 | [08_run_notebook.md](08_run_notebook.md) | Execute the session-progression notebook for a run |
-| 09 | [09_find_sensitivity.md](09_find_sensitivity.md) | Hand-set [legitimate, impostor] experiments × DTW tolerance grid; accuracy per side; best mean accuracy per experiment |
-| 10 | [10_find_session.md](10_find_session.md) | Each E_k at its chosen sensitivity × 2 … 10 profile sessions; sensitivity heatmap |
+| 09 | [09_find_sensitivity.md](09_find_sensitivity.md) | The notebook's draw at the configured sensitivity; accuracy per legitimate user and per impostor |
+| 10 | [10_find_session.md](10_find_session.md) | The same at 1 … `sessions_per_user` profile sessions; sensitivity heatmap (sessions × legitimate users) |
 | 14 | [14_plot_matches.md](14_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
 | 15 | [15_genuine_check.md](15_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
 
@@ -47,7 +47,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 - **Legitimate user / profile**: the user whose sessions form a shape library.
 - **Impostor**: any other user whose sessions are tested against that profile.
 - **Sensitivity**: in 05, 06 and the notebook, impostors matched / impostors (called *threshold* before 2026-10-14). In 09 and 10 it also names the DTW tolerance being tried, the config key `sensitivity` (formerly `dtw_tolerance`).
-- **Accuracy** (09, 10): legitimate = own sessions accepted / legitimate users; impostor = impostors rejected / impostor users.
+- **Accuracy** (09, 10): per user, the share of tested sessions decided correctly; overall, legitimate users accepted / legitimate users and impostors kept out / impostors.
 
 ## Formulas shared by several scripts
 

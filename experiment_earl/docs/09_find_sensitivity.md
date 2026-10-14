@@ -11,71 +11,66 @@ raw → RNG (legitimate users, impostor users, sessions) → strokes (chunk shap
     → user × user × sensitivity (09) → user × session × sensitivity (10) → sensitivity → heatmap (10)
 ```
 
-One draw from `seed` puts the users in one random order and fixes each user's session order. The experiments
-are set by hand in `experiments`: entry $i$, $[L_i, I_i]$, is experiment **E_i**, with the first $L_i$ users of
-the order as legitimate and the next $I_i$ as impostors. (The first version split $n$ drawn users into all
-"direct-opposite" pairs $[k, n - k]$; that was dropped the same day.) Every experiment is scored at each **sensitivity**
-in `sensitivity_values`. The sensitivity is the DTW tolerance of script 04, config key `sensitivity` (formerly `dtw_tolerance`); matching uses DTW only.
+It uses only the main configuration (user decision 2026-10-14): the notebook's draw from `seed`
+(`n_legitimate` legitimate users in draw order, `n_impostor` impostors, each user's session order), the
+configured **sensitivity** (the DTW tolerance of script 04, config key `sensitivity`, formerly `dtw_tolerance`)
+and `sessions_per_user`. To compare sensitivities, change `sensitivity` and rerun; each value gets its own run
+folder. Matching uses DTW only.
 
-Outputs: `runs/<run>/results/sensitivity/experiments.csv`, `results/sensitivity/chosen.csv`,
+Outputs: `runs/<run>/results/sensitivity/users.csv`, `results/sensitivity/summary.csv`,
 `figures/find_sensitivity.png`.
 
 ## Algorithm
 
 ```
-users, order ← random.Random(seed).sample(all users, max(L + I)), each user's shuffled session pool
-P ← sensitivity_sessions                                    # profile size
-T[u] ← order[u][max(session_values) : max(session_values) + test_sessions]   # never in any profile
-for each sensitivity τ in sensitivity_values:
-    for each pair (profile p, user u) of the drawn users:   # computed once, shared by all experiments
-        library ← p's first P sessions
-        through[p, u] ← share of T[u] with r ≥ match_shape_ratio  is  ≥ match_session_ratio
-    for each [L_i, I_i] in experiments:
-        L ← users[:L_i],  I ← users[L_i : L_i + I_i]
-        legit accuracy    ← |{u ∈ L : through[u, u]}| / |L|
-        impostor accuracy ← |{v ∈ I : no p ∈ L has through[p, v]}| / |I|
-chosen[E_i] ← τ with the highest mean of the two accuracies (ties: the smaller, stricter τ)
+L, I, order ← 14.draw_users(config, seed)                       # the notebook's draw
+T[u] ← order[u][sessions_per_user : sessions_per_user + 2]      # tested sessions, never in a profile
+for each legitimate profile p, each user u in L ∪ I:
+    library ← p's first sessions_per_user sessions
+    hit[p, u][s] ← r(s, library) ≥ match_shape_ratio  for s in T[u]     # r: 04's session match ratio at τ
+legitimate u: accuracy = mean(hit[u, u]);  accepted  = accuracy ≥ match_session_ratio
+impostor v:   accuracy = share of s in T[v] with no p in L having hit[p, v][s]
+              through  = some p in L has mean(hit[p, v]) ≥ match_session_ratio
 ```
-
-$r$ is script 04's session match ratio: the share of a session's strokes with a DTW match (same kind, within
-$\tau \cdot$ `resample_n`) in any library session.
 
 ## Formulas
 
-$$\text{Acc}_L(E_i, \tau) = \frac{|\{u \in L : u \text{ goes through its own profile}\}|}{L_i},\qquad
-\text{Acc}_I(E_i, \tau) = 1 - \frac{|\{v \in I : \exists\, p \in L,\ v \text{ goes through } p\}|}{I_i}$$
+Per user, with $T_u$ the tested sessions and $\tau$ the sensitivity:
 
-$$\text{Acc}(E_i, \tau) = \tfrac12\left(\text{Acc}_L + \text{Acc}_I\right),\qquad
-\tau^*(E_i) = \arg\max_\tau \text{Acc}(E_i, \tau)$$
+$$\text{Acc}(u) = \frac{|\{s \in T_u : s \text{ matches } u\text{'s profile}\}|}{|T_u|} \ (u \in L),\qquad
+\text{Acc}(v) = \frac{|\{s \in T_v : \text{no } p \in L \text{ matches } s\}|}{|T_v|} \ (v \in I)$$
+
+Overall (`summary.csv`):
+
+$$\text{Acc}_L = \frac{|\{u \in L : u \text{ accepted}\}|}{|L|},\qquad
+\text{Acc}_I = 1 - \frac{|\{v \in I : v \text{ through}\}|}{|I|},\qquad
+\text{Acc} = \tfrac12(\text{Acc}_L + \text{Acc}_I)$$
 
 $1 - \text{Acc}_L$ is a user-level false rejection rate and $1 - \text{Acc}_I$ a user-level false acceptance
-rate [[1]](#ref-1); the mean of both is balanced accuracy, so an experiment with 1 legitimate user and 4 impostors
-weighs both sides equally. The CSV also stores $1 - \text{Acc}_I$ as `impostor_sensitivity`: the old *threshold*
-(impostors through / impostors), renamed by the adviser.
+rate [[1]](#ref-1); their mean is balanced accuracy, so 1 legitimate user and 4 impostors weigh both sides
+equally. `impostor_sensitivity` $= 1 - \text{Acc}_I$ is the old *threshold* (impostors through / impostors).
 
 ## Why these choices
 
-- **Experiments by hand** (user decision): the user counts are the variable under study, so they are set in the
-  config; one shared user order means a larger experiment extends a smaller one instead of drawing new users.
-- **One draw:** the same users and sessions in every experiment and every sensitivity, so differences come from the
-  split and the tolerance, not from a new random draw.
-- **Fixed tested sessions** after the largest profile (also 10's `session_values`), so 09 and 10 test the same
-  sessions and a legitimate user's tested sessions are never part of their own profile.
-- **Two separate graphs** (adviser): legitimate accuracy against the number of legitimate users, impostor
-  accuracy against the number of impostor users, one line per sensitivity; experiments with the same user count on an axis are averaged into one point.
+- **One configuration for every script:** 09 and 10 see the same users, sessions and tolerance as the notebook
+  and scripts 01–05, 14 and 15, so their numbers can be compared directly.
+- **x = each user** (whiteboard axis "1, 2, …, I, …, n"): with one draw there is one legitimate set and one
+  impostor set, so the graphs show every user separately instead of a count.
+- **Tested sessions after the profile:** a legitimate user's tested sessions are never part of their own
+  profile, at any session step of script 10.
 
-## What we learned (`oct14_test1_229cd4`, direct-opposite split [1, 4] … [4, 1], users user21, user15, user29, user23, user12)
+## What we learned
 
-At every sensitivity from 0.2 to 1.0 every legitimate user is accepted and every impostor goes through
-(legitimate accuracy 1, impostor accuracy 0, mean 0.5), so all lines overlap and 0.2 is chosen by the tie rule.
-DTW with banding [[2]](#ref-2) on normalized strokes is already permissive at 0.15 (about 99% of strokes match).
-A probe outside the config at 2 sessions gave: 0.01–0.02 nobody goes through (mean 0.5), 0.03 one legitimate
-user accepted and no impostor through (E3 0.67, E4 0.63), 0.05 impostors start going through, 0.1 everyone again.
+- With the adviser's tolerances 0.2–1.0 (earlier version, `oct14_exp1_23ed6f`), every legitimate user was
+  accepted and every impostor went through. Banded DTW [[2]](#ref-2) on normalized strokes is already
+  permissive at 0.15 (about 99% of strokes match).
+- At 0.02 (`oct14_exp1_c8f010`, user20 vs user21, user23, user29, user35): no impostor session matches, but
+  neither do user20's own (accuracy 0.50).
 
 ## Settings used
 
-`seed`, `experiments`, `sensitivity_values`, `sensitivity_sessions`, `session_values`, `test_sessions`, the chunking
-settings, `dtw_band`, `match_shape_ratio`, `match_session_ratio`.
+`seed`, `n_legitimate`, `n_impostor`, `sessions_per_user`, `sensitivity`, the chunking settings, `dtw_band`,
+`match_shape_ratio`, `match_session_ratio`.
 
 ## References
 
