@@ -100,7 +100,7 @@ No settings of their own (user decision 2026-10-14): they use `seed`, `n_legitim
 Any change to a value (except `run_name`) makes the next script run create a new folder under `runs/`, so nothing needs deleting or resetting. Then:
 
 - **Single trial:** run 01 → 05 again (or the sweep, or the notebook). The new folder starts empty.
-- **Speed:** DTW results are shared through `cache/pairs.pkl`. Changing only `match_session_ratio`, `sweep_delta`, `sweep_sessions_max`, `n_trials` or `seed` reuses all of them; each sensitivity in `sensitivity_values` is cached as its own tolerance; changing chunking, band or tolerance recomputes what it must.
+- **Speed:** DTW results are shared through `cache/pairs.pkl`. Changing only `match_session_ratio`, `sweep_delta`, `sweep_sessions_max`, `n_trials` or `seed` reuses all of them; changing chunking, `dtw_band` or `sensitivity` recomputes what it must.
 - **Going back:** run the scripts with `--run <old folder>` to read or extend an older run with its own saved settings, whatever `config.yaml` says now.
 
 ## Limits to remember
