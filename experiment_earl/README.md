@@ -1,17 +1,16 @@
 # How to run the EARL experiment
 
-This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the three ways to run it, exporting the shapes as images, the convex and concave hulls, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md); how each script works (algorithm, formulas, and why) is in [docs/](docs/README.md).
+This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the ways to run it, exporting the shapes as images, the find-the-sensitivity and find-the-sessions experiments, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md); how each script works (algorithm, formulas, and why) is in [docs/](docs/README.md).
 
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
 ## The data
 
-All of Balabit is used, raw (adviser, 2026-10-08): 10 users, 65 training sessions and 1,611 test sessions. **A session belongs to the user whose folder it is in**, for training and test files alike; no label file is used.
+All of Balabit is used, raw (adviser, 2026-10-08): 10 users, 1,676 sessions. Balabit's `training_files` and `test_files` are merged into **one folder per user**, `datasets/balabit/users/<user>/` (adviser, 2026-10-14). **A session belongs to the user whose folder it is in**; no label file is used.
 
-- Each user's sessions are their training sessions (5–7, about 2 hours each) followed by their test sessions (about 5 minutes each), each part shuffled once with `seed`.
-- So the first 5 session steps always use training sessions; test sessions come in from step 6–8 on, depending on the user.
-- With `use_test_files: true` a user has 114–253 sessions, so `sessions_per_user` can go up to 114. With `use_test_files: false`, only training files are used and the limit is 5.
-- Every script prints these counts and the limit when it starts.
+- Each user has 114–253 sessions: 5–7 former training sessions (about 2 hours each) and the rest former test sessions (about 5 minutes each). The folder no longer says which is which.
+- Each user's sessions are shuffled once with `seed`; step k takes the first k, so step k+1 contains step k.
+- Every script prints these counts and the session limit (114) when it starts.
 
 ## 1. One-time setup
 
@@ -56,7 +55,7 @@ Tries 1 up to `sweep_sessions_max` sessions per user, and every mix of legitimat
 .venv/bin/python experiment_earl/src/06_sweep.py --trials 1    # quick look: one draw
 ```
 
-It ignores `n_legitimate`, `n_impostor` and `sessions_per_user` (it tries them all). If it stops halfway, run it again: it continues from the last finished draw. Raising `sweep_sessions_max` above 5 brings test sessions in, but every extra session step compares all 10 users with each other again, so the run time grows quickly.
+It ignores `n_legitimate`, `n_impostor` and `sessions_per_user` (it tries them all). If it stops halfway, run it again: it continues from the last finished draw. Raising `sweep_sessions_max` adds sessions, but every extra session step compares all 10 users with each other again, so the run time grows quickly.
 
 ### C. Single trial, step by step (file-based)
 
@@ -67,10 +66,10 @@ One draw of `n_legitimate` + `n_impostor` users with `sessions_per_user` session
 .venv/bin/python experiment_earl/src/02_sample_sessions.py   # pick sessions     -> temp/<class>/<user>/
 .venv/bin/python experiment_earl/src/03_chunk_shapes.py      # cut into chunks   -> shapes/<class>/<user>/*.npz
 .venv/bin/python experiment_earl/src/04_match_shapes.py      # compare chunks    -> results/trial_0.json
-.venv/bin/python experiment_earl/src/05_threshold.py         # threshold         -> results/summary.csv
+.venv/bin/python experiment_earl/src/05_sensitivity.py       # sensitivity       -> results/summary.csv
 ```
 
-Step 04 also scores each legitimate user's own **held-out** sessions (the ones not drawn) against their profile, as a sanity check: they should match better than the impostors do. With test files that is up to about 250 sessions per user.
+Step 04 also scores each legitimate user's own **held-out** sessions (the ones not drawn) against their profile, as a sanity check: they should match better than the impostors do. That is up to about 250 sessions per user.
 
 ### D. Export the shapes (lines) as images
 
@@ -110,68 +109,36 @@ shapes/<legitimate|impostor>/<user>/
 
 Each image shows the real screen path: green dot = start, red dot = end, blue = mouse move, orange = drag (button held). The title gives the shape's number, length in pixels and duration. A session has hundreds to over a thousand shapes, so all users can mean tens of thousands of images (about 25 minutes for 10 users × 5 sessions); `--user` and `--limit` keep it small.
 
-### E. Convex and concave hulls per user
+### E. Find the sensitivity (User × User × Sensitivity)
 
-Pipeline: raw data → chunks → chunk end points → convex hull → concave hull. For each of the 10 users it takes their first `sessions_per_user` sessions (same order as the notebook) and cuts them into chunks with step 03's rules. Each chunk is moved so it starts at (0, 0), and only its **end point** is kept: one point per chunk, its net movement (dx, dy). The convex hull wraps all of a user's end points; the concave hull (`concave_ratio`) follows them more tightly. Together they show the range of directions and distances the user moves in one stroke.
+The adviser's pipeline (2026-10-14): raw → RNG (legitimate users, impostor users, sessions) → strokes (chunk shapes) → **user × user × sensitivity** → user × session × sensitivity → sensitivity → heatmap. Matching uses DTW only.
 
-```bash
-.venv/bin/python experiment_earl/src/09_build_hulls.py                 # all 10 users, ~15 seconds
-.venv/bin/python experiment_earl/src/09_build_hulls.py --user user9    # one user
-```
+One draw from `seed` picks `n_users` users (default 5) and each user's session order. Experiment **E_k** uses the first k users as legitimate and the other n − k as their **direct-opposite impostors**: with n = 5, E1 = 1 legitimate + 4 impostors, E2 = 2 + 3, E3 = 3 + 2, E4 = 4 + 1. Each E_k is scored at every **sensitivity** in `sensitivity_values` (0.2, 0.4, … 1.0). Sensitivity is the DTW setting `dtw_tolerance`; other matching settings may become sensitivities later.
 
-It reads the raw sessions itself, so it does not need steps 01–03 first. Outputs, inside the run folder: `hulls/<user>.json` (sessions used, chunk count, median movement, both areas and outlines), `hulls/summary.csv`, and `figures/hulls/<user>.png` plus `figures/hulls/all_users.png`.
-
-### F. Hull anomaly test: can an own session be flagged?
-
-Builds each user's concave hull from `anomaly_enroll_sessions` training sessions (default 4) and checks sessions window by window: a window of `anomaly_window` strokes (default 30) is an **anomaly** when more than `anomaly_outside_share` of its strokes (default 20%) end outside the hull. A session is flagged when any of its windows is.
-
-- **Own sessions:** each training session is left out in turn and tested against a hull built from 4 of the user's other sessions. A flag here is a **false rejection** (FRR).
-- **Other users' sessions:** every training session of the other 9 users against the user's hull. A session never flagged is a **missed impostor** (FAR).
-- **EER:** the error where both are equal, scoring each session by its worst window.
+- **Profile:** a legitimate user's first `sensitivity_sessions` sessions (default 2).
+- **Tested sessions:** every user's next `test_sessions` sessions (default 2) after the largest profile (`max(session_values)`), so they are never in a profile at any step.
+- **Goes through:** a user goes through a profile when at least `match_session_ratio` of their tested sessions match it (a session matches when at least `match_shape_ratio` of its strokes match).
+- **Legitimate accuracy** = share of legitimate users whose own tested sessions go through their own profile. **Impostor accuracy** = share of impostors that no legitimate profile lets through.
 
 ```bash
-.venv/bin/python experiment_earl/src/10_hull_anomaly.py               # all users, ~5 seconds
-.venv/bin/python experiment_earl/src/10_hull_anomaly.py --user user9
+.venv/bin/python experiment_earl/src/09_find_sensitivity.py     # seconds once the DTW cache is warm
 ```
 
-Only training sessions are used, so every session's owner is certain. Outputs, inside the run folder: `results/anomaly/sessions.csv` (every session scored), `results/anomaly/summary.csv` (FRR, FAR, EER per user against all other users; the last row is the configured experiment) and `figures/hull_anomaly.png`.
+Outputs, inside the run folder: `results/sensitivity/experiments.csv` (every E_k × sensitivity: users, legitimate accepted, impostors through, both accuracies, their mean), `results/sensitivity/chosen.csv` (per E_k, the sensitivity with the best mean accuracy; ties go to the stricter one) and `figures/find_sensitivity.png`: two separate graphs, **legitimate** (x = legitimate users L) and **impostor** (x = impostor users I), y = accuracy, one line per sensitivity.
 
-**Users in F–I.** Every profile is scored against every other user once; the experiment you configured is then read from those scores. One draw from `seed` (the same users as script 01 and the notebook) fixes `n_legitimate` legitimate users (profiles) and `n_impostor` impostors for the whole run. FRR comes from the legitimate users' own held-out sessions, FAR from those impostors' sessions only; the last row of `summary.csv` gives FRR, FAR and EER with the users' names. The per-user rows and bars still show each user against all 9 others. With `--user`, the last row only covers the users that were run.
+### F. Find the sessions (User × Session × Sensitivity) and the sensitivity heatmap
 
-### G. One-Class SVM anomaly test
-
-The same test as F (same sessions, windows and number of registered sessions), but each user is modelled by a **One-Class SVM** instead of a concave hull. The SVM learns the region where the user's strokes usually fall, from several numbers per stroke (`ocsvm_features`: end point dx, dy, path length, straightness, speed, duration), and gives every new stroke a score: above 0 inside the user's region, below 0 outside. A window of `anomaly_window` strokes is an anomaly when its mean score is below `ocsvm_flag_score` (default 0).
+Same draw and experiments as E. Each E_k uses its own chosen sensitivity from E (`chosen.csv`, so run E first) and is scored with 2, 4, … 10 profile sessions (`session_values`). The tested sessions stay the same at every step.
 
 ```bash
-.venv/bin/python experiment_earl/src/11_ocsvm_anomaly.py               # all users, ~15 seconds
-.venv/bin/python experiment_earl/src/11_ocsvm_anomaly.py --user user9
+.venv/bin/python experiment_earl/src/10_find_session.py
 ```
 
-It needs scikit-learn in `.venv` (`.venv/bin/pip install scikit-learn`). Outputs, inside the run folder: `results/ocsvm/sessions.csv`, `results/ocsvm/summary.csv` (per user, last row = the configured experiment) and `figures/ocsvm_anomaly.png`. Compare its EER with F's to see which model separates users better.
+Outputs, inside the run folder: `results/session/experiments.csv`, `figures/find_session.png` (legitimate and impostor graphs, y = accuracy, one line per session count) and `figures/sensitivity_heatmap.png` (profile sessions × experiment; colour = **sensitivity** = impostors through / impostors, the former threshold, 0–1 in 0.1 steps; each cell also shows impostors through and legitimate users accepted).
 
-### H. DTW shape-matching anomaly test
+**First result** (`oct14_test1_229cd4`, users user21, user15, user29, user23, user12): at every sensitivity from 0.2 to 1.0 and every session count, every legitimate user is accepted and every impostor goes through (legitimate accuracy 1, impostor accuracy 0). Tolerance 0.15 already matched about 99% of all strokes, so this grid cannot separate users; a quick probe at 2 sessions showed that only tolerances around 0.03–0.05 give any difference between users.
 
-The same test as F and G, with shape matching as the model. Each user's **shape library** is built from the chunks of `anomaly_enroll_sessions` training sessions (at most `dtw_max_library` shapes, the same cap as the One-Class SVM). A stroke is anomalous when no shape of the same kind (move or drag) in the library is within `dtw_tolerance` by DTW distance. Windows, flags, FRR, FAR, EER and the figure work exactly as in F, so the three methods compare directly.
-
-```bash
-.venv/bin/python experiment_earl/src/12_dtw_anomaly.py               # all users, ~10 minutes
-.venv/bin/python experiment_earl/src/12_dtw_anomaly.py --user user9  # one user, ~1 minute
-```
-
-It saves each finished user, so an interrupted run continues where it stopped. Outputs, inside the run folder: `results/dtw/sessions.csv`, `results/dtw/summary.csv` and `figures/dtw_anomaly.png`.
-
-### I. Registered sessions sweep: all three tests, 1 → 4 sessions
-
-Reruns F, G and H with 1, 2, ... up to `anomaly_enroll_sessions` registered sessions (default 1–4), on the same draws: the first k sessions of each draw are exactly the ones F–H register when `anomaly_enroll_sessions` is k, so step 4 reproduces their results.
-
-```bash
-.venv/bin/python experiment_earl/src/13_enroll_sweep.py                                   # all three, ~25 minutes (DTW is the slow one)
-.venv/bin/python experiment_earl/src/13_enroll_sweep.py --method hull --method ocsvm      # the two fast ones, ~30 seconds
-```
-
-It saves each finished (method, sessions, user) cell, so an interrupted run continues. Outputs, inside the run folder: `results/enroll_sweep/sessions.csv`, `results/enroll_sweep/summary.csv` (FRR, FAR, EER per method, session count and user; the last row of each block is the configured experiment), `figures/enroll_sweep_lines.png` (FRR, FAR and EER against registered sessions, one line per method) and `figures/enroll_sweep_heatmap.png` (EER per method × sessions, 0–1 in 0.1 steps). Compare methods by **EER**: FRR and FAR depend on each method's fixed flag rule (DTW flags nearly every session at the 20% rule).
-
-### J. Matched shapes behind the per-user bar graphs
+### G. Matched shapes### J. Matched shapes behind the per-user bar graphs
 
 Shows which impostor strokes matched which strokes of each legitimate user in the notebook (A): the same draw, users and sessions, one figure per legitimate user and session step. Each panel is one matched pair after normalization (what DTW compares): the impostor stroke (red dashed) on the user's stroke it matched (blue), with both session ids, chunk numbers and the DTW cost per point. The figure title repeats the bar graph's verdict per impostor (strokes matched, sessions at or above `match_shape_ratio`, matched or not). Run the notebook first so the run folder exists.
 
@@ -183,16 +150,16 @@ Shows which impostor strokes matched which strokes of each legitimate user in th
 
 Outputs, inside the run folder: `figures/matches/<user>_sessions<k>.png` (at most `--max` pairs, random sample) and `results/matches.csv` (every matched stroke of the drawn users and steps).
 
-### K. Genuine check: own unused sessions against their own profile
+### H. Genuine check: own unused sessions against their own profile
 
-The notebook (A) only asks whether impostors get through. This asks the opposite: does a legitimate user's own new session match their own profile? Same draw, same profiles (first 1, 2, ... `sessions_per_user` sessions) and the same 30% rule (`match_shape_ratio`). Each legitimate user's next `--held-out` sessions after the first `sessions_per_user` (default 2; never part of the profile at any step) are tested, next to the impostors' sessions against the same profile.
+The notebook (A) only asks whether impostors get through. This asks the opposite: does a legitimate user's own new session match their own profile? Same draw, same profiles (first 1, 2, ... `sessions_per_user` sessions) and the same `match_shape_ratio` rule. Each legitimate user's next `--held-out` sessions after the first `sessions_per_user` (default 2; never part of the profile at any step) are tested, next to the impostors' sessions against the same profile.
 
 ```bash
 .venv/bin/python experiment_earl/src/15_genuine_check.py --run oct12_test3_d05fb2       # seconds once the DTW cache is warm
 .venv/bin/python experiment_earl/src/15_genuine_check.py --held-out 5                    # more own sessions per user
 ```
 
-Outputs, inside the run folder: `results/genuine_check.csv` (every tested session: share of strokes matched, passed or not, train or test file), `results/genuine_check_summary.csv` and `figures/genuine_check.png` (one panel per legitimate user: own sessions blue, impostors red, label = sessions passed / tested). Held-out sessions after a user's training sessions are short test-file sessions (about 50 strokes), whose owner is the folder's user by the raw-data rule only.
+Outputs, inside the run folder: `results/genuine_check.csv` (every tested session: share of strokes matched, passed or not), `results/genuine_check_summary.csv` and `figures/genuine_check.png` (one panel per legitimate user: own sessions blue, impostors red, label = sessions passed / tested).
 
 ### Working with an older run
 
@@ -203,7 +170,7 @@ Every script takes `--run <run folder name>`. It then uses that folder and the s
 .venv/bin/python experiment_earl/src/08_run_notebook.py --run baseline_91da91
 ```
 
-Run folder names are `<run_name>_<hash>`: `run_name` comes from the top of `config.yaml` and the hash from all other settings. Use a new `run_name` (for example `tol003`) to make runs easy to tell apart. Runs made before 2026-10-08 used training files only.
+Run folder names are `<run_name>_<hash>`: `run_name` comes from the top of `config.yaml` and the hash from all other settings. Use a new `run_name` (for example `tol003`) to make runs easy to tell apart. Runs made before 2026-10-08 used training files only; runs before 2026-10-14 read the separate `training_files`/`test_files` folders.
 
 ## 4. Where the results are
 
@@ -217,31 +184,25 @@ experiment_earl/runs/<run name>/
 │   ├── session_progression_users.png    one bar graph per legitimate user               (A)
 │   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users            (A)
 │   ├── sweep_heatmaps.png               one heatmap per session count                   (B)
-│   ├── sweep_lines.png                  threshold vs sessions / legitimate / impostors  (B)
-│   ├── hulls/<user>.png, all_users.png   end points, convex and concave hull per user    (E)
-│   ├── hull_anomaly.png                 own vs other sessions, FRR and FAR per user     (F)
-│   ├── ocsvm_anomaly.png                same, One-Class SVM                             (G)
-│   ├── dtw_anomaly.png                  same, DTW shape matching                        (H)
-│   ├── enroll_sweep_lines.png           FRR, FAR, EER vs registered sessions, per method (I)
-│   ├── enroll_sweep_heatmap.png         EER per method × registered sessions            (I)
-│   ├── matches/<user>_sessions<k>.png   matched impostor strokes on the user's strokes  (J)
-│   └── genuine_check.png                own unused sessions vs impostors, per profile   (K)
+│   ├── sweep_lines.png                  sensitivity vs sessions / legitimate / impostors (B)
+│   ├── find_sensitivity.png             accuracy vs L and vs I, one line per sensitivity (E)
+│   ├── find_session.png                 accuracy vs L and vs I, one line per session count (F)
+│   ├── sensitivity_heatmap.png          sensitivity per session count × experiment     (F)
+│   ├── matches/<user>_sessions<k>.png   matched impostor strokes on the user's strokes  (G)
+│   └── genuine_check.png                own unused sessions vs impostors, per profile   (H)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_steps.csv    every step, every impostor                      (A)
 │   ├── session_progression_heatmap.csv  the heatmap's numbers                           (A)
 │   ├── session_progression_users.csv    impostors matched per legitimate user and step  (A)
-│   ├── sweep/summary.csv                every combination: matched and threshold         (B)
+│   ├── sweep/summary.csv                every combination: matched and sensitivity      (B)
 │   ├── sweep/saturation.csv             where each curve flattens and jumps             (B)
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)
-│   └── summary.csv                      threshold of the single trial                   (C)
-├── results/anomaly/   sessions.csv, summary.csv: hull anomaly test                (F)
-├── results/ocsvm/     sessions.csv, summary.csv: One-Class SVM test               (G)
-├── results/dtw/       sessions.csv, summary.csv: DTW anomaly test                 (H)
-├── results/enroll_sweep/  sessions.csv, summary.csv: all three, 1–4 sessions      (I)
-├── results/matches.csv    every matched stroke behind the per-user bar graphs      (J)
-├── results/genuine_check{,_summary}.csv  own unused sessions vs impostors     (K)
-├── hulls/               per-user convex and concave hulls (.json, summary.csv)      (E)
+│   ├── summary.csv                      sensitivity of the single trial                 (C)
+│   ├── sensitivity/{experiments,chosen}.csv  every E_k × sensitivity, best per E_k      (E)
+│   └── session/experiments.csv          every E_k × session count                       (F)
+├── results/matches.csv    every matched stroke behind the per-user bar graphs      (G)
+├── results/genuine_check{,_summary}.csv  own unused sessions vs impostors     (H)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)
 └── temp/                drawn sessions and manifest.json                           (C)
 ```
@@ -249,8 +210,9 @@ experiment_earl/runs/<run name>/
 How to read them:
 
 - **Impostors matched**: how many impostor users looked like a legitimate user. Lower is better.
-- **Threshold** = impostors matched / impostor users, from 0 to 1. 0 is best: no impostor passed.
-- **±** (std, sweep only): how much a sweep cell changes from draw to draw. It is blank (NaN) when `n_trials` is 1, because one draw has no spread. The notebook and the anomaly tests use one fixed draw, so they have no ±.
+- **Sensitivity** (called *threshold* before 2026-10-14) = impostors matched / impostor users, from 0 to 1. 0 is best: no impostor passed. In E and F, *sensitivity* also names the `dtw_tolerance` value being tried; the CSVs call the share `impostor_sensitivity`.
+- **Accuracy** (E, F): legitimate = own sessions accepted / legitimate users; impostor = impostors rejected / impostor users.
+- **±** (std, sweep only): how much a sweep cell changes from draw to draw. It is blank (NaN) when `n_trials` is 1, because one draw has no spread. The notebook, E and F use one fixed draw, so they have no ±.
 
 The whole `runs/` folder is git-ignored: results stay on your computer. Copy a run folder to share it.
 
@@ -261,14 +223,10 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | What | Typical time |
 |---|---|
 | Notebook, 6 + 2 users, 1–5 sessions | about 1–2 minutes |
-| Matched shapes (J), 6 users × 5 steps | about 2 minutes |
+| Matched shapes (G), 6 users × 5 steps | about 2 minutes |
 | Sweep, 1–5 sessions, 20 draws, first time | about 30 minutes; reruns that only redraw the figures take seconds |
 | Single trial 01–05 | a few minutes (step 04 also scores the held-out sessions) |
-| Hulls (E), 10 users × 5 sessions | about 15 seconds |
-| Hull anomaly test (F) | about 5 seconds |
-| One-Class SVM anomaly test (G) | about 15 seconds |
-| DTW shape-matching anomaly test (H) | about 10 minutes |
-| Registered sessions sweep (I) | about 25 minutes; hull and SVM alone about 30 seconds |
+| Find the sensitivity (E) and the sessions (F), 5 users | seconds at loose tolerances; strict ones (≤ 0.05) take minutes the first time |
 | Shape PNGs (D) for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.
@@ -278,12 +236,13 @@ More sessions per user means more shapes to compare, so runs beyond 5 sessions t
 | Message | Fix |
 |---|---|
 | `... users do not fit in the 10 Balabit users` | Lower `n_legitimate` or `n_impostor`: they must add up to 10 or less. |
-| `sessions_per_user = N but some user has only M sessions` | Lower `sessions_per_user` to M or less (114 with `use_test_files`, 5 without). |
+| `sessions_per_user = N but some user has only M sessions` | Lower `sessions_per_user` to M or less (114). |
 | `sweep_sessions_max = N but some user has only M sessions` | Same for the sweep's `sweep_sessions_max`. |
 | `KeyError` in the sweep right after the draws | `n_trials` is 0; set it to at least 1. |
 | `No run '...' under .../runs` | The `--run` name is wrong; the message lists the existing runs. |
-| `ModuleNotFoundError: sklearn` | `.venv/bin/pip install scikit-learn`. |
 | `ModuleNotFoundError: numba` (or `nbformat`) | Use `.venv/bin/python`, or redo the setup in section 1. |
 | `'RcParams' object has no attribute '_get'` | Run `.venv/bin/pip install "matplotlib-inline<0.2"`. |
 | `Run ... has no shapes yet` from `07_plot_shapes.py` | That run only has notebook results. Run steps 01–03 with the same `--run` (the message prints the commands), then export. |
+| `No .../results/sensitivity/chosen.csv; run 09_find_sensitivity.py first` | Run E before F (same config or `--run`). |
+| `Need N sessions per user (profile + test_sessions)` | Lower `session_values` or `test_sessions`: their sum must stay within 114. |
 | `No shapes for userX in run ...` | That user was not drawn in this run's single trial; the message lists the users that have shapes. |

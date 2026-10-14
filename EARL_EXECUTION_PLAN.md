@@ -1,5 +1,7 @@
 # EARL experiment: execution plan (Balabit only)
 
+> **Note (2026-10-14):** this is the original plan. Since then the data folders are merged into `datasets/balabit/users/`, "threshold" is called **sensitivity** (`05_sensitivity.py`), and the adviser's E_k pipeline lives in `src/09_find_sensitivity.py` and `src/10_find_session.py`. See `CLAUDE.md`.
+
 **Decisions locked in:** pause-based chunking, resample + DTW matching, a "match" means an impostor matches a legitimate profile (a false accept, so lower is better), and impostors are other users' sessions (`public_labels` ignored).
 
 **Two assumptions to confirm or correct:**

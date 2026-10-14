@@ -35,7 +35,7 @@ each legitimate profile, using the rules of [04](04_match_shapes.md). It draws:
 
 - a bar chart of impostors matched;
 - the same count, one panel per legitimate user;
-- a heatmap of the threshold, using the first 1 … `n_legitimate` legitimate users.
+- a heatmap of the sensitivity (formerly threshold), using the first 1 … `n_legitimate` legitimate users.
 
 Script [14](14_plot_matches.md) and script [15](15_genuine_check.md) reproduce its draw.
 

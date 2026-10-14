@@ -88,7 +88,7 @@ def step_matches(profile: str, impostor: list[str], order: dict, k: int, config:
 
 
 def session_verdicts(rows: list[dict], impostor: list[str], order: dict, k: int, config: dict) -> list[str]:
-    """Per impostor: matched strokes and sessions at the notebook's thresholds (the bar graph's count)."""
+    """Per impostor: matched strokes and sessions at the notebook's matching rules (the bar graph's count)."""
     lines = []
     for user in impostor:
         ratios, strokes, matched = [], 0, 0

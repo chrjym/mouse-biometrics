@@ -24,7 +24,7 @@ def score(user: str, sessions: list[tuple[str, str]], library: list, kind: str, 
         session = match_mod.dataset_session(user, name, config, folder)
         ratio = match_mod.matched_chunks(session, library, config) / max(session.n_chunks, 1)
         rows.append({"profile": profile, "sessions": k, "kind": kind, "user": user, "session": name,
-                     "folder": "train" if folder == config["dataset_dir"] else "test", "strokes": session.n_chunks,
+                     "strokes": session.n_chunks,
                      "ratio": round(ratio, 4), "matched": ratio >= config["match_shape_ratio"]})
     return rows
 
@@ -73,8 +73,7 @@ def main() -> None:
             ax.bar_label(bars, labels=[f"{p:.0f}/{t:.0f}" for p, t in zip(part["passed"], part["tested"])],
                          padding=2, fontsize=7)
         ax.axhline(config["match_shape_ratio"], color="k", linestyle=":", linewidth=1)
-        folders = "+".join(sorted({"train" if f == config["dataset_dir"] else "test" for f, _ in held_out[profile]}))
-        ax.set_title(f"{profile} (genuine: {len(held_out[profile])} {folders} sessions)", fontsize=9)
+        ax.set_title(f"{profile} (genuine: {len(held_out[profile])} unused sessions)", fontsize=9)
         ax.set_xticks(x, [str(k) for k in steps])
         ax.set_xlabel("sessions in the profile")
     for ax in axes[:, 0]:

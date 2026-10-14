@@ -10,8 +10,8 @@ cfg_mod = import_module("00_config")
 
 
 def draw_sessions(config: dict, seed: int, users: list[str]) -> dict[str, dict[str, list[list[str]]]]:
-    """Per user, the first `sessions_per_user` sessions of their shuffled pool (training first, then genuine test
-    sessions) and the rest as held-out sessions, each as [folder, name]."""
+    """Per user, the first `sessions_per_user` sessions of their shuffled pool and the rest as held-out sessions,
+    each as [folder, name]."""
     drawn = {}
     for user in users:
         pool = [list(entry) for entry in cfg_mod.session_pool(config, user, seed)]

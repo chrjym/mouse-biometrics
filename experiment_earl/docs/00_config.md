@@ -43,20 +43,20 @@ values, far more than the number of runs we will ever make.
 
 ## 3. Which sessions belong to a user, and in what order
 
-**Rule (adviser + group decision, 2026-10-08):** a session belongs to the user whose folder it is in. This holds
-for training files and test files alike, and `public_labels.csv` is not used.
+**Rule (adviser + group decision, 2026-10-08):** a session belongs to the user whose folder it is in. Balabit's
+training and test files are merged into one folder per user, `datasets/balabit/users/<user>/` (adviser,
+2026-10-14), and `public_labels.csv` is not used.
 
 **Algorithm (`session_pool(config, user, seed)`)**
 
-1. `train` = the user's files in `training_files/<user>/`, sorted by name.
-2. `test` = the user's files in `test_files/<user>/`, but only if `use_test_files` is true.
-3. If a `seed` is given, shuffle each list separately (Python's `shuffle` is the Fisher–Yates shuffle [[3]](#ref-3), [[4]](#ref-4)), each with its own random generator:
-   `Random(f"{seed}-{user}")` for training and `Random(f"{seed}-{user}-test")` for test.
-4. Return training sessions first, then test sessions, as `(folder, name)` pairs.
+1. List the files in the user's folder (`dataset_dir/<user>/`), sorted by name.
+2. If a `seed` is given, shuffle the list (Python's `shuffle` is the Fisher–Yates shuffle [[3]](#ref-3), [[4]](#ref-4)) with
+   its own random generator `Random(f"{seed}-{user}")`.
+3. Return the sessions as `(folder, name)` pairs.
 
-**Why shuffle each part separately and put training first?** Balabit training sessions are long and test
-sessions are often short (a few dozen strokes). Putting training sessions first means the first profile
-sessions are the informative ones.
+Until 2026-10-14 training sessions came first and test sessions after, each part shuffled on its own. Since the
+merge, long former training sessions (about 2 hours) and short former test sessions (a few minutes) are mixed in
+one shuffled order.
 
 **Why seed the generator with a string that includes the user?** Three reasons:
 
@@ -92,7 +92,7 @@ pieces of the path.
 
 ## Settings used
 
-`run_name`, `seed`, `dataset_dir`, `test_dir`, `use_test_files`.
+`run_name`, `seed`, `dataset_dir`.
 
 ## References
 

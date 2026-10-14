@@ -1,6 +1,6 @@
 # `06_sweep.py`: full sweep over sessions, legitimate users and impostors
 
-[← index](README.md) · previous: [05](05_threshold.md)
+[← index](README.md) · previous: [05](05_sensitivity.md)
 
 ## What it does
 
@@ -10,7 +10,7 @@ Runs the shape-matching experiment of 01–05 for **every** combination of
 - legitimate users $n_L = 1 \dots 9$,
 - impostor users $n_I = 1 \dots 10 - n_L$,
 
-over `n_trials` random draws (seeds `seed`, `seed + 1`, …). It reports how the threshold changes along each
+over `n_trials` random draws (seeds `seed`, `seed + 1`, …). It reports how the sensitivity changes along each
 axis: where the curve **saturates** (stops changing) and where its **biggest jump** is.
 
 Outputs (in the run folder): `results/sweep/{pairs,summary,saturation}.csv`, `results/sweep/settings.json`,
@@ -34,7 +34,7 @@ Taking legitimate users from the front and impostors from the back means:
 - the two sets never overlap while $n_L + n_I \le 10$;
 - every set is **nested**: the cell with 3 legitimate users contains the 2 users of the cell with 2.
 
-Neighbouring cells therefore differ by exactly one user or one session, so a change in the threshold can be
+Neighbouring cells therefore differ by exactly one user or one session, so a change in the sensitivity can be
 traced to that one difference instead of to a new random draw.
 
 ### 2. Score every user pair once (`pair_scores`)
@@ -51,7 +51,7 @@ $10 \times 9 = 90$ pairs per $k$ per seed, stored in `pairs.csv`.
 ### 3. Build every cell from the pairs (`cell_results`)
 
 $$\text{matched}(k, n_L, n_I) = \sum_{v \in I}\ \mathbb{1}\Big[\max_{u \in L} \text{share}_k(v, u) \ge \rho\Big],
-\qquad \text{threshold} = \frac{\text{matched}}{n_I}$$
+\qquad \text{sensitivity} = \frac{\text{matched}}{n_I}$$
 
 This is exactly the rule of scripts 04–05 ("an impostor is matched if any single profile accepts them"). With 10
 users there are $\sum_{n_L=1}^{9} (10 - n_L) = 45$ cells per $k$.
@@ -62,7 +62,7 @@ same answer for all 45 cells at a fraction of the cost.
 
 ### 4. Average over draws
 
-For each cell: the mean and standard deviation of `matched` and `threshold` over the seeds (`summary.csv`).
+For each cell: the mean and standard deviation of `matched` and `sensitivity` over the seeds (`summary.csv`).
 
 ### 5. Saturation and biggest jump (`saturation`)
 
@@ -87,9 +87,9 @@ takes about 30 minutes, because it fills the shared DTW cache.
 
 ## Figures
 
-- `sweep_heatmaps.png`: one heatmap per $k$, with legitimate users on x, impostors on y, and the mean threshold
+- `sweep_heatmaps.png`: one heatmap per $k$, with legitimate users on x, impostors on y, and the mean sensitivity
   as colour in 0.1 steps.
-- `sweep_lines.png`: the threshold against each axis, one line per value of a second axis, averaged over the
+- `sweep_lines.png`: the sensitivity against each axis, one line per value of a second axis, averaged over the
   third.
 
 ## Settings used
@@ -98,11 +98,11 @@ takes about 30 minutes, because it fills the shared DTW cache.
 
 ## What we learned (tolerance 0.02, 20 draws)
 
-- **Sessions per user** drive the threshold: going from 1 to 2 sessions adds about 0.2, and the curve is flat
+- **Sessions per user** drive the sensitivity: going from 1 to 2 sessions adds about 0.2, and the curve is flat
   from about 4 sessions.
 - **Legitimate users** give a slow rise: 0.16 → 0.27 from 1 to 9 users (more profiles = more chances that one
   accepts the impostor).
-- **Impostor count** barely matters, because the threshold is already a share.
+- **Impostor count** barely matters, because the sensitivity is already a share.
 
 ## References
 

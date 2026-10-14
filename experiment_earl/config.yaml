@@ -3,21 +3,20 @@
 # Changing any value (except run_name) creates a new folder under runs/, so older results are kept.
 # Every setting is explained in CONFIG.md.
 
-run_name: oct12_test2       # label for this config's folder under runs/ (a short hash of the settings is appended)
+run_name: oct14_test1       # label for this config's folder under runs/ (a short hash of the settings is appended)
 
-# --- Experiment size (single trial 01-05, the notebook, 14 and the anomaly tests 10-13) ---
+# --- Experiment size (single trial 01-05, the notebook, 14 and 15) ---
 # One RNG draw from `seed` fixes the legitimate users, the impostor users and each user's session order for the whole run.
-seed: 97588749237492783474                   # picks the users and sessions once; the same seed gives the same users and sessions (the sweep uses seed, seed + 1, ...)
-n_legitimate: 6            # users whose shapes form the legitimate profiles (anomaly tests: the profiles of the headline row)
-n_impostor: 2              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
+seed: 9778923574                   # picks the users and sessions once; the same seed gives the same users and sessions (the sweep uses seed, seed + 1, ...)
+n_legitimate: 4            # users whose shapes form the legitimate profiles
+n_impostor: 4              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
 sessions_per_user: 5       # sessions per user; the notebook tests 1, 2, ... up to this (max: printed by every script)
-n_trials: 20                # sweep (06) only: random draws each cell is averaged over; the notebook, 14 and the anomaly tests use one fixed draw
+n_trials: 1                # sweep (06) only: random draws each cell is averaged over; the notebook, 14 and 15 use one fixed draw
 
 # --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
+# training_files and test_files are merged into one folder per user (adviser, 2026-10-14).
 # A session belongs to the user whose folder it is in. No label file is used.
-dataset_dir: datasets/balabit/training_files   # relative to experiment_earl/
-test_dir: datasets/balabit/test_files          # relative to experiment_earl/
-use_test_files: true       # add each user's test_files sessions after their training sessions
+dataset_dir: datasets/balabit/users   # relative to experiment_earl/
 
 # --- Chunking (03): cut a session into strokes ---
 pause_gap_s: 0.5           # a pause longer than this many seconds starts a new chunk (clicks also split chunks)
@@ -28,28 +27,17 @@ resample_n: 64             # every chunk is redrawn with this many evenly spaced
 # --- Matching (04): when do two shapes, a session and a user match ---
 dtw_band: 0.1              # DTW may stretch a shape by at most this share of resample_n
 dtw_tolerance: 0.02        # chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
-match_shape_ratio: 0.3     # a session matches a profile when at least this share of its chunks match
+match_shape_ratio: 0.2     # a session matches a profile when at least this share of its chunks match
 match_session_ratio: 0.5   # an impostor user is "matched" when at least this share of their sessions match
 
 # --- Full sweep (06): every sessions x legitimate x impostor combination that fits in 10 users ---
 sweep_sessions_max: 5      # tries 1 up to this many sessions per user (max: printed by every script)
-sweep_delta: 0.05          # a step that changes the mean threshold by less than this counts as "flat" (saturated)
+sweep_delta: 0.05          # a step that changes the mean sensitivity by less than this counts as "flat" (saturated)
 
-# --- Hulls (09): raw data -> chunk end points at (0, 0) -> convex hull -> concave hull, per user ---
-concave_ratio: 0.1         # concave hull tightness: 0 = tightest outline, 1 = same as the convex hull
-
-# --- Hull anomaly test (10): training sessions only ---
-anomaly_enroll_sessions: 4   # sessions that build a user's concave hull (Balabit users have 5-7 training sessions)
-anomaly_window: 30           # strokes per window; each session is checked window by window
-anomaly_outside_share: 0.2   # a window is an anomaly when more than this share of its strokes end outside the hull
-
-# --- One-Class SVM anomaly test (11): same sessions, window and enrollment as 10 ---
-ocsvm_features: [dx, dy, path_length, straightness, mean_speed, duration]   # per-stroke features; see CONFIG.md
-ocsvm_nu: 0.05               # about this share of the user's own training strokes may fall outside the learned region
-ocsvm_gamma: scale           # RBF kernel reach: "scale" (automatic), "auto", or a number (larger = tighter, wigglier region)
-ocsvm_max_train: 4000        # random training strokes per model (the SVM slows down fast with more); 0 = all
-ocsvm_resample_ms: 0         # 0 = raw points; e.g. 125 = path on a 125 ms grid, so ~16 ms and ~110 ms loggers compare fairly
-ocsvm_flag_score: 0.0        # a window is an anomaly when its mean SVM score is below this (0 = the learned boundary)
-
-# --- DTW shape-matching anomaly test (12): same sessions, window and enrollment as 10 and 11 ---
-dtw_max_library: 4000        # random shapes per user library (same cap as ocsvm_max_train, so all methods see as much data); 0 = all
+# --- Find the sensitivity (09) and the sessions (10), adviser 2026-10-14 ---
+# One draw from `seed` picks n_users users; experiment E_k uses the first k as legitimate and the other n_users - k as impostors.
+n_users: 5                                     # users in the draw (2-10); gives experiments E1 ... E(n_users - 1)
+sensitivity_values: [0.2, 0.4, 0.6, 0.8, 1.0]  # dtw_tolerance values tried by 09 (sensitivity = dtw_tolerance)
+sensitivity_sessions: 2                        # profile sessions per legitimate user while 09 finds the sensitivity
+session_values: [2, 4, 6, 8, 10]               # profile sessions per legitimate user tried by 10
+test_sessions: 2                               # sessions tested per user, taken after max(session_values); never in a profile

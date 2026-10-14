@@ -39,12 +39,12 @@ first *k* entries are taken.
 
 ## Checks
 
-The script stops if `sessions_per_user` is larger than the smallest pool (`max_sessions`). Pools are 5–7
-sessions with training files only and 114–253 with `use_test_files`.
+The script stops if `sessions_per_user` is larger than the smallest pool (`max_sessions`). Pools are 114–253
+sessions (one merged folder per user).
 
 ## Input / output
 
-- Input: `temp/manifest.json` from 01; `sessions_per_user`, `use_test_files`, `seed`.
+- Input: `temp/manifest.json` from 01; `sessions_per_user`, `seed`.
 - Output: copied session files in `temp/{legitimate,impostor}/<user>/`, plus the updated manifest.
 
 ## References

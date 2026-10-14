@@ -4,7 +4,7 @@
 
 ## The data
 
-All of Balabit is used, raw (adviser, 2026-10-08): 65 training sessions and 1,611 test sessions for 10 users. A session belongs to the user whose folder it is in; no label file is used. Every script prints the counts and the session limit when it starts.
+All of Balabit is used, raw (adviser, 2026-10-08): 1,676 sessions for 10 users. The former `training_files` and `test_files` are merged into one folder per user, `datasets/balabit/users/<user>/` (adviser, 2026-10-14). A session belongs to the user whose folder it is in; no label file is used. Every script prints the counts and the session limit when it starts.
 
 ## Every config gets its own folder
 
@@ -34,33 +34,28 @@ runs/baseline_2707e0/
 02_sample_sessions   draws sessions per user, copies them to temp/
 03_chunk_shapes      cuts each session into chunks (shapes)
 04_match_shapes      compares impostor chunks with the legitimate library (DTW)
-05_threshold         threshold = impostors matched / total impostors
+05_sensitivity       sensitivity = impostors matched / total impostors (formerly "threshold")
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
 08_run_notebook      executes the notebook and saves the copy in the run folder
-09_build_hulls       per user: raw data -> chunk end points at (0, 0) -> convex hull -> concave hull
-10_hull_anomaly      windows of strokes outside a user's concave hull: own sessions (FRR) vs other users (FAR)
-11_ocsvm_anomaly     the same test with a per-user One-Class SVM on several features per stroke
-12_dtw_anomaly       the same test with DTW shape matching against a per-user shape library
-13_enroll_sweep      reruns 10, 11 and 12 with 1 up to anomaly_enroll_sessions registered sessions
+09_find_sensitivity  E1 ... E(n-1) (k legitimate vs n - k impostors) at every sensitivity (dtw_tolerance)
+10_find_session      each E_k at its chosen sensitivity with 2, 4, ... 10 profile sessions; sensitivity heatmap
 14_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
 15_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
 ```
 
-**One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 14 and the **anomaly tests** (10–13) make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw; the anomaly tests report FRR, FAR and EER for it. Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
+**One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 09, 10, 14 and 15 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 09 and 10 draw `n_users` users instead and split them into E1 … E(n − 1). Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
 
 ## Data and sampling
 
 | Setting | Default | Used by | Meaning |
 |---|---|---|---|
 | `run_name` | `experiment1` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
-| `seed` | 934 | 01, 02, 06, 10–14, notebook | Picks the users and sessions once (which users are legitimate, which are impostors, the order of each user's sessions). The same seed gives the same users and sessions, so a result can be repeated. Only the sweep makes more draws, with `seed`, `seed + 1`, ... |
-| `dataset_dir` | `datasets/balabit/training_files` | all | Balabit training sessions, relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
-| `test_dir` | `datasets/balabit/test_files` | all | Balabit test sessions, relative to `experiment_earl/`. Also counted by folder: every session in `test_files/user12/` is user12. |
-| `use_test_files` | true | all | Adds each user's `test_files` sessions after their training sessions (up to 114 per user instead of 5). |
-| `n_legitimate` | 3 | 01, notebook, 10–13 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. In the anomaly tests (10–13) they are the profiles of the headline row: FRR comes from their own held-out sessions. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
-| `n_impostor` | 2 | 01, notebook, 10–13 | How many other users act as impostors in a single trial. In the anomaly tests (10–13) only these users' sessions count for FAR in the headline row. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
-| `sessions_per_user` | 5 | 02, 09, notebook | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. A user's sessions are ordered training first, then test, so steps up to 5 use training sessions only. At most 114 with `use_test_files` (user20 has 7 + 107), 5 without; every script prints the limit. |
+| `seed` | 934 | 01, 02, 06, 09, 10, 14, 15, notebook | Picks the users and sessions once (which users are legitimate, which are impostors, the order of each user's sessions). The same seed gives the same users and sessions, so a result can be repeated. Only the sweep makes more draws, with `seed`, `seed + 1`, ... |
+| `dataset_dir` | `datasets/balabit/users` | all | Balabit sessions, one folder per user (training and test files merged, adviser 2026-10-14), relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
+| `n_legitimate` | 3 | 01, notebook, 14, 15 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
+| `n_impostor` | 2 | 01, notebook, 14, 15 | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
+| `sessions_per_user` | 5 | 02, notebook, 14, 15 | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 114 (user20); every script prints the limit. |
 
 ## Chunking (script 03)
 
@@ -81,64 +76,39 @@ Chunks that are not comparable (zero length) still count in the denominator of a
 |---|---|---|
 | `dtw_band` | 0.1 | The comparison (banded DTW) may only stretch one shape against the other within this share of `resample_n`. It keeps matching fast and stops absurd alignments. |
 | `dtw_tolerance` | 0.02 | The key setting. Two chunks match when their mean DTW distance per point is at or below this value. Lower is stricter. At 0.15 about 99% of all chunks matched, so the metric told nothing; 0.02 keeps the results from being all 0 or all 1. |
-| `match_shape_ratio` | 0.3 | A session matches a legitimate profile when at least this share of its chunks match a chunk of the same kind (move or drag) in that profile. (Assumption A2 in `EARL_EXECUTION_PLAN.md`.) |
+| `match_shape_ratio` | 0.2 | A session matches a legitimate profile when at least this share of its chunks match a chunk of the same kind (move or drag) in that profile. (Assumption A2 in `EARL_EXECUTION_PLAN.md`.) |
 | `match_session_ratio` | 0.5 | An impostor user counts as **matched** when at least this share of their sessions match any single legitimate profile. This decides `matched_detected`. (Assumption A1 in the plan.) |
 
-The threshold is `matched impostor users / total impostor users`. 0 is best: impostors never look like the legitimate users.
+The **sensitivity** (called *threshold* before 2026-10-14) is `matched impostor users / total impostor users`. 0 is best: impostors never look like the legitimate users.
 
 ## Sweep (script 06)
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `n_trials` | 20 | Sweep only: random draws of users and sessions that every sweep cell is averaged over. It does not change what is tested, only how steady the averages are: more draws give steadier numbers but take longer. The notebook, 14 and the anomaly tests ignore it: they use one fixed draw from `seed`. |
+| `n_trials` | 20 | Sweep only: random draws of users and sessions that every sweep cell is averaged over. It does not change what is tested, only how steady the averages are: more draws give steadier numbers but take longer. The notebook, 09, 10, 14 and 15 ignore it: they use one fixed draw from `seed`. |
 | `sweep_sessions_max` | 5 | The sweep tries 1 up to this many sessions per user. Every Balabit user has at least 5. |
-| `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean threshold by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
+| `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean sensitivity by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
 
 The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legitimate users (1 to 9) and impostor users (1 to 10 minus legitimate users).
 
-## Hulls (script 09)
+## Find the sensitivity (09) and the sessions (10)
+
+Adviser, 2026-10-14. One draw from `seed` picks `n_users` users; experiment E_k uses the first k as legitimate users and the other n − k as their direct-opposite impostors. Matching uses DTW only; a user goes through a profile when at least `match_session_ratio` of their tested sessions reach `match_shape_ratio`.
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `concave_ratio` | 0.1 | Tightness of the concave hull around each user's chunk end points: 0 follows the points as closely as possible, 1 gives the convex hull. The hulls use `sessions_per_user` sessions per user and the chunking settings above. |
-
-## Hull anomaly test (script 10)
-
-| Setting | Default | Meaning |
-|---|---|---|
-| `anomaly_enroll_sessions` | 4 | Training sessions that build each user's concave hull (and SVM model, and DTW library). Must be lower than the user's training session count (5–7), so at least one is left to test. Script 13 tries 1 up to this many. |
-| `anomaly_window` | 30 | Strokes (chunks) per window. Each session is checked window by window, sliding one stroke at a time. |
-| `anomaly_outside_share` | 0.2 | A window is an anomaly when more than this share of its strokes end outside the hull. Higher = fewer own sessions flagged, but more impostors missed. |
-
-The hull also uses `concave_ratio` and the chunking settings.
-
-## One-Class SVM anomaly test (script 11)
-
-Uses `anomaly_enroll_sessions` and `anomaly_window` from the hull test, so both scripts test the same sessions.
-
-| Setting | Default | Meaning |
-|---|---|---|
-| `ocsvm_features` | `[dx, dy, path_length, straightness, mean_speed, duration]` | Numbers per stroke the SVM learns from. `dx`, `dy`: net movement (the hull's end point). `path_length`: distance travelled (log). `straightness`: net movement / path length. `mean_speed`: path length / duration (log). `duration`: seconds. Remove a name to test without it. |
-| `ocsvm_nu` | 0.05 | About this share of the user's own training strokes may fall outside the learned region. Larger = tighter region: more own sessions flagged, fewer impostors missed. |
-| `ocsvm_gamma` | `scale` | How far one training stroke's influence reaches. `scale` is automatic; a number such as 0.1 (smooth) to 10 (tight, can overfit). |
-| `ocsvm_max_train` | 4000 | Random training strokes per model; the SVM slows down quickly with more. 0 = all. |
-| `ocsvm_resample_ms` | 0 | 0 = raw points. 125 = each stroke's path on a 125 ms grid before measuring length, straightness and speed, so users who log every ~16 ms and every ~110 ms compare fairly. |
-| `ocsvm_flag_score` | 0.0 | A window is an anomaly when its mean SVM score is below this. 0 is the learned boundary; lower = fewer flags. |
-
-## DTW shape-matching anomaly test (script 12)
-
-Uses `anomaly_enroll_sessions`, `anomaly_window` and `anomaly_outside_share` like the hull test, and the matching settings `resample_n`, `dtw_band` and `dtw_tolerance` to decide whether a stroke has a matching shape.
-
-| Setting | Default | Meaning |
-|---|---|---|
-| `dtw_max_library` | 4000 | Random shapes kept in each user's library, the same cap as `ocsvm_max_train`, so all methods learn from the same amount of data and the run takes minutes. 0 = every shape (much slower). |
+| `n_users` | 5 | Users in the draw (2–10). Gives experiments E1 … E(n_users − 1): E1 = 1 legitimate + 4 impostors, …, E4 = 4 + 1. |
+| `sensitivity_values` | `[0.2, 0.4, 0.6, 0.8, 1.0]` | The sensitivities 09 tries. Sensitivity = `dtw_tolerance` (the other matching settings may be tried later). At 0.15 about 99% of all strokes already match, so this grid lets every user through; values around 0.03–0.05 are where users start to differ. |
+| `sensitivity_sessions` | 2 | Profile sessions per legitimate user while 09 finds the sensitivity. |
+| `session_values` | `[2, 4, 6, 8, 10]` | Profile sessions per legitimate user that 10 tries, each E_k at the sensitivity 09 chose for it (best mean of legitimate and impostor accuracy, ties to the stricter one). |
+| `test_sessions` | 2 | Sessions tested per user (own sessions for legitimate users, all for impostors): the ones right after `max(session_values)`, so they are never part of a profile and stay the same at every step. |
 
 ## When you change a setting
 
 Any change to a value (except `run_name`) makes the next script run create a new folder under `runs/`, so nothing needs deleting or resetting. Then:
 
 - **Single trial:** run 01 → 05 again (or the sweep, or the notebook). The new folder starts empty.
-- **Speed:** DTW results are shared through `cache/pairs.pkl`. Changing only `match_session_ratio`, `sweep_delta`, `sweep_sessions_max`, `n_trials` or `seed` reuses all of them; changing chunking, band or tolerance recomputes what it must.
+- **Speed:** DTW results are shared through `cache/pairs.pkl`. Changing only `match_session_ratio`, `sweep_delta`, `sweep_sessions_max`, `n_trials` or `seed` reuses all of them; each sensitivity in `sensitivity_values` is cached as its own tolerance; changing chunking, band or tolerance recomputes what it must.
 - **Going back:** run the scripts with `--run <old folder>` to read or extend an older run with its own saved settings, whatever `config.yaml` says now.
 
 ## Limits to remember

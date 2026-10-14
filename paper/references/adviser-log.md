@@ -20,6 +20,30 @@ Suggested format per entry:
 
 ---
 
+## [2026-10-14] — New experiment pipeline: experiments E_k, find the sensitivity, find the sessions
+
+**Context:** Consultation on the EARL shape-matching experiment; notes and whiteboard photo in `Queries.pdf` (random variables: user, session, sensitivity, data points; experiments: 1. move stroke, 2. user × user × sensitivity, 3. user × session × sensitivity; seed = 41 on the board).
+
+**Feedback:**
+- Keep DTW as the matching method throughout; keep the chunking as is. Drop the One-Class SVM entirely (remove all related functions).
+- Rename every "threshold" in the scripts and experiment to **sensitivity**.
+- Merge Balabit `training_files` and `test_files` into one folder per user.
+- New experiment design: from a seeded draw of n users, experiment E_k has k legitimate users and the direct-opposite n − k impostors (n = 5: E1 = 1 + 4, E2 = 2 + 3, …).
+- **Find the sensitivity** (user × user × sensitivity): sensitivity = `dtw_tolerance`, 0.2 to 1.0 in steps of 0.2 (0 = unique, 1 = similar on the board); other config settings may become sensitivities later. Line graphs, y = accuracy, x = impostor / legitimate users, separate graphs for legitimate and impostor, one line per sensitivity.
+- **Find the sessions** (user × session × sensitivity): 2, 4, … 10 sessions per user at the sensitivity found above; same graphs, one line per session count.
+- Pipeline: raw → RNG (legitimate users, impostor users, sessions) → mouse strokes (chunk shapes) → user × user × sensitivity → user × session × sensitivity → sensitivity (formerly threshold) → heatmap.
+
+**Decisions:**
+- Implemented as `experiment_earl/src/09_find_sensitivity.py` and `10_find_session.py`; data merged into `experiment_earl/datasets/balabit/users/`. The hull, One-Class SVM and DTW anomaly tests and the enroll sweep (old scripts 09–13) were removed along with the OCSVM (group decision).
+- Accuracy (group decision): legitimate = share of legitimate users whose own unseen sessions pass their own profile; impostor = share of impostors rejected by every legitimate profile. The chosen sensitivity per E_k maximizes the mean of the two.
+- First run (`oct14_test1`): at every sensitivity 0.2–1.0 and every session count 2–10, all legitimate users pass and all impostors get through (heatmap all 1.0). Users only start to differ around `dtw_tolerance` 0.03–0.05.
+
+**Open questions:**
+- The 0.2–1.0 grid saturates (0.15 already matched ~99% of strokes). Ask the adviser whether to use a finer grid (e.g. 0.01–0.05), or to read "sensitivity 0–1" as a scale mapped onto the tolerance.
+- The board's "seed = 41": the config still uses the group's own seed. Confirm whether 41 should be used.
+
+---
+
 ## [2026-10-08] — Use all the data in the experiments
 
 **Context:** The EARL shape-matching experiment (`experiment_earl/`) used only Balabit's `training_files` to build and compare user profiles; `test_files` were used only in a separate FAR/FRR/EER evaluation (`09_evaluate_test.py`). Relayed by a group member.

@@ -69,36 +69,28 @@ def list_users(config: dict) -> list[str]:
 
 
 def list_sessions(config: dict, user: str) -> list[Path]:
-    """The user's training sessions only."""
+    """Every session of `user`: Balabit's training and test files were merged into one folder per user (adviser, 2026-10-14)."""
     return sorted(p for p in (ROOT / config["dataset_dir"] / user).iterdir() if p.is_file())
 
 
 def session_pool(config: dict, user: str, seed: int | None = None) -> list[tuple[str, str]]:
     """(folder, session name) of every session of `user`: a session belongs to the user whose folder it is in.
-    Training sessions come first, then, with `use_test_files`, the sessions in the user's test_files folder.
-    With `seed`, each part is shuffled on its own, so the long training sessions come first and step k+1
-    contains step k."""
-    train = [p.name for p in list_sessions(config, user)]
-    test_folder = ROOT / config["test_dir"] / user
-    test = sorted(p.name for p in test_folder.iterdir() if p.is_file()) \
-        if config.get("use_test_files") and test_folder.exists() else []
+    With `seed`, the order is shuffled once, so step k+1 contains step k."""
+    names = [p.name for p in list_sessions(config, user)]
     if seed is not None:
-        random.Random(f"{seed}-{user}").shuffle(train)
-        random.Random(f"{seed}-{user}-test").shuffle(test)
-    return [(config["dataset_dir"], n) for n in train] + [(config["test_dir"], n) for n in test]
+        random.Random(f"{seed}-{user}").shuffle(names)
+    return [(config["dataset_dir"], n) for n in names]
 
 
 def max_sessions(config: dict) -> int:
     """Largest session count every user can supply."""
-    return min(len(session_pool(config, user)) for user in list_users(config))
+    return min(len(list_sessions(config, user)) for user in list_users(config))
 
 
 def describe_data(config: dict) -> str:
     users = list_users(config)
-    train = sum(len(list_sessions(config, u)) for u in users)
-    test = sum(len(session_pool(config, u)) for u in users) - train
-    source = f"{train} training + {test} test sessions" if config.get("use_test_files") else f"{train} training sessions"
-    return (f"Data: {len(users)} users, {source} (each session belongs to its folder's user); "
+    total = sum(len(list_sessions(config, u)) for u in users)
+    return (f"Data: {len(users)} users, {total} sessions (each session belongs to its folder's user); "
             f"at most {max_sessions(config)} sessions per user")
 
 

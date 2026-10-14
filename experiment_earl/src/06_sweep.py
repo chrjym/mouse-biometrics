@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sweep sessions per user x legitimate users x impostor users and report where the threshold saturates or jumps."""
+"""Sweep sessions per user x legitimate users x impostor users and report where the sensitivity saturates or jumps."""
 
 import argparse
 import json
@@ -48,7 +48,7 @@ def pair_scores(config: dict, seed: int, sessions_max: int) -> list[dict]:
 
 
 def cell_results(pairs: pd.DataFrame, config: dict, users_by_seed: dict[int, list[str]]) -> pd.DataFrame:
-    """matched_detected and threshold for every (seed, sessions, n_legit, n_impostor) with n_legit + n_impostor <= users."""
+    """matched_detected and sensitivity for every (seed, sessions, n_legit, n_impostor) with n_legit + n_impostor <= users."""
     share = pairs.set_index(["seed", "sessions", "impostor", "legit"])["session_share"]
     rows = []
     for (seed, k), _ in pairs.groupby(["seed", "sessions"]):
@@ -61,7 +61,7 @@ def cell_results(pairs: pd.DataFrame, config: dict, users_by_seed: dict[int, lis
                     max(share[(seed, k, v, u)] for u in legit) >= config["match_session_ratio"] for v in impostors
                 )
                 rows.append({"seed": seed, "sessions": k, "n_legit": n_legit, "n_impostor": n_impostor,
-                             "matched_detected": matched, "threshold": matched / n_impostor})
+                             "matched_detected": matched, "sensitivity": matched / n_impostor})
     return pd.DataFrame(rows)
 
 
@@ -84,7 +84,7 @@ def plot_heatmaps(summary: pd.DataFrame, path, n_users: int) -> None:
     fig, axes = plt.subplots(1, len(sessions), figsize=(4.2 * len(sessions), 4.4), sharey=True)
     for ax, k in zip(np.atleast_1d(axes), sessions):
         grid = (summary[summary["sessions"] == k]
-                .pivot(index="n_impostor", columns="n_legit", values="threshold_mean")
+                .pivot(index="n_impostor", columns="n_legit", values="sensitivity_mean")
                 .reindex(index=range(1, n_users), columns=range(1, n_users)))
         image = ax.imshow(grid.to_numpy(), cmap="YlOrRd", norm=BoundaryNorm(levels, 256), origin="lower")
         for (r, c), value in np.ndenumerate(grid.to_numpy()):
@@ -95,7 +95,7 @@ def plot_heatmaps(summary: pd.DataFrame, path, n_users: int) -> None:
         ax.set_xlabel("legitimate users")
         ax.set_title(f"{k} session{'s' if k > 1 else ''} per user")
     np.atleast_1d(axes)[0].set_ylabel("impostor users")
-    fig.colorbar(image, ax=axes, ticks=levels, label="mean threshold (0 = best)", shrink=0.8)
+    fig.colorbar(image, ax=axes, ticks=levels, label="mean sensitivity (0 = best)", shrink=0.8)
     fig.savefig(path, dpi=130, bbox_inches="tight")
     plt.close(fig)
 
@@ -107,14 +107,14 @@ def plot_lines(summary: pd.DataFrame, path) -> None:
                               ("n_impostor", axes[2], "impostor users")):
         others = [c for c in ("sessions", "n_legit", "n_impostor") if c != column]
         # one line per value of the first other axis, averaged over the second
-        curves = summary.groupby([others[0], column])["threshold_mean"].mean().unstack(0)
+        curves = summary.groupby([others[0], column])["sensitivity_mean"].mean().unstack(0)
         curves.plot(ax=ax, marker="o")
         ax.set_xticks(curves.index)
         ax.set_xlabel(label)
-        ax.set_ylabel("mean threshold")
+        ax.set_ylabel("mean sensitivity")
         ax.set_ylim(0, 1)
         ax.legend(title=others[0].replace("n_", ""), fontsize=7)
-        ax.set_title(f"threshold vs {label} (averaged over {others[1].replace('n_', '')})")
+        ax.set_title(f"sensitivity vs {label} (averaged over {others[1].replace('n_', '')})")
     fig.tight_layout()
     fig.savefig(path, dpi=130)
     plt.close(fig)
@@ -154,23 +154,23 @@ def main() -> None:
     cells = cell_results(pairs, config, users_by_seed)
     summary = (cells.groupby(["sessions", "n_legit", "n_impostor"])
                .agg(matched_mean=("matched_detected", "mean"), matched_std=("matched_detected", "std"),
-                    threshold_mean=("threshold", "mean"), threshold_std=("threshold", "std"))
+                    sensitivity_mean=("sensitivity", "mean"), sensitivity_std=("sensitivity", "std"))
                .round(3).reset_index())
     summary.to_csv(out / "summary.csv", index=False)
 
     report = []
     for (n_legit, n_impostor), group in summary.groupby(["n_legit", "n_impostor"]):
-        flat, jump, size = saturation(group.set_index("sessions")["threshold_mean"], delta)
+        flat, jump, size = saturation(group.set_index("sessions")["sensitivity_mean"], delta)
         report.append({"axis": "sessions", "n_legit": n_legit, "n_impostor": n_impostor, "sessions": None,
                        "flat_from": flat, "biggest_jump_at": jump, "biggest_jump": round(size, 3)})
     for (k, n_impostor), group in summary.groupby(["sessions", "n_impostor"]):
         if len(group) > 1:
-            flat, jump, size = saturation(group.set_index("n_legit")["threshold_mean"], delta)
+            flat, jump, size = saturation(group.set_index("n_legit")["sensitivity_mean"], delta)
             report.append({"axis": "n_legit", "n_legit": None, "n_impostor": n_impostor, "sessions": k,
                            "flat_from": flat, "biggest_jump_at": jump, "biggest_jump": round(size, 3)})
     for (k, n_legit), group in summary.groupby(["sessions", "n_legit"]):
         if len(group) > 1:
-            flat, jump, size = saturation(group.set_index("n_impostor")["threshold_mean"], delta)
+            flat, jump, size = saturation(group.set_index("n_impostor")["sensitivity_mean"], delta)
             report.append({"axis": "n_impostor", "n_legit": n_legit, "n_impostor": None, "sessions": k,
                            "flat_from": flat, "biggest_jump_at": jump, "biggest_jump": round(size, 3)})
     report = pd.DataFrame(report)

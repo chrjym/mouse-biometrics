@@ -50,8 +50,7 @@ $$\bar r_\text{genuine} > \bar r_\text{impostor} \quad\text{and}\quad \text{genu
 ## Figure
 
 One panel per legitimate user. Blue bars show the genuine mean ratio and red bars the impostor mean ratio, per
-$k$. The labels give *passed / tested*, and a dotted line marks `match_shape_ratio`. The panel title says whether
-the held-out sessions are training or test files: test files can be very short.
+$k$. The labels give *passed / tested*, and a dotted line marks `match_shape_ratio`.
 
 ## What we learned (`oct12_test3_d05fb2`, impostors user16 + user21)
 
@@ -61,7 +60,8 @@ the held-out sessions are training or test files: test files can be very short.
 - The own share beats the impostors' share for 5 of 6 users, but user9 and user20 are also the users who get
   through **as impostors**. Passing therefore tracks a user's tendency to draw straight strokes more than their
   identity.
-- user15's and user35's held-out sessions include short test files (44–61 strokes).
+- user15's and user35's held-out sessions include short test files (44–61 strokes). (This run predates the 2026-10-14
+  merge of training and test files.)
 
 ## References
 

@@ -1,6 +1,6 @@
 # `04_match_shapes.py`: banded DTW shape matching
 
-[← index](README.md) · previous: [03](03_chunk_shapes.md) · next: [05](05_threshold.md)
+[← index](README.md) · previous: [03](03_chunk_shapes.md) · next: [05](05_sensitivity.md)
 
 ## What it does
 
