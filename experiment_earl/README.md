@@ -134,7 +134,7 @@ Same draw and experiments as E. Each E_k uses its own chosen sensitivity from E 
 .venv/bin/python experiment_earl/src/10_find_session.py
 ```
 
-Outputs, inside the run folder: `results/session/experiments.csv`, `figures/find_session.png` (legitimate and impostor graphs, y = accuracy, one line per session count) and `figures/sensitivity_heatmap.png` (profile sessions × experiment; colour = **sensitivity** = impostors through / impostors, the former threshold, 0–1 in 0.1 steps; each cell also shows impostors through and legitimate users accepted).
+Outputs, inside the run folder: `results/session/experiments.csv` (chosen sensitivity only), `results/session/grid.csv` (every session count × every sensitivity), `figures/find_session.png` (legitimate and impostor graphs, y = accuracy, one line per session count) and `figures/sensitivity_heatmap.png` (one panel per experiment: profile sessions × sensitivity 0.2 … 1.0, the chosen one marked `*`; colour = **sensitivity** = impostors through / impostors, the former threshold, 0–1 in 0.1 steps; each cell also shows impostors through and legitimate users accepted).
 
 **First result** (`oct14_test1_229cd4`, old direct-opposite split, users user21, user15, user29, user23, user12): at every sensitivity from 0.2 to 1.0 and every session count, every legitimate user is accepted and every impostor goes through (legitimate accuracy 1, impostor accuracy 0). Tolerance 0.15 already matched about 99% of all strokes, so this grid cannot separate users; a quick probe at 2 sessions showed that only tolerances around 0.03–0.05 give any difference between users.
 
@@ -187,7 +187,7 @@ experiment_earl/runs/<run name>/
 │   ├── sweep_lines.png                  sensitivity vs sessions / legitimate / impostors (B)
 │   ├── find_sensitivity.png             accuracy vs L and vs I, one line per sensitivity (E)
 │   ├── find_session.png                 accuracy vs L and vs I, one line per session count (F)
-│   ├── sensitivity_heatmap.png          sensitivity per session count × experiment     (F)
+│   ├── sensitivity_heatmap.png          sessions × sensitivity, one panel per experiment (F)
 │   ├── matches/<user>_sessions<k>.png   matched impostor strokes on the user's strokes  (G)
 │   └── genuine_check.png                own unused sessions vs impostors, per profile   (H)
 ├── results/
@@ -200,7 +200,7 @@ experiment_earl/runs/<run name>/
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (C)
 │   ├── summary.csv                      sensitivity of the single trial                 (C)
 │   ├── sensitivity/{experiments,chosen}.csv  every E_k × sensitivity, best per E_k      (E)
-│   └── session/experiments.csv          every E_k × session count                       (F)
+│   └── session/{experiments,grid}.csv   chosen sensitivity / every sensitivity × sessions (F)
 ├── results/matches.csv    every matched stroke behind the per-user bar graphs      (G)
 ├── results/genuine_check{,_summary}.csv  own unused sessions vs impostors     (H)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (C, D)

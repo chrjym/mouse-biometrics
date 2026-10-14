@@ -8,7 +8,7 @@ Second and last step of the adviser's pipeline (2026-10-14). It uses the same dr
 and, for each experiment, the sensitivity 09 chose for it (`results/sensitivity/chosen.csv`, so run 09
 first). Each E_k is then scored with 2, 4, … 10 profile sessions per legitimate user (`session_values`).
 
-Outputs: `runs/<run>/results/session/experiments.csv`, `figures/find_session.png`,
+Outputs: `runs/<run>/results/session/experiments.csv`, `results/session/grid.csv`, `figures/find_session.png`,
 `figures/sensitivity_heatmap.png`.
 
 ## Algorithm
@@ -17,9 +17,10 @@ Outputs: `runs/<run>/results/session/experiments.csv`, `figures/find_session.png
 users, order ← 09.draw(config, seed)                # the same users and session orders as 09
 τ*[E_k]       ← chosen.csv
 for k_s in session_values:
-    for each distinct τ in τ*:
+    for each τ in sensitivity_values:
         through ← 09.pass_matrix(users, order, k_s, τ)     # profile = first k_s sessions
-        keep the rows of 09.score(...) for the E_k whose τ*[E_k] = τ
+        grid += 09.score(...)                              # every experiment, every τ  -> grid.csv, heatmap
+table ← rows of grid with τ = τ*[experiment]               # -> experiments.csv, find_session.png
 ```
 
 The tested sessions are the same as in 09 (`test_sessions` after `max(session_values)`), so only the profile
@@ -29,9 +30,11 @@ grows between steps, and step $k_s + 2$ contains step $k_s$ (nested prefix of on
 
 - **`find_session.png`**: like 09's figure, two separate graphs (legitimate accuracy against the number of
   legitimate users, impostor accuracy against the number of impostors), one line per session count.
-- **`sensitivity_heatmap.png`**: rows = profile sessions, columns = E_k (with L, I and the chosen τ). Colour =
-  **sensitivity** = impostors through / impostors (the former *threshold*), fixed 0–1 scale in 0.1 steps,
-  0 = best. Each cell also shows impostors through and legitimate users accepted.
+- **`sensitivity_heatmap.png`**: one panel per experiment; rows = profile sessions, columns = every sensitivity in
+  `sensitivity_values` (0.2, 0.4, … 1.0; the one 09 chose is marked `*`). Colour = **sensitivity** = impostors
+  through / impostors (the former *threshold*), fixed 0–1 scale in 0.1 steps, 0 = best. Each cell also shows
+  impostors through and legitimate users accepted. The line graph uses only the chosen sensitivity (adviser step
+  8); the heatmap shows the whole user × session × sensitivity grid so the sensitivity steps are visible.
 
 Accuracy and sensitivity are defined in [09](09_find_sensitivity.md) [[1]](#ref-1); matching is script 04's banded
 DTW [[2]](#ref-2).
