@@ -11,9 +11,10 @@ raw → RNG (legitimate users, impostor users, sessions) → strokes (chunk shap
     → user × user × sensitivity (09) → user × session × sensitivity (10) → sensitivity → heatmap (10)
 ```
 
-One draw from `seed` picks `n_users` users in random order and fixes each user's session order. Experiment
-**E_k** takes the first $k$ users as legitimate and the other $n - k$ as their **direct-opposite impostors**:
-with $n = 5$, E1 = 1 + 4, E2 = 2 + 3, E3 = 3 + 2, E4 = 4 + 1. Every E_k is scored at each **sensitivity**
+One draw from `seed` puts the users in one random order and fixes each user's session order. The experiments
+are set by hand in `experiments`: entry $i$, $[L_i, I_i]$, is experiment **E_i**, with the first $L_i$ users of
+the order as legitimate and the next $I_i$ as impostors. (The first version split $n$ drawn users into all
+"direct-opposite" pairs $[k, n - k]$; that was dropped the same day.) Every experiment is scored at each **sensitivity**
 in `sensitivity_values`. The sensitivity is the DTW setting `dtw_tolerance` (script 04); matching uses DTW only.
 
 Outputs: `runs/<run>/results/sensitivity/experiments.csv`, `results/sensitivity/chosen.csv`,
@@ -22,18 +23,18 @@ Outputs: `runs/<run>/results/sensitivity/experiments.csv`, `results/sensitivity/
 ## Algorithm
 
 ```
-users, order ← random.Random(seed).sample(all users, n_users), each user's shuffled session pool
+users, order ← random.Random(seed).sample(all users, max(L + I)), each user's shuffled session pool
 P ← sensitivity_sessions                                    # profile size
 T[u] ← order[u][max(session_values) : max(session_values) + test_sessions]   # never in any profile
 for each sensitivity τ in sensitivity_values:
-    for each pair (profile p, user u) of the drawn users:   # computed once, shared by all E_k
+    for each pair (profile p, user u) of the drawn users:   # computed once, shared by all experiments
         library ← p's first P sessions
         through[p, u] ← share of T[u] with r ≥ match_shape_ratio  is  ≥ match_session_ratio
-    for k in 1 … n − 1:
-        L ← users[:k],  I ← users[k:]
+    for each [L_i, I_i] in experiments:
+        L ← users[:L_i],  I ← users[L_i : L_i + I_i]
         legit accuracy    ← |{u ∈ L : through[u, u]}| / |L|
         impostor accuracy ← |{v ∈ I : no p ∈ L has through[p, v]}| / |I|
-chosen[E_k] ← τ with the highest mean of the two accuracies (ties: the smaller, stricter τ)
+chosen[E_i] ← τ with the highest mean of the two accuracies (ties: the smaller, stricter τ)
 ```
 
 $r$ is script 04's session match ratio: the share of a session's strokes with a DTW match (same kind, within
@@ -41,29 +42,29 @@ $\tau \cdot$ `resample_n`) in any library session.
 
 ## Formulas
 
-$$\text{Acc}_L(E_k, \tau) = \frac{|\{u \in L : u \text{ goes through its own profile}\}|}{k},\qquad
-\text{Acc}_I(E_k, \tau) = 1 - \frac{|\{v \in I : \exists\, p \in L,\ v \text{ goes through } p\}|}{n - k}$$
+$$\text{Acc}_L(E_i, \tau) = \frac{|\{u \in L : u \text{ goes through its own profile}\}|}{L_i},\qquad
+\text{Acc}_I(E_i, \tau) = 1 - \frac{|\{v \in I : \exists\, p \in L,\ v \text{ goes through } p\}|}{I_i}$$
 
-$$\text{Acc}(E_k, \tau) = \tfrac12\left(\text{Acc}_L + \text{Acc}_I\right),\qquad
-\tau^*(E_k) = \arg\max_\tau \text{Acc}(E_k, \tau)$$
+$$\text{Acc}(E_i, \tau) = \tfrac12\left(\text{Acc}_L + \text{Acc}_I\right),\qquad
+\tau^*(E_i) = \arg\max_\tau \text{Acc}(E_i, \tau)$$
 
 $1 - \text{Acc}_L$ is a user-level false rejection rate and $1 - \text{Acc}_I$ a user-level false acceptance
-rate [[1]](#ref-1); the mean of both is balanced accuracy, so E1 (1 legitimate, 4 impostors) and E4 (4, 1) weigh
-both sides equally. The CSV also stores $1 - \text{Acc}_I$ as `impostor_sensitivity`: the old *threshold*
+rate [[1]](#ref-1); the mean of both is balanced accuracy, so an experiment with 1 legitimate user and 4 impostors
+weighs both sides equally. The CSV also stores $1 - \text{Acc}_I$ as `impostor_sensitivity`: the old *threshold*
 (impostors through / impostors), renamed by the adviser.
 
 ## Why these choices
 
-- **Direct opposite:** every drawn user is either legitimate or impostor in each E_k, so the impostor set is
-  exactly the complement and the experiments differ only in where the split falls.
-- **One draw:** the same users and sessions in every E_k and every sensitivity, so differences come from the
+- **Experiments by hand** (user decision): the user counts are the variable under study, so they are set in the
+  config; one shared user order means a larger experiment extends a smaller one instead of drawing new users.
+- **One draw:** the same users and sessions in every experiment and every sensitivity, so differences come from the
   split and the tolerance, not from a new random draw.
 - **Fixed tested sessions** after the largest profile (also 10's `session_values`), so 09 and 10 test the same
   sessions and a legitimate user's tested sessions are never part of their own profile.
 - **Two separate graphs** (adviser): legitimate accuracy against the number of legitimate users, impostor
-  accuracy against the number of impostor users, one line per sensitivity.
+  accuracy against the number of impostor users, one line per sensitivity; experiments with the same user count on an axis are averaged into one point.
 
-## What we learned (`oct14_test1_229cd4`, users user21, user15, user29, user23, user12)
+## What we learned (`oct14_test1_229cd4`, direct-opposite split [1, 4] … [4, 1], users user21, user15, user29, user23, user12)
 
 At every sensitivity from 0.2 to 1.0 every legitimate user is accepted and every impostor goes through
 (legitimate accuracy 1, impostor accuracy 0, mean 0.5), so all lines overlap and 0.2 is chosen by the tie rule.
@@ -73,7 +74,7 @@ user accepted and no impostor through (E3 0.67, E4 0.63), 0.05 impostors start g
 
 ## Settings used
 
-`seed`, `n_users`, `sensitivity_values`, `sensitivity_sessions`, `session_values`, `test_sessions`, the chunking
+`seed`, `experiments`, `sensitivity_values`, `sensitivity_sessions`, `session_values`, `test_sessions`, the chunking
 settings, `dtw_band`, `match_shape_ratio`, `match_session_ratio`.
 
 ## References

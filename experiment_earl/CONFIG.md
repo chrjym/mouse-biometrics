@@ -38,13 +38,13 @@ runs/baseline_2707e0/
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
 08_run_notebook      executes the notebook and saves the copy in the run folder
-09_find_sensitivity  E1 ... E(n-1) (k legitimate vs n - k impostors) at every sensitivity (dtw_tolerance)
+09_find_sensitivity  every [legitimate, impostor] experiment set in `experiments` at every sensitivity (dtw_tolerance)
 10_find_session      each E_k at its chosen sensitivity with 2, 4, ... 10 profile sessions; sensitivity heatmap
 14_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
 15_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
 ```
 
-**One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 09, 10, 14 and 15 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 09 and 10 draw `n_users` users instead and split them into E1 … E(n − 1). Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
+**One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 09, 10, 14 and 15 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 09 and 10 use the same kind of draw but take their user counts from `experiments`. Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
 
 ## Data and sampling
 
@@ -93,14 +93,14 @@ The sweep covers every combination of sessions (1 to `sweep_sessions_max`), legi
 
 ## Find the sensitivity (09) and the sessions (10)
 
-Adviser, 2026-10-14. One draw from `seed` picks `n_users` users; experiment E_k uses the first k as legitimate users and the other n − k as their direct-opposite impostors. Matching uses DTW only; a user goes through a profile when at least `match_session_ratio` of their tested sessions reach `match_shape_ratio`.
+Adviser, 2026-10-14. One draw from `seed` puts the users in one random order and fixes each user's session order. The experiments are set by hand in `experiments`: each `[L, I]` entry (E1, E2, … in list order) takes the first L users of that order as legitimate and the next I as impostors (user change 2026-10-14: the automatic direct-opposite split, I = n − L, was dropped). Matching uses DTW only; a user goes through a profile when at least `match_session_ratio` of their tested sessions reach `match_shape_ratio`.
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `n_users` | 5 | Users in the draw (2–10). Gives experiments E1 … E(n_users − 1): E1 = 1 legitimate + 4 impostors, …, E4 = 4 + 1. |
+| `experiments` | `[[1, 1], [2, 2], [3, 3], [4, 4]]` | The experiments, set by hand: one `[legitimate, impostor]` pair each (E1, E2, … in this order). Each needs at least 1 of both and at most 10 users in total. Since every experiment starts from the same user order, a larger L reuses the smaller L's legitimate users. In the graphs, experiments with the same L (or I) are averaged into one point. |
 | `sensitivity_values` | `[0.2, 0.4, 0.6, 0.8, 1.0]` | The sensitivities 09 tries. Sensitivity = `dtw_tolerance` (the other matching settings may be tried later). At 0.15 about 99% of all strokes already match, so this grid lets every user through; values around 0.03–0.05 are where users start to differ. |
 | `sensitivity_sessions` | 2 | Profile sessions per legitimate user while 09 finds the sensitivity. |
-| `session_values` | `[2, 4, 6, 8, 10]` | Profile sessions per legitimate user that 10 tries, each E_k at the sensitivity 09 chose for it (best mean of legitimate and impostor accuracy, ties to the stricter one). |
+| `session_values` | `[2, 4, 6, 8, 10]` | Profile sessions per legitimate user that 10 tries, each experiment at the sensitivity 09 chose for it (best mean of legitimate and impostor accuracy, ties to the stricter one). |
 | `test_sessions` | 2 | Sessions tested per user (own sessions for legitimate users, all for impostors): the ones right after `max(session_values)`, so they are never part of a profile and stay the same at every step. |
 
 ## When you change a setting

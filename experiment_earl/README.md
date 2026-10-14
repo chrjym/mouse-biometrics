@@ -113,7 +113,7 @@ Each image shows the real screen path: green dot = start, red dot = end, blue = 
 
 The adviser's pipeline (2026-10-14): raw → RNG (legitimate users, impostor users, sessions) → strokes (chunk shapes) → **user × user × sensitivity** → user × session × sensitivity → sensitivity → heatmap. Matching uses DTW only.
 
-One draw from `seed` picks `n_users` users (default 5) and each user's session order. Experiment **E_k** uses the first k users as legitimate and the other n − k as their **direct-opposite impostors**: with n = 5, E1 = 1 legitimate + 4 impostors, E2 = 2 + 3, E3 = 3 + 2, E4 = 4 + 1. Each E_k is scored at every **sensitivity** in `sensitivity_values` (0.2, 0.4, … 1.0). Sensitivity is the DTW setting `dtw_tolerance`; other matching settings may become sensitivities later.
+One draw from `seed` puts the users in one random order and fixes each user's session order. The experiments are set by hand in `experiments`: each `[L, I]` entry (E1, E2, … in list order) takes the first L users of that order as legitimate and the next I as impostors (user change 2026-10-14: the automatic direct-opposite split, I = n − L, was dropped). For example `[[1, 4], [2, 2]]` gives E1 = 1 legitimate + 4 impostors and E2 = 2 + 2. Each experiment is scored at every **sensitivity** in `sensitivity_values` (0.2, 0.4, … 1.0). Sensitivity is the DTW setting `dtw_tolerance`; other matching settings may become sensitivities later.
 
 - **Profile:** a legitimate user's first `sensitivity_sessions` sessions (default 2).
 - **Tested sessions:** every user's next `test_sessions` sessions (default 2) after the largest profile (`max(session_values)`), so they are never in a profile at any step.
@@ -124,7 +124,7 @@ One draw from `seed` picks `n_users` users (default 5) and each user's session o
 .venv/bin/python experiment_earl/src/09_find_sensitivity.py     # seconds once the DTW cache is warm
 ```
 
-Outputs, inside the run folder: `results/sensitivity/experiments.csv` (every E_k × sensitivity: users, legitimate accepted, impostors through, both accuracies, their mean), `results/sensitivity/chosen.csv` (per E_k, the sensitivity with the best mean accuracy; ties go to the stricter one) and `figures/find_sensitivity.png`: two separate graphs, **legitimate** (x = legitimate users L) and **impostor** (x = impostor users I), y = accuracy, one line per sensitivity.
+Outputs, inside the run folder: `results/sensitivity/experiments.csv` (every E_k × sensitivity: users, legitimate accepted, impostors through, both accuracies, their mean), `results/sensitivity/chosen.csv` (per experiment, the sensitivity with the best mean accuracy; ties go to the stricter one) and `figures/find_sensitivity.png`: two separate graphs, **legitimate** (x = legitimate users L) and **impostor** (x = impostor users I), y = accuracy, one line per sensitivity. Experiments with the same number of users on an axis are averaged into one point.
 
 ### F. Find the sessions (User × Session × Sensitivity) and the sensitivity heatmap
 
@@ -136,7 +136,7 @@ Same draw and experiments as E. Each E_k uses its own chosen sensitivity from E 
 
 Outputs, inside the run folder: `results/session/experiments.csv`, `figures/find_session.png` (legitimate and impostor graphs, y = accuracy, one line per session count) and `figures/sensitivity_heatmap.png` (profile sessions × experiment; colour = **sensitivity** = impostors through / impostors, the former threshold, 0–1 in 0.1 steps; each cell also shows impostors through and legitimate users accepted).
 
-**First result** (`oct14_test1_229cd4`, users user21, user15, user29, user23, user12): at every sensitivity from 0.2 to 1.0 and every session count, every legitimate user is accepted and every impostor goes through (legitimate accuracy 1, impostor accuracy 0). Tolerance 0.15 already matched about 99% of all strokes, so this grid cannot separate users; a quick probe at 2 sessions showed that only tolerances around 0.03–0.05 give any difference between users.
+**First result** (`oct14_test1_229cd4`, old direct-opposite split, users user21, user15, user29, user23, user12): at every sensitivity from 0.2 to 1.0 and every session count, every legitimate user is accepted and every impostor goes through (legitimate accuracy 1, impostor accuracy 0). Tolerance 0.15 already matched about 99% of all strokes, so this grid cannot separate users; a quick probe at 2 sessions showed that only tolerances around 0.03–0.05 give any difference between users.
 
 ### G. Matched shapes### J. Matched shapes behind the per-user bar graphs
 
@@ -243,6 +243,7 @@ More sessions per user means more shapes to compare, so runs beyond 5 sessions t
 | `ModuleNotFoundError: numba` (or `nbformat`) | Use `.venv/bin/python`, or redo the setup in section 1. |
 | `'RcParams' object has no attribute '_get'` | Run `.venv/bin/pip install "matplotlib-inline<0.2"`. |
 | `Run ... has no shapes yet` from `07_plot_shapes.py` | That run only has notebook results. Run steps 01–03 with the same `--run` (the message prints the commands), then export. |
+| `experiments entry [L, I]: need at least 1 of each ...` | Fix that entry in `experiments`: L ≥ 1, I ≥ 1, L + I ≤ 10. |
 | `No .../results/sensitivity/chosen.csv; run 09_find_sensitivity.py first` | Run E before F (same config or `--run`). |
 | `Need N sessions per user (profile + test_sessions)` | Lower `session_values` or `test_sessions`: their sum must stay within 114. |
 | `No shapes for userX in run ...` | That user was not drawn in this run's single trial; the message lists the users that have shapes. |

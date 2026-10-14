@@ -4,8 +4,8 @@
 
 ## What it does
 
-Second and last step of the adviser's pipeline (2026-10-14). It uses the same draw and experiments E1 … E(n − 1)
-as script 09 and, for each E_k, the sensitivity 09 chose for it (`results/sensitivity/chosen.csv`, so run 09
+Second and last step of the adviser's pipeline (2026-10-14). It uses the same draw and `experiments` as script 09
+and, for each experiment, the sensitivity 09 chose for it (`results/sensitivity/chosen.csv`, so run 09
 first). Each E_k is then scored with 2, 4, … 10 profile sessions per legitimate user (`session_values`).
 
 Outputs: `runs/<run>/results/session/experiments.csv`, `figures/find_session.png`,

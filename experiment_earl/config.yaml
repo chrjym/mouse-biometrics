@@ -35,8 +35,9 @@ sweep_sessions_max: 5      # tries 1 up to this many sessions per user (max: pri
 sweep_delta: 0.05          # a step that changes the mean sensitivity by less than this counts as "flat" (saturated)
 
 # --- Find the sensitivity (09) and the sessions (10), adviser 2026-10-14 ---
-# One draw from `seed` picks n_users users; experiment E_k uses the first k as legitimate and the other n_users - k as impostors.
-n_users: 5                                     # users in the draw (2-10); gives experiments E1 ... E(n_users - 1)
+# Set the experiments by hand: each [L, I] is one experiment (E1, E2, ... in this order) with L legitimate and I impostor users.
+# One draw from `seed` orders the users once; every experiment takes the first L of that order as legitimate and the next I as impostors.
+experiments: [[1, 1], [2, 2], [3, 3], [4, 4]]   # [legitimate, impostor] per experiment; L + I <= 10, at least 1 of each
 sensitivity_values: [0.2, 0.4, 0.6, 0.8, 1.0]  # dtw_tolerance values tried by 09 (sensitivity = dtw_tolerance)
 sensitivity_sessions: 2                        # profile sessions per legitimate user while 09 finds the sensitivity
 session_values: [2, 4, 6, 8, 10]               # profile sessions per legitimate user tried by 10

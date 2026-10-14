@@ -60,12 +60,13 @@ def main() -> None:
     for k in config["session_values"]:
         for tolerance in sorted(set(chosen.values())):
             matrix = sens_mod.pass_matrix(users, order, k, tolerance, config)
-            rows += [r for r in sens_mod.score(users, matrix, sensitivity=tolerance, sessions=k)
+            rows += [r for r in sens_mod.score(users, matrix, config, sensitivity=tolerance, sessions=k)
                      if chosen[r["experiment"]] == tolerance]
         print(f"{k} sessions done", flush=True)
     match_mod.save_cache()
 
-    table = pd.DataFrame(rows).sort_values(["sessions", "n_legit"])
+    table = pd.DataFrame(rows)
+    table = table.sort_values(["sessions", "experiment"], key=lambda c: c.str[1:].astype(int) if c.name == "experiment" else c)
     out = run / "results" / "session"
     out.mkdir(parents=True, exist_ok=True)
     table.to_csv(out / "experiments.csv", index=False)
