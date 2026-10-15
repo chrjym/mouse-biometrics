@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run every notebook run of batch.yaml: set config.yaml per run, skip finished runs, log, restore."""
+"""Run every notebook run of batch.yaml (set config.yaml per run, skip finished runs, log, restore), then plot them."""
 
 import argparse
 import csv
@@ -70,6 +70,7 @@ def main() -> None:
     parser.add_argument("--only", type=float, help="run a single sensitivity, e.g. 0.2 (quick test)")
     parser.add_argument("--dry-run", action="store_true", help="list the runs and whether each is done, run nothing")
     parser.add_argument("--timeout", type=int, default=3600, help="seconds allowed per notebook run")
+    parser.add_argument("--no-plot", action="store_true", help="skip the accuracy plots (16_plot_accuracy.py) at the end")
     args = parser.parse_args()
 
     runs = plan_runs(yaml.safe_load(args.plan.read_text()), args.only)
@@ -80,11 +81,13 @@ def main() -> None:
     shutil.copy2(CONFIG, BACKUP)
     counts = {"ok": 0, "skipped": 0, "failed": 0}
     new_folders = []
+    groups = set()
     try:
         for i, overrides in enumerate(runs, 1):
             name = cfg_mod.run_folder_name(cfg_mod.load_config(**overrides))
             folder = cfg_mod.RUNS / name
             prefix = f"[{i}/{len(runs)}] {name}"
+            groups.add(name.split("/")[0])
             if (folder / DONE_MARKER).exists():
                 counts["skipped"] += 1
                 print(f"{prefix} ... done already, skipped")
@@ -117,6 +120,18 @@ def main() -> None:
     if new_folders:
         print("\nTo share the new runs (runs/ is git-ignored, so -f is needed):")
         print("  git add -f " + " ".join(f"experiment_earl/runs/{name}" for name in new_folders))
+    if not args.no_plot and counts["ok"] + counts["skipped"]:
+        plot_groups(sorted(groups))
+
+
+def plot_groups(groups: list[str]) -> None:
+    """Run 16_plot_accuracy.py on each hash folder the plan used."""
+    for group in groups:
+        print(f"\nPlotting runs/{group} (16_plot_accuracy.py) ...", flush=True)
+        result = subprocess.run([sys.executable, str(ROOT / "src" / "16_plot_accuracy.py"), group], cwd=ROOT.parent)
+        if result.returncode != 0:
+            print(f"Plotting runs/{group} failed (exit code {result.returncode}); rerun: "
+                  f".venv/bin/python experiment_earl/src/16_plot_accuracy.py {group}")
 
 
 if __name__ == "__main__":
