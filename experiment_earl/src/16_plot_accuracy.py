@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Share of strokes that go through, per user, for every run under runs/<hash>/: legitimate and impostor line graphs."""
+"""Share of strokes that go through, per user, for every run under runs/<hash>/: one figure per sensitivity with legitimate and impostor line graphs."""
 
 import argparse
 from importlib import import_module
@@ -17,7 +17,6 @@ plot_mod = import_module("14_plot_matches")
 
 ROOT = Path(__file__).resolve().parents[1]
 HELD_OUT = 2  # last sessions of a legitimate user's pool: never in a profile, the same for every run
-COLOURS = ["tab:blue", "tab:orange", "tab:green", "tab:red", "tab:purple", "tab:brown"]
 
 
 def stroke_share(user: str, sessions: list[tuple[str, str]], library: list, config: dict) -> tuple[int, int]:
@@ -55,16 +54,14 @@ def plot(table: pd.DataFrame, path: Path, title: str) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.8), sharey=True,
                              gridspec_kw={"width_ratios": [max(table[table.kind == k].user.nunique(), 2)
                                                            for k in ("legitimate", "impostor")]})
-    sensitivities = sorted(table["sensitivity"].unique())
     sessions = sorted(table["sessions"].unique())
+    colours = plt.cm.viridis([0.85 * i / max(len(sessions) - 1, 1) for i in range(len(sessions))])
     for ax, kind in zip(axes, ("legitimate", "impostor")):
         part = table[table["kind"] == kind]
         users = sorted(part["user"].unique(), key=lambda u: int(u[4:]))
-        for (sens, k), g in part.groupby(["sensitivity", "sessions"]):
+        for k, g in part.groupby("sessions"):
             line = g.set_index("user")["accuracy"].reindex(users)
-            shade = 0.35 + 0.65 * (sessions.index(k) + 1) / len(sessions)
-            ax.plot(users, line, marker="o", color=COLOURS[sensitivities.index(sens) % len(COLOURS)], alpha=shade,
-                    label=f"sensitivity {sens:g}, {k} sessions")
+            ax.plot(users, line, marker="o", color=colours[sessions.index(k)], label=f"{k} sessions")
         ax.set_title(f"{kind.capitalize()} users", fontsize=10)
         ax.set_xlabel(f"{kind} user")
         ax.set_ylim(-0.02, 1.02)
@@ -98,15 +95,19 @@ def main() -> None:
     table["accuracy"] = (table["matched"] / table["strokes"].clip(lower=1)).round(4)
     table.to_csv(group / "accuracy.csv", index=False)
     config = cfg_mod.load_config(folders[0] / "config.yaml")
-    plot(table, group / "accuracy.png",
-         f"runs/{group.name}: share of strokes that match a legitimate profile (seed {config['seed']})\n"
-         f"legitimate = own last {HELD_OUT} sessions (never in a profile) vs own profile; impostor = first <sessions> sessions vs the "
-         f"best-matching legitimate profile; line = one run (colour = sensitivity, darker = more sessions)")
+    figures = []
+    for sens, part in table.groupby("sensitivity"):
+        path = group / f"accuracy_sensitivity_{sens:g}.png"
+        plot(part, path,
+             f"runs/{group.name}, sensitivity {sens:g}: share of strokes that match a legitimate profile (seed {config['seed']})\n"
+             f"legitimate = own last {HELD_OUT} sessions (never in a profile) vs own profile; impostor = first <sessions> "
+             f"sessions vs the best-matching legitimate profile; line = sessions per user")
+        figures.append(path.name)
 
     summary = table.groupby(["kind", "sensitivity", "sessions"])["accuracy"].mean().unstack("sessions")
     print(summary.round(3).to_string())
     print(f"Runs: {len(folders)}  Rows: {len(table)}")
-    print(f"Output: {group / 'accuracy.csv'}, {group / 'accuracy.png'}")
+    print(f"Output: {group / 'accuracy.csv'}, {', '.join(figures)}")
 
 
 if __name__ == "__main__":

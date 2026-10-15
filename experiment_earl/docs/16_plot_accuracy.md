@@ -6,14 +6,14 @@
 
 Compares every run inside one hash folder, `runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/`.
 Runs in one hash folder share every other setting (seed, chunking, matching), so they differ only in those four values.
-For each run it scores every drawn user and draws two line graphs side by side:
+For each run it scores every drawn user. Per `sensitivity` it draws one figure with two line graphs side by side:
 
 - **Legitimate users:** x = each legitimate user, y = share of their own strokes that match their own profile.
 - **Impostor users:** x = each impostor user, y = share of their strokes that match the legitimate profile that matches them most.
 
-One line per run: colour = `sensitivity`, darker = more `sessions_per_user`.
+One line per run of that sensitivity, i.e. per `sessions_per_user` (lighter = more sessions).
 
-Outputs (in the hash folder, not in a run): `runs/<hash>/accuracy.csv`, `runs/<hash>/accuracy.png`.
+Outputs (in the hash folder, not in a run): `runs/<hash>/accuracy.csv`, `runs/<hash>/accuracy_sensitivity_<value>.png` (one per sensitivity).
 
 ## Algorithm
 

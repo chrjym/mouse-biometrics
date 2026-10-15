@@ -26,7 +26,7 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/07_plot_shapes.py     # PNG per chunk under shapes/
 .venv/bin/python experiment_earl/src/09_find_sensitivity.py # adviser pipeline: E_k x sensitivity
 .venv/bin/python experiment_earl/src/10_find_session.py     # then E_k x sessions + sensitivity heatmap
-.venv/bin/python experiment_earl/src/16_plot_accuracy.py    # accuracy per user, one line per run of runs/<hash>/
+.venv/bin/python experiment_earl/src/16_plot_accuracy.py    # accuracy per user, one figure per sensitivity of runs/<hash>/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
@@ -92,7 +92,7 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 
 ### Accuracy across runs (`src/16_plot_accuracy.py`)
 
-- Takes a hash folder (`runs/<hash>/`, default the current config's) and scores every run in it with its own snapshot: legitimate accuracy = share of the user's last `HELD_OUT` (2) pool sessions (never in a profile, same for every run) matched by their own first-`sessions_per_user` library; impostor accuracy = share of the impostor's first `sessions_per_user` sessions' strokes matched by the best legitimate library. Outputs `runs/<hash>/accuracy.{csv,png}` (two line graphs, x = each user, line per run). ~10 s with a warm DTW cache.
+- Takes a hash folder (`runs/<hash>/`, default the current config's) and scores every run in it with its own snapshot: legitimate accuracy = share of the user's last `HELD_OUT` (2) pool sessions (never in a profile, same for every run) matched by their own first-`sessions_per_user` library; impostor accuracy = share of the impostor's first `sessions_per_user` sessions' strokes matched by the best legitimate library. Outputs `runs/<hash>/accuracy.csv` and one `accuracy_sensitivity_<value>.png` per sensitivity (two line graphs, x = each user, line per `sessions_per_user`). ~10 s with a warm DTW cache.
 - First result (`efdc92`, seed 945, user29 legitimate vs 9 impostors): at 0.04 / 10 sessions user29's own share is 0.49, impostors 0.26–0.53 (user9 highest); at 0.02 own 0.02–0.15 vs impostor means 0.005–0.10 (2 → 10 sessions). Own share is only a little above the impostor mean and below the best impostors, so strokes still do not separate users.
 
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
