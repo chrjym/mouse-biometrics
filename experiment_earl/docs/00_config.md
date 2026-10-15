@@ -21,15 +21,17 @@ dictionary. Every number used by the experiment comes from this dictionary. No s
 
 **Algorithm (`run_folder_name`, `open_run`)**
 
-1. Take every setting except `run_name`.
+1. Take every setting except `n_legitimate`, `n_impostor`, `sensitivity` and `sessions_per_user`
+   (and the retired `run_name`).
 2. Turn the settings into a JSON string with the keys sorted, so the same settings always give the same string.
 3. Hash the string with **SHA-1** [[1]](#ref-1), [[2]](#ref-2) and keep the first 6 hexadecimal characters.
-4. The folder is `runs/<run_name>_<hash>/`. If it does not exist yet, create it and save a copy of
+4. The folder is `runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/`, so runs that
+   differ only in those four sit side by side under one hash. If it does not exist yet, create it and save a copy of
    `config.yaml` there, plus `run.json` (creation time and the current git commit).
 5. With `--run <folder>`, or the `EARL_RUN` environment variable, open that existing folder and use **its**
    saved `config.yaml`, not the current one.
 
-$$\text{folder} = \text{run\_name} \;\|\; \text{"\_"} \;\|\; \text{SHA1}(\text{JSON}_\text{sorted}(\text{settings} \setminus \text{run\_name}))_{[0:6]}$$
+$$\text{folder} = \text{SHA1}(\text{JSON}_\text{sorted}(\text{settings} \setminus \{L, I, \text{sensitivity}, S\}))_{[0:6]} \;/\; L\_I\_\text{sensitivity}\_S$$
 
 **Why a hash?** We change settings often (tolerance, number of users, seed). If every script wrote to a fixed
 `results/` folder, a new run would overwrite the old one, and we could not tell which settings produced a
@@ -92,7 +94,7 @@ pieces of the path.
 
 ## Settings used
 
-`run_name`, `seed`, `dataset_dir`.
+`seed`, `dataset_dir`, and `n_legitimate`, `n_impostor`, `sensitivity`, `sessions_per_user` for the folder name.
 
 ## References
 

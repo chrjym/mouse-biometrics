@@ -27,16 +27,24 @@ def load_config(path: Path | None = None, **overrides) -> dict:
     return config
 
 
+RUN_KEYS = ("n_legitimate", "n_impostor", "sensitivity", "sessions_per_user")  # name the run, not the hash
+
+
 def run_folder_name(config: dict) -> str:
-    """`<run_name or tol/gap/n>_<hash>`: the same settings always give the same folder, any change gives a new one."""
-    settings = {k: v for k, v in config.items() if k != "run_name"}
+    """`<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>`: the hash covers every other
+    setting, so runs that differ only in these four sit side by side; any change gives a new folder."""
+    settings = {k: v for k, v in config.items() if k not in RUN_KEYS and k != "run_name"}
     digest = hashlib.sha1(json.dumps(settings, sort_keys=True).encode()).hexdigest()[:6]
-    label = config.get("run_name") or f"sens{config['sensitivity']}_gap{config['pause_gap_s']}_n{config['resample_n']}"
-    return f"{label}_{digest}"
+    return f"{digest}/" + "_".join(f"{config[k]:g}" for k in RUN_KEYS)
+
+
+def run_id(folder: Path) -> str:
+    """What `--run` and EARL_RUN take for this folder: its path under runs/."""
+    return folder.relative_to(RUNS).as_posix()
 
 
 def add_run_argument(parser) -> None:
-    parser.add_argument("--run", help="name of an existing folder under runs/ to read and write instead of "
+    parser.add_argument("--run", help="existing folder under runs/ (e.g. 1a2b3c/1_9_0.04_10) to read and write instead of "
                                       "the one config.yaml selects")
 
 
@@ -47,7 +55,7 @@ def open_run(run: str | None = None) -> tuple[dict, Path]:
     if run:
         folder = RUNS / run
         if not (folder / "config.yaml").exists():
-            known = ", ".join(sorted(p.name for p in RUNS.iterdir())) if RUNS.exists() else "none"
+            known = ", ".join(sorted(run_id(p.parent) for p in RUNS.glob("**/config.yaml"))) or "none"
             raise SystemExit(f"No run {run!r} under {RUNS}; existing runs: {known}")
         return load_config(folder / "config.yaml"), folder
     config = load_config()

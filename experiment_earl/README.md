@@ -30,7 +30,7 @@ The Balabit data is already in `experiment_earl/datasets/`; nothing to download.
 
 1. **Edit [config.yaml](config.yaml)**: users, seed, sessions, data, matching settings.
 2. **Run** the notebook, the sweep or the single trial (section 3).
-3. **Open the results** in `experiment_earl/runs/<run name>/` (section 4). The script prints the folder.
+3. **Open the results** in `experiment_earl/runs/<hash>/<L>_<I>_<sensitivity>_<sessions>/` (section 4). The script prints the folder.
 
 Each distinct config gets its own run folder, so changing a setting never overwrites an older result. Running again with the same config reuses its folder.
 
@@ -92,7 +92,7 @@ Useful options:
 .venv/bin/python experiment_earl/src/07_plot_shapes.py --user user21 --user user9 # several users
 .venv/bin/python experiment_earl/src/07_plot_shapes.py --limit 50                 # at most 50 shapes per session
 .venv/bin/python experiment_earl/src/07_plot_shapes.py --no-overview              # skip the overview grid
-.venv/bin/python experiment_earl/src/07_plot_shapes.py --run baseline_2707e0      # shapes of an older run
+.venv/bin/python experiment_earl/src/07_plot_shapes.py --run 1a2b3c/1_9_0.04_10   # shapes of an older run
 ```
 
 What it writes, inside the run folder:
@@ -162,19 +162,19 @@ Outputs, inside the run folder: `results/genuine_check.csv` (every tested sessio
 
 ### Working with an older run
 
-Every script takes `--run <run folder name>`. It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
+Every script takes `--run <run folder>` (its path under `runs/`). It then uses that folder and the settings saved in it, whatever `config.yaml` says now:
 
 ```bash
-.venv/bin/python experiment_earl/src/07_plot_shapes.py --run baseline_2707e0 --user user12
-.venv/bin/python experiment_earl/src/08_run_notebook.py --run baseline_91da91
+.venv/bin/python experiment_earl/src/07_plot_shapes.py --run 1a2b3c/1_9_0.04_10 --user user12
+.venv/bin/python experiment_earl/src/08_run_notebook.py --run 1a2b3c/1_9_0.02_10
 ```
 
-Run folder names are `<run_name>_<hash>`: `run_name` comes from the top of `config.yaml` and the hash from all other settings. Use a new `run_name` (for example `tol003`) to make runs easy to tell apart. Runs made before 2026-10-08 used training files only; runs before 2026-10-14 read the separate `training_files`/`test_files` folders.
+Run folders are `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>`: the hash covers every other setting (seed, chunking, matching, ...), so runs that differ only in those four sit side by side under one hash. Runs made before 2026-10-15 are flat `<run_name>_<hash>` folders and still open with `--run`. Runs made before 2026-10-08 used training files only; runs before 2026-10-14 read the separate `training_files`/`test_files` folders.
 
 ## 4. Where the results are
 
 ```
-experiment_earl/runs/<run name>/
+experiment_earl/runs/<hash>/<L>_<I>_<sensitivity>_<sessions>/
 ├── config.yaml          the exact settings this run used
 ├── run.json             when the folder was created and the git commit
 ├── notebooks/           executed notebook with all tables and plots                (A)

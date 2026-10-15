@@ -75,14 +75,14 @@ def main() -> None:
     shapes = run / "shapes"
     saved = sorted(shapes.glob("*/*/session_*.npz"))
     if not saved:
-        steps = "\n".join(f"  .venv/bin/python experiment_earl/src/{s}.py --run {run.name}"
+        steps = "\n".join(f"  .venv/bin/python experiment_earl/src/{s}.py --run {cfg_mod.run_id(run)}"
                           for s in ("01_sample_users", "02_sample_sessions", "03_chunk_shapes"))
-        raise SystemExit(f"Run {run.name} has no shapes yet (the notebook does not save them). Run steps 01-03 first:\n{steps}")
+        raise SystemExit(f"Run {cfg_mod.run_id(run)} has no shapes yet (the notebook does not save them). Run steps 01-03 first:\n{steps}")
     jobs = [(npz, npz.with_suffix(""), args.limit, not args.no_overview)
             for npz in saved if not args.user or npz.parent.name in args.user]
     if not jobs:
         users = ", ".join(sorted({f"{npz.parent.name} ({npz.parent.parent.name})" for npz in saved}))
-        raise SystemExit(f"No shapes for {', '.join(args.user)} in run {run.name}. Users with shapes: {users}")
+        raise SystemExit(f"No shapes for {', '.join(args.user)} in run {cfg_mod.run_id(run)}. Users with shapes: {users}")
 
     total = 0
     with Pool(args.workers) as pool:

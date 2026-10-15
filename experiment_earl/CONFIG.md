@@ -8,10 +8,10 @@ All of Balabit is used, raw (adviser, 2026-10-08): 1,676 sessions for 10 users. 
 
 ## Every config gets its own folder
 
-Nothing is overwritten when you change a setting. The scripts store everything for a config under `experiment_earl/runs/<name>_<hash>/`:
+Nothing is overwritten when you change a setting. The scripts store everything for a config under `experiment_earl/runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/`:
 
 ```
-runs/baseline_2707e0/
+runs/1a2b3c/1_9_0.04_10/
 ├── config.yaml     snapshot of the settings used (with comments)
 ├── run.json        when the folder was created and the git commit
 ├── results/        trial_0.json, summary.csv, session_progression*.csv, sweep/
@@ -21,9 +21,9 @@ runs/baseline_2707e0/
 └── temp/           manifest.json and the copied sessions    (regenerable)
 ```
 
-- **Name:** `run_name` (the label at the top of `config.yaml`) plus a 6-character hash of all the other settings. If `run_name` is empty, the label is built from the tolerance, pause gap and `resample_n`.
+- **Name:** `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>`, for example `1a2b3c/1_9_0.04_10`. The 6-character hash covers every other setting, so runs that differ only in those four sit side by side in one hash folder.
 - **Same settings, same folder:** running again with an unchanged config reuses its folder, so the sweep resumes. **Any change gives a new folder**, and the old one stays as it was.
-- **Pick an old run:** every script takes `--run <folder name>`, for example `07_plot_shapes.py --run baseline_2707e0`. The notebook helper takes it too; the notebook itself reads the `EARL_RUN` environment variable.
+- **Pick an old run:** every script takes `--run <folder name>`, for example `07_plot_shapes.py --run 1a2b3c/1_9_0.04_10`. The notebook helper takes it too; the notebook itself reads the `EARL_RUN` environment variable.
 - **Shared cache:** `experiment_earl/cache/pairs.pkl` holds DTW results for all runs. Its keys contain the chunking, band and tolerance settings, so a new run reuses whatever is still valid.
 - **Git:** the whole `runs/` folder and `cache/` are git-ignored. Runs stay on your disk for reference but are not committed, so copy a run folder somewhere safe if you need to share it.
 
@@ -50,7 +50,6 @@ runs/baseline_2707e0/
 
 | Setting | Default | Used by | Meaning |
 |---|---|---|---|
-| `run_name` | `experiment1` | all | Label for this config's folder under `runs/`. It is not part of the hash, so renaming it does not change which settings the folder stands for. |
 | `seed` | 934 | 01, 02, 06, 09, 10, 14, 15, notebook | Picks the users and sessions once (which users are legitimate, which are impostors, the order of each user's sessions). The same seed gives the same users and sessions, so a result can be repeated. Only the sweep makes more draws, with `seed`, `seed + 1`, ... |
 | `dataset_dir` | `datasets/balabit/users` | all | Balabit sessions, one folder per user (training and test files merged, adviser 2026-10-14), relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
 | `n_legitimate` | 3 | 01, notebook, 09, 10, 14, 15 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
@@ -97,7 +96,7 @@ No settings of their own (user decision 2026-10-14): they use `seed`, `n_legitim
 
 ## When you change a setting
 
-Any change to a value (except `run_name`) makes the next script run create a new folder under `runs/`, so nothing needs deleting or resetting. Then:
+Any change to a value makes the next script run create a new folder under `runs/`, so nothing needs deleting or resetting. Then:
 
 - **Single trial:** run 01 → 05 again (or the sweep, or the notebook). The new folder starts empty.
 - **Speed:** DTW results are shared through `cache/pairs.pkl`. Changing only `match_session_ratio`, `sweep_delta`, `sweep_sessions_max`, `n_trials` or `seed` reuses all of them; changing chunking, `dtw_band` or `sensitivity` recomputes what it must.

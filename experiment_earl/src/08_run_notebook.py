@@ -19,7 +19,7 @@ def main() -> None:
     parser.add_argument("--timeout", type=int, default=3600, help="seconds allowed for the whole notebook")
     args = parser.parse_args()
     _, run = cfg_mod.open_run(args.run)
-    os.environ["EARL_RUN"] = run.name  # the notebook picks the same run folder
+    os.environ["EARL_RUN"] = cfg_mod.run_id(run)  # the notebook picks the same run folder
 
     notebook = nbformat.read(TEMPLATE, 4)
     ExecutePreprocessor(timeout=args.timeout, kernel_name="python3").preprocess(
