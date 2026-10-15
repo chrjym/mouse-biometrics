@@ -1,9 +1,7 @@
-# Batch plan for src/17_batch.py: every run = one split x one sensitivity x one session count.
-# Only these values change between runs; every other setting comes from config.yaml as it is.
+# What src/17_batch.py runs: every sensitivity x every session count below, one notebook run each.
+# Edit these lists to choose what to run; every other setting comes from config.yaml as it is.
 seed: 945
-splits: [[1, 9], [9, 1]]                       # [n_legitimate, n_impostor]
+n_legitimate: 1
+n_impostor: 9
 sensitivities: [0.20, 0.40, 0.60, 0.80, 1.00]  # DTW tolerance, steps of 0.2
 sessions: [2, 4, 6, 8, 10]                     # sessions_per_user
-assign:                                        # which splits each member runs (--member A / --member B)
-  A: [[1, 9]]
-  B: [[9, 1]]
