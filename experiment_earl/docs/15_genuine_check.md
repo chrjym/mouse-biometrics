@@ -1,6 +1,6 @@
 # `15_genuine_check.py`: does the user's own unseen data match their profile?
 
-[← index](README.md) · previous: [14](14_plot_matches.md)
+[← index](README.md) · previous: [14](14_plot_matches.md) · next: [16](16_plot_accuracy.md)
 
 ## What it does
 

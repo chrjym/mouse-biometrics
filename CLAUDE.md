@@ -26,6 +26,7 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/07_plot_shapes.py     # PNG per chunk under shapes/
 .venv/bin/python experiment_earl/src/09_find_sensitivity.py # adviser pipeline: E_k x sensitivity
 .venv/bin/python experiment_earl/src/10_find_session.py     # then E_k x sessions + sensitivity heatmap
+.venv/bin/python experiment_earl/src/16_plot_accuracy.py    # accuracy per user, one line per run of runs/<hash>/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
@@ -55,7 +56,7 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 
 ## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
 
-Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/CONFIG.md`, `experiment_earl/README.md` is the user-facing run guide, and `experiment_earl/docs/NN_*.md` explain each script's algorithm, formulas and reasons (keep both in sync when commands, outputs or algorithms change). Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`): 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03, 08 executes the notebook, 09 → 10 is the adviser's 2026-10-14 pipeline; settings in `experiment_earl/config.yaml`.
+Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/CONFIG.md`, `experiment_earl/README.md` is the user-facing run guide, and `experiment_earl/docs/NN_*.md` explain each script's algorithm, formulas and reasons (keep both in sync when commands, outputs or algorithms change). Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`): 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03, 08 executes the notebook, 09 → 10 is the adviser's 2026-10-14 pipeline, 16 compares the runs of one hash folder; settings in `experiment_earl/config.yaml`.
 
 **Runs:** nothing writes into fixed folders. `00_config.open_run()` maps the current config to `experiment_earl/runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/` (hash = every other setting; `run_name` was dropped 2026-10-15, older runs are flat `<run_name>_<hash>` folders), creating it with a `config.yaml` snapshot and `run.json` on first use. `results/`, `figures/`, `shapes/`, `temp/` and `notebooks/` (executed notebook) live inside it. Any config change → new folder, so earlier results are never overwritten. Every script takes `--run <hash>/<name>` (the notebook reads `EARL_RUN`) to reuse an old run with its own settings. The whole `runs/` folder and the shared DTW cache (`experiment_earl/cache/`) are git-ignored: results stay on disk for reference but are not committed.
 
@@ -88,6 +89,11 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 
 - Same draw and profiles as the notebook (`14.draw_users`); per legitimate user and step k, scores the user's next `--held-out` (default 2) sessions after the first `sessions_per_user` (never in the profile) and the impostors' first k sessions against the user's first-k-session library with `04.matched_chunks` (shared DTW cache) and the `match_shape_ratio` rule. Outputs `results/genuine_check{,_summary}.csv`, `figures/genuine_check.png`.
 - First result (`oct12_test3_d05fb2`, impostors user16 + user21): own sessions pass only for user9 and user20 (2/2 from 1–2 sessions, 35–57% of strokes matched) and user29 at 4–5 sessions (1/2); user12, user15, user35 never pass (11–21%). Own share beats the impostors' for 5 of 6 users, but user9/user20 are also the users that get through as impostors, so passing tracks a user's straight-stroke style more than identity. user15/user35 held-out sessions include short test files (44–61 strokes). This run predates the data merge.
+
+### Accuracy across runs (`src/16_plot_accuracy.py`)
+
+- Takes a hash folder (`runs/<hash>/`, default the current config's) and scores every run in it with its own snapshot: legitimate accuracy = share of the user's last `HELD_OUT` (2) pool sessions (never in a profile, same for every run) matched by their own first-`sessions_per_user` library; impostor accuracy = share of the impostor's first `sessions_per_user` sessions' strokes matched by the best legitimate library. Outputs `runs/<hash>/accuracy.{csv,png}` (two line graphs, x = each user, line per run). ~10 s with a warm DTW cache.
+- First result (`efdc92`, seed 945, user29 legitimate vs 9 impostors): at 0.04 / 10 sessions user29's own share is 0.49, impostors 0.26–0.53 (user9 highest); at 0.02 own 0.02–0.15 vs impostor means 0.005–0.10 (2 → 10 sessions). Own share is only a little above the impostor mean and below the best impostors, so strokes still do not separate users.
 
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 

@@ -16,6 +16,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    │   01 draw users → 02 draw sessions → 03 cut into strokes → 04 DTW match → 05 sensitivity │
    │   06 sweep every (sessions × legitimate × impostor) cell                                 │
    │   07 draw the strokes   08 run the notebook   14 draw matched pairs   15 genuine check   │
+   │   16 accuracy per user across the runs of one hash folder                               │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
    ┌──────────────────────────────────────────────────────────────────────────────────────────┐
    │ B. Adviser pipeline (2026-10-14), main configuration (seed, L, I, sessions, sensitivity) │
@@ -38,6 +39,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 10 | [10_find_session.md](10_find_session.md) | The same at 1 … `sessions_per_user` profile sessions; sensitivity heatmap (sessions × legitimate users) |
 | 14 | [14_plot_matches.md](14_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
 | 15 | [15_genuine_check.md](15_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
+| 16 | [16_plot_accuracy.md](16_plot_accuracy.md) | Share of strokes matched per legitimate and impostor user, one line per run of a hash folder |
 
 ## Words used on every page
 
