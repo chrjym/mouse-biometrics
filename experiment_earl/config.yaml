@@ -1,4 +1,3 @@
-# EARL shape-matching experiment (Balabit only).
 # Every script in src/ and the notebook read this file; nothing is hardcoded there.
 # Results go to runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/; the hash covers every other
 # setting, so any change gives a new folder and older results are kept.
@@ -9,7 +8,7 @@
 seed: 945                   # picks the users and sessions once; the same seed gives the same users and sessions (the sweep uses seed, seed + 1, ...)
 n_legitimate: 1            # users whose shapes form the legitimate profiles
 n_impostor: 9              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
-sessions_per_user: 10       # sessions per user; the notebook and 10 test 1, 2, ... up to this (max: printed by every script)
+sessions_per_user: 2       # sessions per user; the notebook and 10 test 1, 2, ... up to this (max: printed by every script)
 n_trials: 1                # sweep (06) only: random draws each cell is averaged over; the notebook, 14 and 15 use one fixed draw
 
 # --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
@@ -25,7 +24,7 @@ resample_n: 64             # every chunk is redrawn with this many evenly spaced
 
 # --- Matching (04): when do two shapes, a session and a user match ---
 dtw_band: 0.1              # DTW may stretch a shape by at most this share of resample_n
-sensitivity: 0.04          # (formerly dtw_tolerance; the value 09 and 10 test) chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
+sensitivity: 0.06          # (formerly dtw_tolerance; the value 09 and 10 test) chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
 match_shape_ratio: 0.2     # a session matches a profile when at least this share of its chunks match
 match_session_ratio: 0.5   # an impostor user is "matched" when at least this share of their sessions match
 
