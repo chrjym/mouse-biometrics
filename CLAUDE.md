@@ -26,7 +26,7 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/07_plot_shapes.py     # PNG per chunk under shapes/
 .venv/bin/python experiment_earl/src/09_find_sensitivity.py # adviser pipeline: E_k x sensitivity
 .venv/bin/python experiment_earl/src/10_find_session.py     # then E_k x sessions + sensitivity heatmap
-.venv/bin/python experiment_earl/src/16_plot_accuracy.py    # accuracy per user, one figure per sensitivity of runs/<hash>/
+.venv/bin/python experiment_earl/src/16_plot_accuracy.py    # sessions through per user, one figure per sensitivity of runs/<hash>/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
@@ -90,10 +90,10 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Same draw and profiles as the notebook (`14.draw_users`); per legitimate user and step k, scores the user's next `--held-out` (default 2) sessions after the first `sessions_per_user` (never in the profile) and the impostors' first k sessions against the user's first-k-session library with `04.matched_chunks` (shared DTW cache) and the `match_shape_ratio` rule. Outputs `results/genuine_check{,_summary}.csv`, `figures/genuine_check.png`.
 - First result (`oct12_test3_d05fb2`, impostors user16 + user21): own sessions pass only for user9 and user20 (2/2 from 1–2 sessions, 35–57% of strokes matched) and user29 at 4–5 sessions (1/2); user12, user15, user35 never pass (11–21%). Own share beats the impostors' for 5 of 6 users, but user9/user20 are also the users that get through as impostors, so passing tracks a user's straight-stroke style more than identity. user15/user35 held-out sessions include short test files (44–61 strokes). This run predates the data merge.
 
-### Accuracy across runs (`src/16_plot_accuracy.py`)
+### Sessions through across runs (`src/16_plot_accuracy.py`)
 
-- Takes a hash folder (`runs/<hash>/`, default the current config's) and scores every run in it with its own snapshot: legitimate accuracy = share of the user's last `HELD_OUT` (2) pool sessions (never in a profile, same for every run) matched by their own first-`sessions_per_user` library; impostor accuracy = share of the impostor's first `sessions_per_user` sessions' strokes matched by the best legitimate library. Outputs `runs/<hash>/accuracy.csv` and one `accuracy_sensitivity_<value>.png` per sensitivity (two line graphs, x = each user, line per `sessions_per_user`). ~10 s with a warm DTW cache.
-- First result (`efdc92`, seed 945, user29 legitimate vs 9 impostors): at 0.04 / 10 sessions user29's own share is 0.49, impostors 0.26–0.53 (user9 highest); at 0.02 own 0.02–0.15 vs impostor means 0.005–0.10 (2 → 10 sessions). Own share is only a little above the impostor mean and below the best impostors, so strokes still do not separate users.
+- Takes a hash folder (`runs/<hash>/`, default the current config's) and scores every run in it with its own snapshot, using the notebook's **fixed counts** (user request 2026-10-15; an earlier version plotted the share of strokes matched): y = sessions that go through (≥ `match_shape_ratio` of strokes match). Legitimate = the user's last `sessions_per_user` pool sessions (never in a profile) against their own library; impostor = their first `sessions_per_user` sessions against the legitimate library that passes most of them. Filled marker = user through (≥ `match_session_ratio`). Outputs `runs/<hash>/accuracy.csv` and one `accuracy_sensitivity_<value>.png` per sensitivity (x = each user, line per `sessions_per_user`). Impostor counts equal the notebook's `sessions_matched` and "impostors matched" on all 11 runs of `efdc92`. ~10 s with a warm DTW cache.
+- First result (`efdc92`, seed 945, user29 legitimate vs 9 impostors): at 0.02 almost nothing goes through (user29 1/10 at 10 sessions, impostors 0–5 of 90 sessions); at 0.04 user29 goes through from 4 sessions (3/4 … 10/10) but so do 4, 7, 9, 9 of 9 impostors at 4, 6, 8, 10 sessions; at 0.06 / 2 sessions user29 2/2 and 8 of 9 impostors. No sensitivity accepts the user while rejecting impostors.
 
 ### Notebook (`experiment_earl/notebooks/session_progression.ipynb`)
 

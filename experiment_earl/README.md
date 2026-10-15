@@ -171,16 +171,16 @@ Every script takes `--run <run folder>` (its path under `runs/`). It then uses t
 
 Run folders are `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>`: the hash covers every other setting (seed, chunking, matching, ...), so runs that differ only in those four sit side by side under one hash. Runs made before 2026-10-15 are flat `<run_name>_<hash>` folders and still open with `--run`. Runs made before 2026-10-08 used training files only; runs before 2026-10-14 read the separate `training_files`/`test_files` folders.
 
-### I. Accuracy per user across the runs of one hash folder
+### I. Sessions through per user across the runs of one hash folder
 
-Runs that differ only in `n_legitimate`, `n_impostor`, `sensitivity` and `sessions_per_user` share one `runs/<hash>/` folder. This script scores every run in it and, per sensitivity, draws one figure with two line graphs: **legitimate users** (own last 2 sessions, never in a profile, against their own profile) and **impostor users** (their first `sessions_per_user` sessions against the best-matching legitimate profile). y = accuracy = share of strokes matched at that sensitivity; one line per `sessions_per_user`.
+Runs that differ only in `n_legitimate`, `n_impostor`, `sensitivity` and `sessions_per_user` share one `runs/<hash>/` folder. This script scores every run in it and, per sensitivity, draws one figure with two line graphs: **legitimate users** (own last `sessions_per_user` sessions, never in a profile, against their own profile) and **impostor users** (their first `sessions_per_user` sessions, as in the notebook, against the legitimate profile that passes most of them). y = sessions that go through (≥ `match_shape_ratio` of strokes match), the notebook's fixed counts; one line per `sessions_per_user`; filled marker = the user goes through (≥ `match_session_ratio` of sessions).
 
 ```bash
 .venv/bin/python experiment_earl/src/16_plot_accuracy.py            # the hash folder config.yaml selects
 .venv/bin/python experiment_earl/src/16_plot_accuracy.py efdc92     # a specific hash folder
 ```
 
-Outputs, in the hash folder: `runs/<hash>/accuracy.csv` (one row per run and user: matched strokes, strokes, accuracy, best profile) and `runs/<hash>/accuracy_sensitivity_<value>.png` (one per sensitivity).
+Outputs, in the hash folder: `runs/<hash>/accuracy.csv` (one row per run and user: sessions passed / tested, matched strokes, strokes, through, best profile) and `runs/<hash>/accuracy_sensitivity_<value>.png` (one per sensitivity).
 
 ## 4. Where the results are
 

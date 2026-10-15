@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Share of strokes that go through, per user, for every run under runs/<hash>/: one figure per sensitivity with legitimate and impostor line graphs."""
+"""Sessions that go through (fixed counts, as in the notebook), per user, for every run under runs/<hash>/: one figure per sensitivity with legitimate and impostor line graphs."""
 
 import argparse
 from importlib import import_module
@@ -10,28 +10,30 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.ticker import MaxNLocator
 
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
 plot_mod = import_module("14_plot_matches")
 
 ROOT = Path(__file__).resolve().parents[1]
-HELD_OUT = 2  # last sessions of a legitimate user's pool: never in a profile, the same for every run
 
 
-def stroke_share(user: str, sessions: list[tuple[str, str]], library: list, config: dict) -> tuple[int, int]:
-    """(strokes matched by the library, strokes) over all `sessions` of `user`."""
-    matched = strokes = 0
+def score(user: str, sessions: list[tuple[str, str]], library: list, config: dict) -> dict:
+    """Sessions of `user` that pass (>= match_shape_ratio of their strokes match the library), plus the strokes."""
+    passed = matched = strokes = 0
     for folder, name in sessions:
         session = match_mod.dataset_session(user, name, config, folder)
-        matched += match_mod.matched_chunks(session, library, config)
+        hits = match_mod.matched_chunks(session, library, config)
+        passed += hits / max(session.n_chunks, 1) >= config["match_shape_ratio"]
+        matched += hits
         strokes += session.n_chunks
-    return matched, strokes
+    return {"passed": passed, "tested": len(sessions), "matched_strokes": matched, "strokes": strokes}
 
 
 def score_run(folder: Path) -> list[dict]:
-    """Legitimate: own held-out sessions against own profile. Impostor: first sessions_per_user sessions against
-    the legitimate profile that matches most of their strokes (the notebook's best profile)."""
+    """Legitimate: own last sessions_per_user pool sessions (never in a profile) against own profile. Impostor: first
+    sessions_per_user sessions (the notebook's) against the legitimate profile that passes most of them."""
     config = cfg_mod.load_config(folder / "config.yaml")
     k = config["sessions_per_user"]
     legit, impostor, order = plot_mod.draw_users(config, config["seed"])
@@ -40,13 +42,14 @@ def score_run(folder: Path) -> list[dict]:
            "n_legitimate": config["n_legitimate"], "n_impostor": config["n_impostor"]}
     rows = []
     for user in legit:
-        matched, strokes = stroke_share(user, order[user][-HELD_OUT:], libraries[user], config)
-        rows.append({**run, "kind": "legitimate", "user": user, "profile": user, "matched": matched, "strokes": strokes})
+        rows.append({**run, "kind": "legitimate", "user": user, "profile": user,
+                     **score(user, order[user][-k:], libraries[user], config)})
     for user in impostor:
-        scores = {p: stroke_share(user, order[user][:k], lib, config) for p, lib in libraries.items()}
-        profile = max(scores, key=lambda p: scores[p][0] / max(scores[p][1], 1))
-        rows.append({**run, "kind": "impostor", "user": user, "profile": profile,
-                     "matched": scores[profile][0], "strokes": scores[profile][1]})
+        scores = {p: score(user, order[user][:k], lib, config) for p, lib in libraries.items()}
+        profile = max(scores, key=lambda p: (scores[p]["passed"], scores[p]["matched_strokes"] / max(scores[p]["strokes"], 1)))
+        rows.append({**run, "kind": "impostor", "user": user, "profile": profile, **scores[profile]})
+    for row in rows:
+        row["through"] = row["passed"] >= config["match_session_ratio"] * row["tested"]
     return rows
 
 
@@ -60,13 +63,17 @@ def plot(table: pd.DataFrame, path: Path, title: str) -> None:
         part = table[table["kind"] == kind]
         users = sorted(part["user"].unique(), key=lambda u: int(u[4:]))
         for k, g in part.groupby("sessions"):
-            line = g.set_index("user")["accuracy"].reindex(users)
-            ax.plot(users, line, marker="o", color=colours[sessions.index(k)], label=f"{k} sessions")
+            g = g.set_index("user").reindex(users)
+            colour = colours[sessions.index(k)]
+            ax.plot(users, g["passed"], color=colour, label=f"{k} sessions")
+            ax.scatter(users, g["passed"], s=36, zorder=3, edgecolors=colour,
+                       facecolors=[colour if t else "white" for t in g["through"].fillna(False)])
         ax.set_title(f"{kind.capitalize()} users", fontsize=10)
         ax.set_xlabel(f"{kind} user")
-        ax.set_ylim(-0.02, 1.02)
+        ax.set_ylim(-0.3, max(sessions) + 0.3)
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
         ax.grid(alpha=0.3)
-    axes[0].set_ylabel("accuracy (share of strokes matched)")
+    axes[0].set_ylabel("sessions that go through")
     axes[1].legend(fontsize=7, loc="center left", bbox_to_anchor=(1.01, 0.5))
     fig.suptitle(title, fontsize=9)
     fig.tight_layout()
@@ -92,20 +99,21 @@ def main() -> None:
     match_mod.save_cache()
 
     table = pd.DataFrame(rows)
-    table["accuracy"] = (table["matched"] / table["strokes"].clip(lower=1)).round(4)
     table.to_csv(group / "accuracy.csv", index=False)
     config = cfg_mod.load_config(folders[0] / "config.yaml")
     figures = []
     for sens, part in table.groupby("sensitivity"):
         path = group / f"accuracy_sensitivity_{sens:g}.png"
         plot(part, path,
-             f"runs/{group.name}, sensitivity {sens:g}: share of strokes that match a legitimate profile (seed {config['seed']})\n"
-             f"legitimate = own last {HELD_OUT} sessions (never in a profile) vs own profile; impostor = first <sessions> "
-             f"sessions vs the best-matching legitimate profile; line = sessions per user")
+             f"runs/{group.name}, sensitivity {sens:g}: sessions that go through (≥ {config['match_shape_ratio']:.0%} of strokes "
+             f"match), seed {config['seed']}\nlegitimate = own last <sessions> sessions (never in a profile) vs own profile; "
+             f"impostor = first <sessions> sessions vs the best legitimate profile; line = sessions per user; "
+             f"filled = user goes through (≥ {config['match_session_ratio']:.0%} of sessions)")
         figures.append(path.name)
 
-    summary = table.groupby(["kind", "sensitivity", "sessions"])["accuracy"].mean().unstack("sessions")
-    print(summary.round(3).to_string())
+    summary = table.groupby(["kind", "sensitivity", "sessions"]).agg(passed=("passed", "sum"), tested=("tested", "sum"),
+                                                                     through=("through", "sum"), users=("user", "size"))
+    print(summary.to_string())
     print(f"Runs: {len(folders)}  Rows: {len(table)}")
     print(f"Output: {group / 'accuracy.csv'}, {', '.join(figures)}")
 

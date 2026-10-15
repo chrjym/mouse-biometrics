@@ -42,7 +42,7 @@ runs/1a2b3c/1_9_0.04_10/
 10_find_session      the same at 1, 2, ... sessions_per_user profile sessions; sensitivity heatmap
 14_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
 15_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
-16_plot_accuracy     every run of one runs/<hash>/ folder: share of strokes matched per legitimate and impostor user
+16_plot_accuracy     every run of one runs/<hash>/ folder: sessions through per legitimate and impostor user
 ```
 
 **One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 09, 10, 14 and 15 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 09 and 10 use the same draw and settings (the main configuration). Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
