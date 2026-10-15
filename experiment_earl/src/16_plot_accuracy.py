@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sessions that go through (fixed counts, as in the notebook), per user, for every run under runs/<hash>/: one figure per sensitivity with legitimate and impostor line graphs."""
+"""Sessions that go through (fixed counts, as in the notebook), per user, for every run under runs/<hash>/: one figure per split and sensitivity with legitimate and impostor line graphs."""
 
 import argparse
 from importlib import import_module
@@ -102,16 +102,16 @@ def main() -> None:
     table.to_csv(group / "accuracy.csv", index=False)
     config = cfg_mod.load_config(folders[0] / "config.yaml")
     figures = []
-    for sens, part in table.groupby("sensitivity"):
-        path = group / f"accuracy_sensitivity_{sens:g}.png"
+    for (n_legit, n_impostor, sens), part in table.groupby(["n_legitimate", "n_impostor", "sensitivity"]):
+        path = group / f"accuracy_{n_legit}_{n_impostor}_sensitivity_{sens:g}.png"
         plot(part, path,
-             f"runs/{group.name}, sensitivity {sens:g}: sessions that go through (≥ {config['match_shape_ratio']:.0%} of strokes "
+             f"runs/{group.name}, {n_legit} legitimate vs {n_impostor} impostors, sensitivity {sens:g}: sessions that go through (≥ {config['match_shape_ratio']:.0%} of strokes "
              f"match), seed {config['seed']}\nlegitimate = own last <sessions> sessions (never in a profile) vs own profile; "
              f"impostor = first <sessions> sessions vs the best legitimate profile; line = sessions per user; "
              f"filled = user goes through (≥ {config['match_session_ratio']:.0%} of sessions)")
         figures.append(path.name)
 
-    summary = table.groupby(["kind", "sensitivity", "sessions"]).agg(passed=("passed", "sum"), tested=("tested", "sum"),
+    summary = table.groupby(["n_legitimate", "n_impostor", "kind", "sensitivity", "sessions"]).agg(passed=("passed", "sum"), tested=("tested", "sum"),
                                                                      through=("through", "sum"), users=("user", "size"))
     print(summary.to_string())
     print(f"Runs: {len(folders)}  Rows: {len(table)}")

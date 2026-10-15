@@ -28,8 +28,10 @@ Open `experiment_earl/batch.yaml` and choose what to run:
 
 ```yaml
 seed: 945
-n_legitimate: 1
-n_impostor: 9
+splits:                                        # [n_legitimate, n_impostor]
+  - [1, 9]
+  - [2, 8]
+  - ...                                        # up to [9, 1]
 sensitivities: [0.20, 0.40, 0.60, 0.80, 1.00]  # DTW tolerance, steps of 0.2
 sessions: [2, 4, 6, 8, 10]                     # sessions_per_user
 ```
@@ -37,16 +39,15 @@ sessions: [2, 4, 6, 8, 10]                     # sessions_per_user
 | Key | What it means | Rules |
 |---|---|---|
 | `seed` | Picks the users and each user's session order. Same seed = same users and sessions. | any whole number |
-| `n_legitimate` | Users whose strokes form the profiles | `n_legitimate + n_impostor <= 10` |
-| `n_impostor` | Other users tested against those profiles | see above |
+| `splits` | `[n_legitimate, n_impostor]` pairs: users whose strokes form the profiles, and other users tested against them. The default steps legitimate 1 → 9 while impostors go 9 → 1. | each pair adds up to at most 10 |
 | `sensitivities` | DTW tolerance: a stroke matches when its mean distance per point is at most this. Lower = stricter. | list of numbers |
 | `sessions` | Profile sessions per user (`sessions_per_user`) | list, each at most 114 |
 
-The batch runs **every sensitivity with every session count**: 5 × 5 = 25 runs with the values above.
+The batch runs **every split with every sensitivity and every session count**: 9 × 5 × 5 = 225 runs with the values above (about 15–25 s each, so roughly 1–1.5 hours). Shorten the lists for a smaller batch, e.g. `splits: [[1, 9]]` gives 25 runs.
 
 Every other setting (chunking, `dtw_band`, `match_shape_ratio`, `match_session_ratio`, data folder) comes from `config.yaml` as it is. Explained in [CONFIG.md](CONFIG.md).
 
-> **Two members running the same plan:** keep `seed`, `n_legitimate`, `n_impostor` and `config.yaml` identical, and give each member different `sensitivities`. All runs then land in the same `runs/<hash>/` folder and are plotted together.
+> **Two members running the same plan:** keep `seed` and `config.yaml` identical, and give each member different `splits` (e.g. one takes 1–9 to 5–5, the other 6–4 to 9–1). All runs then land in the same `runs/<hash>/` folder and are plotted together.
 
 ## Step 3: Check the plan (dry run)
 
@@ -57,10 +58,10 @@ Every other setting (chunking, `dtw_band`, `match_shape_ratio`, `match_session_r
 Lists every run and whether it is done already. Runs nothing and changes nothing.
 
 ```
-[1/25] efdc92/1_9_0.2_2 ... to run
-[2/25] efdc92/1_9_0.2_4 ... to run
+[1/225] efdc92/1_9_0.2_2 ... to run
+[2/225] efdc92/1_9_0.2_4 ... to run
 ...
-Dry run: 25 runs, 0 done, 25 to run.
+Dry run: 225 runs, 0 done, 225 to run.
 ```
 
 The run name is `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>`.
@@ -76,9 +77,9 @@ What happens, in order:
 1. **Back up** `config.yaml` (to `config.yaml.batch-backup`).
 2. **For each run:**
    1. **Skip** it if its folder already has `results/session_progression.csv`.
-   2. **Set** `seed`, `n_legitimate`, `n_impostor`, `sensitivity` and `sessions_per_user` in `config.yaml`.
+   2. **Set** `seed`, the split (`n_legitimate`, `n_impostor`), `sensitivity` and `sessions_per_user` in `config.yaml`.
    3. **Simulate:** run `08_run_notebook.py` (pick users and sessions → cut strokes → DTW matching → decide which sessions and users pass).
-   4. **Print** progress, e.g. `[7/25] efdc92/1_9_0.4_6 ... ok (0m 26s)`.
+   4. **Print** progress, e.g. `[7/225] efdc92/1_9_0.4_6 ... ok (0m 26s)`.
    5. **Log** one line to `runs/batch_log.csv`.
    6. If the run **fails**, note it and continue with the next.
 3. **Restore** `config.yaml`, even after an error or Ctrl+C, and delete the backup.
@@ -110,8 +111,8 @@ runs/
     │   ├── README.md                   results table + links to every plot and run folder
     │   └── summary.csv                 one row per run
     ├── accuracy.csv                    every run x every user
-    ├── accuracy_sensitivity_0.2.png    one plot per sensitivity
-    ├── accuracy_sensitivity_0.4.png
+    ├── accuracy_1_9_sensitivity_0.2.png  one plot per split and sensitivity
+    ├── accuracy_1_9_sensitivity_0.4.png
     ├── ...
     └── 1_9_0.2_2/                      one folder per run
         ├── config.yaml                 exact settings of this run
@@ -125,6 +126,7 @@ runs/
 
 | Column | Meaning |
 |---|---|
+| `split`, `n_legitimate`, `n_impostor` | the run's split (`1_9` = 1 legitimate vs 9 impostors) |
 | `sensitivity`, `sessions` | the run's settings |
 | `run` | run folder |
 | `legit_passed` / `legit_tested` | legitimate user's own tested sessions that pass their profile (**higher is better**) |
@@ -132,7 +134,9 @@ runs/
 | `impostor_passed` / `impostor_tested` | impostor sessions that pass the profile (**lower is better**) |
 | `impostors_through` | impostors who get through |
 
-### The plots (`accuracy_sensitivity_<value>.png`)
+### The plots (`accuracy_<legit>_<impostor>_sensitivity_<value>.png`)
+
+One figure per split and sensitivity, so splits are never mixed.
 
 - **Left panel, legitimate:** x = each legitimate user, y = their sessions that pass.
 - **Right panel, impostor:** x = each impostor, y = their sessions that pass.

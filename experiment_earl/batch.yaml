@@ -1,7 +1,15 @@
-# What src/17_batch.py runs: every sensitivity x every session count below, one notebook run each.
+# What src/17_batch.py runs: every split x every sensitivity x every session count below, one notebook run each.
 # Edit these lists to choose what to run; every other setting comes from config.yaml as it is.
 seed: 945
-n_legitimate: 1
-n_impostor: 9
+splits:                                        # [n_legitimate, n_impostor]; legitimate goes up as impostors go down
+  - [1, 9]
+  - [2, 8]
+  - [3, 7]
+  - [4, 6]
+  - [5, 5]
+  - [6, 4]
+  - [7, 3]
+  - [8, 2]
+  - [9, 1]
 sensitivities: [0.20, 0.40, 0.60, 0.80, 1.00]  # DTW tolerance, steps of 0.2
 sessions: [2, 4, 6, 8, 10]                     # sessions_per_user

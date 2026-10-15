@@ -25,9 +25,13 @@ DONE_MARKER = Path("results") / "session_progression.csv"
 
 
 def plan_runs(plan: dict, only: float | None) -> list[dict]:
-    """Every (sensitivity, sessions) of the plan, as config overrides."""
-    return [{"seed": plan["seed"], "n_legitimate": plan["n_legitimate"], "n_impostor": plan["n_impostor"],
+    """Every (split, sensitivity, sessions) of the plan, as config overrides."""
+    for legit, impostor in plan["splits"]:
+        if legit + impostor > 10:
+            raise SystemExit(f"Split [{legit}, {impostor}] needs {legit + impostor} users; Balabit has 10")
+    return [{"seed": plan["seed"], "n_legitimate": legit, "n_impostor": impostor,
              "sensitivity": sensitivity, "sessions_per_user": sessions}
+            for legit, impostor in plan["splits"]
             for sensitivity in plan["sensitivities"] if only is None or sensitivity == only
             for sessions in plan["sessions"]]
 
@@ -141,14 +145,16 @@ def summarize_group(group: Path) -> None:
     """One row per run from accuracy.csv, written as summary/summary.csv and an overview summary/README.md."""
     table = pd.read_csv(group / "accuracy.csv")
     rows = []
-    for (run, sens, sessions), part in table.groupby(["run", "sensitivity", "sessions"]):
+    for (run, n_legit, n_impostor, sens, sessions), part in table.groupby(
+            ["run", "n_legitimate", "n_impostor", "sensitivity", "sessions"]):
         legit, impostor = part[part.kind == "legitimate"], part[part.kind == "impostor"]
-        rows.append({"sensitivity": sens, "sessions": sessions, "run": run,
+        rows.append({"split": f"{n_legit}_{n_impostor}", "n_legitimate": n_legit, "n_impostor": n_impostor,
+                     "sensitivity": sens, "sessions": sessions, "run": run,
                      "legit_passed": int(legit.passed.sum()), "legit_tested": int(legit.tested.sum()),
                      "legit_accepted": f"{int(legit.through.sum())}/{len(legit)}",
                      "impostor_passed": int(impostor.passed.sum()), "impostor_tested": int(impostor.tested.sum()),
                      "impostors_through": f"{int(impostor.through.sum())}/{len(impostor)}"})
-    summary = pd.DataFrame(rows).sort_values(["sensitivity", "sessions"])
+    summary = pd.DataFrame(rows).sort_values(["n_legitimate", "sensitivity", "sessions"])
     out = group / "summary"
     out.mkdir(exist_ok=True)
     summary.to_csv(out / "summary.csv", index=False)
@@ -159,17 +165,19 @@ def summarize_group(group: Path) -> None:
              "## Results per run", "",
              "Legitimate = own tested sessions that pass their own profile (higher is better). "
              "Impostor = impostor sessions that pass the profile (lower is better).", "",
-             "| Sensitivity | Sessions | Legitimate passed | Legitimate accepted | Impostor passed | Impostors through | Run folder |",
-             "| --- | --- | --- | --- | --- | --- | --- |"]
-    lines += [f"| {r.sensitivity:g} | {r.sessions} | {r.legit_passed}/{r.legit_tested} | {r.legit_accepted} | "
+             "| Split (legit_impostor) | Sensitivity | Sessions | Legitimate passed | Legitimate accepted | Impostor passed | Impostors through | Run folder |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+    lines += [f"| {r.split} | {r.sensitivity:g} | {r.sessions} | {r.legit_passed}/{r.legit_tested} | {r.legit_accepted} | "
               f"{r.impostor_passed}/{r.impostor_tested} | {r.impostors_through} | [{r.run}](../{r.run}/) |"
               for r in summary.itertuples()]
-    lines += ["", "## Plots (one per sensitivity)", ""]
-    lines += [f"- [sensitivity {s:g}](../accuracy_sensitivity_{s:g}.png)" for s in sorted(summary.sensitivity.unique())]
+    lines += ["", "## Plots (one per split and sensitivity)", ""]
+    for split, part in summary.groupby("split", sort=False):
+        lines.append(f"- {split}: " + ", ".join(f"[{s:g}](../accuracy_{split}_sensitivity_{s:g}.png)"
+                                                 for s in sorted(part.sensitivity.unique())))
     lines += ["", "## Files", "",
               "- `summary/summary.csv`: the table above",
               "- `accuracy.csv`: every run and user (from `16_plot_accuracy.py`)",
-              "- `accuracy_sensitivity_<value>.png`: the plots",
+              "- `accuracy_<legit>_<impostor>_sensitivity_<value>.png`: the plots",
               "- `<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>/`: one folder per run (results/, figures/, notebooks/)",
               "- `../batch_log.csv`: which runs finished or failed, and how long each took", ""]
     (out / "README.md").write_text("\n".join(lines))

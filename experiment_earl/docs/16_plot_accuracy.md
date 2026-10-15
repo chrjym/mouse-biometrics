@@ -6,7 +6,7 @@
 
 Compares every run inside one hash folder, `runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/`.
 Runs in one hash folder share every other setting (seed, chunking, matching), so they differ only in those four values.
-For each run it scores every drawn user with the notebook's fixed counts. Per `sensitivity` it draws one figure with
+For each run it scores every drawn user with the notebook's fixed counts. Per split (`n_legitimate`, `n_impostor`) and `sensitivity` it draws one figure with
 two line graphs side by side:
 
 - **Legitimate users:** x = each legitimate user, y = how many of their own last `sessions_per_user` sessions
@@ -18,7 +18,7 @@ One line per run of that sensitivity, i.e. per `sessions_per_user` (lighter = mo
 the user as a whole goes through (at least `match_session_ratio` of the sessions); hollow means rejected.
 
 Outputs (in the hash folder, not in a run): `runs/<hash>/accuracy.csv` (passed, tested, matched strokes, strokes,
-through, best profile per run and user) and `runs/<hash>/accuracy_sensitivity_<value>.png` (one per sensitivity).
+through, best profile per run and user) and `runs/<hash>/accuracy_<n_legitimate>_<n_impostor>_sensitivity_<value>.png` (one per split and sensitivity).
 
 ## Algorithm
 
