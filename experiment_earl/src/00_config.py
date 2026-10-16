@@ -4,7 +4,6 @@ import hashlib
 import json
 import os
 import random
-import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -35,7 +34,7 @@ def run_folder_name(config: dict) -> str:
     setting, so runs that differ only in these four sit side by side; any change gives a new folder."""
     settings = {k: v for k, v in config.items() if k not in RUN_KEYS and k != "run_name"}
     digest = hashlib.sha1(json.dumps(settings, sort_keys=True).encode()).hexdigest()[:6]
-    return f"{digest}/" + "_".join(f"{config[k]:g}" for k in RUN_KEYS)
+    return f"{digest}/" + "_".join(f"{config[k]:.2f}" if k == "sensitivity" else f"{config[k]:g}" for k in RUN_KEYS)
 
 
 def run_id(folder: Path) -> str:
@@ -61,17 +60,22 @@ def open_run(run: str | None = None) -> tuple[dict, Path]:
     config = load_config()
     folder = RUNS / run_folder_name(config)
     if not folder.exists():
-        folder.mkdir(parents=True)
-        shutil.copy2(ROOT / "config.yaml", folder / "config.yaml")
-        try:
-            commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
-                                    cwd=ROOT, check=True).stdout.strip()
-        except (OSError, subprocess.CalledProcessError):
-            commit = None
-        (folder / "run.json").write_text(json.dumps(
-            {"created": datetime.now().isoformat(timespec="seconds"), "git_commit": commit}, indent=2) + "\n")
-        print(f"New run folder: {folder}")
+        create_run(folder, (ROOT / "config.yaml").read_text())
     return config, folder
+
+
+def create_run(folder: Path, config_text: str) -> None:
+    """New run folder with its config snapshot and run.json (creation time, git commit)."""
+    folder.mkdir(parents=True)
+    (folder / "config.yaml").write_text(config_text)
+    try:
+        commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
+                                cwd=ROOT, check=True).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        commit = None
+    (folder / "run.json").write_text(json.dumps(
+        {"created": datetime.now().isoformat(timespec="seconds"), "git_commit": commit}, indent=2) + "\n")
+    print(f"New run folder: {folder}")
 
 
 def list_users(config: dict) -> list[str]:

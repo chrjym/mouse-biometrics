@@ -1,6 +1,6 @@
 # How to run the automation (`17_batch.py`)
 
-`src/17_batch.py` runs every simulation listed in `batch.yaml` with one command, then plots and summarizes the results. You never edit `config.yaml` by hand: the script sets it for each run and puts it back afterwards.
+`src/17_batch.py` runs every simulation listed in `batch.yaml` with one command, then plots and summarizes the results. You only edit `batch.yaml`: the script never changes `config.yaml`. Each run gets its own `config.yaml` snapshot in its run folder.
 
 Run every command from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -58,13 +58,13 @@ Every other setting (chunking, `dtw_band`, `match_shape_ratio`, `match_session_r
 Lists every run and whether it is done already. Runs nothing and changes nothing.
 
 ```
-[1/225] efdc92/1_9_0.2_2 ... to run
-[2/225] efdc92/1_9_0.2_4 ... to run
+[1/225] efdc92/1_9_0.20_2 ... to run
+[2/225] efdc92/1_9_0.20_4 ... to run
 ...
 Dry run: 225 runs, 0 done, 225 to run.
 ```
 
-The run name is `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>`.
+The run name is `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>`, sensitivity always with two decimals (`0.10`).
 
 ## Step 4: Run the batch
 
@@ -74,18 +74,16 @@ The run name is `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>`.
 
 What happens, in order:
 
-1. **Back up** `config.yaml` (to `config.yaml.batch-backup`).
-2. **For each run:**
+1. **For each run:**
    1. **Skip** it if its folder already has `results/session_progression.csv`.
-   2. **Set** `seed`, the split (`n_legitimate`, `n_impostor`), `sensitivity` and `sessions_per_user` in `config.yaml`.
+   2. **Write** the run's own `config.yaml` (in its run folder): `config.yaml` with the run's `seed`, split, `sensitivity` and `sessions_per_user`.
    3. **Simulate:** run `08_run_notebook.py` (pick users and sessions → cut strokes → DTW matching → decide which sessions and users pass).
-   4. **Print** progress, e.g. `[7/225] efdc92/1_9_0.4_6 ... ok (0m 26s)`.
+   4. **Print** progress, e.g. `[7/225] efdc92/1_9_0.40_6 ... ok (0m 26s)`.
    5. **Log** one line to `runs/batch_log.csv`.
    6. If the run **fails**, note it and continue with the next.
-3. **Restore** `config.yaml`, even after an error or Ctrl+C, and delete the backup.
-4. **Summary:** runs ok, skipped and failed, and a `git add` command for the new run folders.
-5. **Plot:** run `16_plot_accuracy.py` on the hash folder.
-6. **Summarize:** write `summary/summary.csv` and `summary/README.md`.
+2. **Summary:** runs ok, skipped and failed, and a `git add` command for the new run folders.
+3. **Plot:** run `16_plot_accuracy.py` on the hash folder.
+4. **Summarize:** write `summary/summary.csv` and `summary/README.md`.
 
 Options:
 
@@ -93,7 +91,7 @@ Options:
 |---|---|
 | `--dry-run` | list the runs only (step 3) |
 | `--only 0.4` | run a single sensitivity (quick test) |
-| `--no-plot` | skip the plotting and summary (steps 5–6) |
+| `--no-plot` | skip the plotting and summary (steps 3–4) |
 | `--plan <file>` | use another plan file instead of `batch.yaml` |
 | `--timeout 3600` | seconds allowed per run (default 3600) |
 
@@ -111,10 +109,10 @@ runs/
     │   ├── README.md                   results table + links to every plot and run folder
     │   └── summary.csv                 one row per run
     ├── accuracy.csv                    every run x every user
-    ├── accuracy_1_9_sensitivity_0.2.png  one plot per split and sensitivity
-    ├── accuracy_1_9_sensitivity_0.4.png
+    ├── accuracy_1_9_sensitivity_0.20.png  one plot per split and sensitivity
+    ├── accuracy_1_9_sensitivity_0.40.png
     ├── ...
-    └── 1_9_0.2_2/                      one folder per run
+    └── 1_9_0.20_2/                     one folder per run
         ├── config.yaml                 exact settings of this run
         ├── run.json                    when it was created, git commit
         ├── results/                    session_progression*.csv
@@ -153,18 +151,15 @@ One figure per split and sensitivity, so splits are never mixed.
 `runs/` is git-ignored, so adding it needs `-f`. Agree first on who commits; `accuracy.csv`, the plots and `summary/` are rewritten by every batch.
 
 ```bash
-git add -f experiment_earl/runs/<hash>/1_9_0.2_2 ...   # the command printed at the end of the batch
+git add -f experiment_earl/runs/<hash>/1_9_0.20_2 ...   # the command printed at the end of the batch
 git commit -m "experiment: batch runs sensitivity 0.2-1.0"
 git pull --rebase && git push
 ```
-
-Never commit `config.yaml` changes made for a run; the batch always restores it.
 
 ## Troubleshooting
 
 | Message | What to do |
 |---|---|
-| `config.yaml.batch-backup exists: an earlier batch did not finish cleanly` | The computer stopped mid-run. Compare `config.yaml` with the backup, restore if needed (`cp experiment_earl/config.yaml.batch-backup experiment_earl/config.yaml`), then delete the backup. |
 | `config.yaml has no line '<key>: ...'` | A key in `config.yaml` was renamed or removed. Put it back as `<key>: <value>` at the start of a line. |
 | A run shows `failed` | Read its `error` in `batch_log.csv`, fix the cause, run the batch again (only missing runs run). |
 | `Plotting runs/<hash> failed` | The runs are kept. Rerun: `.venv/bin/python experiment_earl/src/16_plot_accuracy.py <hash>` |
