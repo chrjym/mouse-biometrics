@@ -125,12 +125,17 @@ def main() -> None:
     parser.add_argument("--sensitivity", type=float, default=0.04)
     parser.add_argument("--sessions", type=int, default=4, help="enrollment sessions per user")
     parser.add_argument("--core", type=float, default=0.9, help="share of points nearest the median path kept for the core hull")
+    parser.add_argument("--no-filter", action="store_true", help="put every enrolled stroke in the hull, not only repeated ones")
+    parser.add_argument("--seed", type=int, default=None, help="draw seed (default: config seed)")
+    parser.add_argument("--no-figures", action="store_true")
     parser.add_argument("--no-rotate", action="store_true", help="keep each stroke's direction (skip the turn to +x)")
     args = parser.parse_args()
 
     config = cfg_mod.load_config(sensitivity=args.sensitivity, sessions_per_user=args.sessions)
+    if args.seed is not None:
+        config["seed"] = args.seed
     turn, k = not args.no_rotate, args.sessions
-    out = cfg_mod.RUNS / f"hull_{args.sensitivity}_{k}{'' if turn else '_norotate'}"
+    out = cfg_mod.RUNS / f"hull_{'all' if args.no_filter else args.sensitivity}_{k}{'' if turn else '_norotate'}_seed{config['seed']}"
     (out / "figures").mkdir(parents=True, exist_ok=True)
     match_mod.load_cache()
 
@@ -145,7 +150,8 @@ def main() -> None:
     for u in users:
         profiles[u] = {}
         for kind in KINDS:
-            paths = repeated(enrolled[u], kind, config)
+            paths = (np.concatenate([s.paths[kind] for s in enrolled[u]]) if args.no_filter
+                     else repeated(enrolled[u], kind, config))
             paths = rotate(paths) if turn else paths
             h = hulls(paths, args.core)
             if h:
@@ -170,9 +176,12 @@ def main() -> None:
     scores.to_csv(out / "scores.csv", index=False)
     g, i = scores[scores.kind == "genuine"].score.to_numpy(), scores[scores.kind == "impostor"].score.to_numpy()
     rate, threshold = eer(g, i)
-    tag = f"sensitivity {args.sensitivity}, {k} sessions, core {args.core:.0%}, {'rotated' if turn else 'not rotated'}"
+    tag = f"{'no filter' if args.no_filter else f'sensitivity {args.sensitivity}'}, {k} sessions, core {args.core:.0%}, {'rotated' if turn else 'not rotated'}"
     print(f"EER {rate:.1%} at threshold {threshold:.3f}  (genuine mean {g.mean():.3f}, impostor mean {i.mean():.3f})")
 
+    if args.no_figures:
+        print(f"wrote {out}")
+        return
     rng = np.random.default_rng(config["seed"])
     for u in users:
         prof = profiles[u][chunk_mod.MOVE]
