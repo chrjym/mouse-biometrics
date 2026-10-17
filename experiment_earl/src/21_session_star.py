@@ -93,10 +93,11 @@ def plot_users(state: dict, path_out, title: str) -> None:
         for s in state[u]["own"]:
             draw_star(ax, s, color="#4c78a8", lw=1.3, alpha=0.9)
         draw_star(ax, state[u]["profile"], color="k", lw=2.2)
-        own = np.mean([distance(s, state[u]["profile"]) for s in state[u]["own"]])
+        own = np.mean([d for s in state[u]["own"] if np.isfinite(d := distance(s, state[u]["profile"]))] or [np.nan])
         imp = np.mean([d for v in users if v != u for s in state[v]["other"]
                        if np.isfinite(d := distance(s, state[u]["profile"]))])
-        ax.set_title(f"{u}: own {own:.3f} vs impostor {imp:.3f}", fontsize=9,
+        n_own = sum(np.isfinite(distance(s, state[u]["profile"])) for s in state[u]["own"])
+        ax.set_title(f"{u}: own {own:.3f} ({n_own}/{len(state[u]['own'])} with a star) vs impostor {imp:.3f}", fontsize=9,
                      color="#2a7a2a" if own < imp else "#b22222")
         ax.tick_params(labelsize=7)
     for ax in fig.axes:
