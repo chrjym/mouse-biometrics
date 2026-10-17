@@ -94,15 +94,81 @@ def verify(data: dict, features: list[str]) -> float:
     return eer(np.array(genuine), np.array(impostor))
 
 
+def explain(config: dict, path_out) -> None:
+    """One real stroke per panel, turned so its chord runs from (0, 0) to (1, 0), with each measure drawn on it."""
+    user = cfg_mod.list_users(config)[0]
+    pool = cfg_mod.session_pool(config, user, config["seed"])
+    paths = match_mod.dataset_session(user, pool[0][1], config, pool[0][0]).paths[0]
+    turned = [hull_mod.rotate(p[None])[0] / np.hypot(*p[-1]) for p in paths if np.hypot(*p[-1]) > 1e-6]
+    stats = [measures(p) for p in paths if np.hypot(*p[-1]) > 1e-6]
+    # a curved stroke with a visible overshoot shows every measure at once
+    pick = max(range(len(turned)), key=lambda i: (0.05 < stats[i]["overshoot"] < 0.4) * (0.4 < stats[i]["straightness"] < 0.8)
+               * stats[i]["chord_deviation"] * (stats[i]["chord_deviation"] < 0.6))
+    p, m = turned[pick], stats[pick]
+    k = menger(p)
+    i_dev = np.argmax(np.abs(p[:, 1]))
+    hull = ConvexHull(p).vertices
+
+    fig, axes = plt.subplots(2, 3, figsize=(15, 8.5))
+    def base(ax, title):
+        ax.plot(p[:, 0], p[:, 1], color="#4c78a8", lw=2)
+        ax.plot([0, 1], [0, 0], "k--", lw=1, label="chord (start → end)")
+        ax.plot(0, 0, "go", ms=8, label="start (0, 0)"); ax.plot(1, 0, "rs", ms=8, label="end (1, 0)")
+        ax.set_aspect("equal"); ax.set_title(title, fontsize=10); ax.grid(alpha=0.2)
+
+    base(axes[0, 0], f"Straightness = chord / path length = {m['straightness']:.2f}\n(1 = perfectly straight)")
+    axes[0, 0].legend(fontsize=7, loc="best")
+    base(axes[0, 1], f"Chord deviation = largest gap from chord = {m['chord_deviation']:.2f}")
+    axes[0, 1].annotate("", xy=(p[i_dev, 0], p[i_dev, 1]), xytext=(p[i_dev, 0], 0),
+                        arrowprops={"arrowstyle": "<->", "color": "#e45756", "lw": 2})
+    base(axes[0, 2], f"Bow side = mean signed gap = {m['bow_side']:+.2f}\n(+ left of travel, − right)")
+    axes[0, 2].fill_between(p[:, 0], 0, p[:, 1], where=p[:, 1] > 0, color="#54a24b", alpha=0.3, label="left")
+    axes[0, 2].fill_between(p[:, 0], 0, p[:, 1], where=p[:, 1] < 0, color="#e45756", alpha=0.3, label="right")
+    axes[0, 2].legend(fontsize=7)
+    ax = axes[1, 0]
+    sc = ax.scatter(p[1:-1, 0], p[1:-1, 1], c=k, cmap="viridis", s=25, zorder=3)
+    ax.plot([0, 1], [0, 0], "k--", lw=1); ax.set_aspect("equal"); ax.grid(alpha=0.2)
+    j = np.argmax(k) + 1
+    r = 1 / max(k[j - 1], 1e-9)
+    a, b, c = p[j - 1], p[j], p[j + 1]
+    d = 2 * (a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]))
+    if abs(d) > 1e-12:
+        ux = ((a @ a) * (b[1] - c[1]) + (b @ b) * (c[1] - a[1]) + (c @ c) * (a[1] - b[1])) / d
+        uy = ((a @ a) * (c[0] - b[0]) + (b @ b) * (a[0] - c[0]) + (c @ c) * (b[0] - a[0])) / d
+        ax.add_patch(plt.Circle((ux, uy), r, fill=False, color="#e45756", lw=1.5, ls=":"))
+    fig.colorbar(sc, ax=ax, shrink=0.7, label="curvature")
+    ax.set_title(f"Menger curvature = 1 / radius of circle through 3 points\nmean {m['curvature_mean']:.1f}, "
+                 f"peak (90th pct) {m['curvature_peak']:.1f}; red circle = sharpest bend", fontsize=10)
+    base(axes[1, 1], f"Overshoot = how far it passes the end = {m['overshoot']:.2f}")
+    xmax = p[:, 0].max()
+    axes[1, 1].axvline(1, color="grey", lw=0.8); axes[1, 1].axvline(xmax, color="#e45756", lw=0.8)
+    axes[1, 1].annotate("", xy=(xmax, -0.05), xytext=(1, -0.05), arrowprops={"arrowstyle": "<->", "color": "#e45756", "lw": 2})
+    base(axes[1, 2], f"Hull fill = area of the stroke's convex hull = {m['hull_fill']:.2f}\n(chord length 1)")
+    poly = np.vstack([p[hull], p[hull[:1]]])
+    axes[1, 2].fill(poly[:, 0], poly[:, 1], color="#f58518", alpha=0.25); axes[1, 2].plot(poly[:, 0], poly[:, 1], color="#f58518")
+    for ax in axes.ravel():
+        ax.set_xlim(-0.15, max(1.15, xmax + 0.1))
+        ax.set_ylim(min(-0.2, p[:, 1].min() - 0.1), max(0.2, p[:, 1].max() + 0.1))
+    fig.suptitle(f"What each geometric measure means, on one real stroke of {user} "
+                 "(turned so it runs from (0, 0) to (1, 0))")
+    fig.tight_layout(); fig.savefig(path_out, dpi=130); plt.close(fig)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sessions", type=int, default=4, help="enrollment sessions per user")
     parser.add_argument("--seeds", type=int, nargs="+", default=[945, 946, 947, 948, 949])
+    parser.add_argument("--explain", action="store_true", help="only draw figures/measures_explained.png")
     args = parser.parse_args()
 
     config = cfg_mod.load_config(sessions_per_user=args.sessions)
     out = cfg_mod.RUNS / f"geometry_{args.sessions}"
     (out / "figures").mkdir(parents=True, exist_ok=True)
+    if args.explain:
+        config["seed"] = args.seeds[0]
+        explain(config, out / "figures" / "measures_explained.png")
+        print(f"wrote {out / 'figures' / 'measures_explained.png'}")
+        return
 
     rows, first = [], None
     for seed in args.seeds:
