@@ -154,6 +154,22 @@ def explain(config: dict, path_out) -> None:
     fig.tight_layout(); fig.savefig(path_out, dpi=130); plt.close(fig)
 
 
+def euclidean(data: dict) -> tuple[np.ndarray, np.ndarray]:
+    """Genuine and impostor distances: each session = median of every measure, z-scored with the spread of all
+    enrolled session medians; profile = mean of the user's enrolled session vectors."""
+    median = lambda t: t.median().to_numpy() if len(t) >= 5 else np.full(len(FEATURES), np.nan)
+    enrolled = np.array([median(t) for e, _, _ in data.values() for t in e])
+    mu, sd = np.nanmean(enrolled, axis=0), np.nanstd(enrolled, axis=0)
+    z = lambda t: (median(t) - mu) / sd
+    dist = lambda t, c: float(np.linalg.norm(v - c)) if not np.isnan(v := z(t)).any() else np.inf
+    genuine, impostor = [], []
+    for p, (e, own, _) in data.items():
+        centre = np.nanmean([z(t) for t in e], axis=0)
+        genuine += [dist(t, centre) for t in own]
+        impostor += [dist(t, centre) for v, (_, _, other) in data.items() if v != p for t in other]
+    return np.array(genuine), np.array(impostor)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sessions", type=int, default=4, help="enrollment sessions per user")
@@ -177,7 +193,11 @@ def main() -> None:
         first = first or data
         for f in list(FEATURES) + ["all"]:
             rows.append({"seed": seed, "feature": f, "eer": verify(data, list(FEATURES) if f == "all" else [f])})
-        print(f"seed {seed}: combined EER {rows[-1]['eer']:.1%}")
+        g, i = euclidean(data)
+        rows.append({"seed": seed, "feature": "euclidean (all)", "eer": eer(g, i)})
+        if seed == args.seeds[0]:
+            first_dist = (g, i)
+        print(f"seed {seed}: KS combined EER {rows[-2]['eer']:.1%}, Euclidean EER {rows[-1]['eer']:.1%}")
     result = pd.DataFrame(rows).groupby("feature")["eer"].agg(["mean", "std"]).sort_values("mean")
 
     strokes = pd.concat([t.assign(user=u) for u, (enrolled, _, _) in first.items() for t in enrolled])
@@ -208,8 +228,20 @@ def main() -> None:
     ax.barh(result.index, result["mean"] * 100, xerr=result["std"] * 100, color="#4c78a8")
     ax.axvline(50, color="k", ls="--", lw=1, label="chance (50%)")
     ax.axvline(45.4, color="#e45756", ls=":", lw=1.5, label="convex hull (45.4%)")
+    ax.barh(["euclidean (all)"], [result.loc["euclidean (all)", "mean"] * 100], color="#f58518")
     ax.set_xlabel(f"EER % (mean ± std over {len(args.seeds)} draws, lower is better)"); ax.invert_yaxis(); ax.legend()
     fig.tight_layout(); fig.savefig(out / "figures" / "eer_by_feature.png", dpi=130)
+    plt.close(fig)
+
+    g, i = first_dist
+    fig, ax = plt.subplots(figsize=(8, 4))
+    bins = np.linspace(0, np.quantile(np.concatenate([g, i])[np.isfinite(np.concatenate([g, i]))], 0.99), 40)
+    ax.hist(i[np.isfinite(i)], bins, alpha=0.6, color="#e45756", density=True, label=f"impostor sessions ({len(i)})")
+    ax.hist(g[np.isfinite(g)], bins, alpha=0.6, color="#4c78a8", density=True, label=f"own sessions ({len(g)})")
+    ax.set_xlabel("Euclidean distance from the user's profile (z-scored session medians of all 7 measures)")
+    ax.set_title(f"Euclidean distance, seed {args.seeds[0]}: EER {result.loc['euclidean (all)', 'mean']:.1%} "
+                 f"(mean of {len(args.seeds)} draws); own sessions should sit left", fontsize=9)
+    ax.legend(); fig.tight_layout(); fig.savefig(out / "figures" / "euclidean_distances.png", dpi=130)
     print(f"wrote {out}")
 
 
