@@ -17,7 +17,6 @@ from scipy.spatial.distance import cdist
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
 hull_mod = import_module("18_hull_profile")
-geo_mod = import_module("19_geometry")
 
 
 def prepare(session, turn: bool) -> dict[int, np.ndarray]:
@@ -33,6 +32,13 @@ def nearest(query: dict, profile: dict) -> np.ndarray:
             n = q.shape[1] // 2
             out.append(cdist(q, profile[kind]).min(axis=1) / np.sqrt(n))
     return np.concatenate(out) if out else np.empty(0)
+
+
+def eer(genuine: np.ndarray, impostor: np.ndarray) -> float:
+    """Equal error rate for distances (accept when distance <= t)."""
+    rates = [((genuine > t).mean(), (impostor <= t).mean()) for t in np.unique(np.concatenate([genuine, impostor]))]
+    frr, far = min(rates, key=lambda r: abs(r[0] - r[1]))
+    return (frr + far) / 2
 
 
 def run(config: dict, k: int, turn: bool) -> tuple[pd.DataFrame, dict]:
@@ -98,7 +104,7 @@ def main() -> None:
             table, state = run(config, args.sessions, turn)
             g = table[table.kind == "genuine"].score.to_numpy()
             i = table[table.kind == "impostor"].score.to_numpy()
-            rate = geo_mod.eer(g, i)
+            rate = eer(g, i)
             results.append({"rotated": turn, "seed": seed, "eer": rate, "genuine_median": np.median(g),
                             "impostor_median": np.median(i)})
             scores.append(table.assign(rotated=turn, seed=seed))
