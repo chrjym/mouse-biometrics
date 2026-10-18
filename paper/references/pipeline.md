@@ -1,54 +1,47 @@
-# Methodology pipeline
+# Methodology
 
-What this study does, step by step, from raw mouse logs to a verdict on the user. It describes the pipeline as
-implemented and tested in `experiment_earl/` up to 2026-10-18, not the original proposal. Results are summarized in
+How this study was conducted, from raw mouse logs to a verdict on the user, written so that others can trust and
+replicate it. It describes the pipeline as implemented and tested in `experiment_earl/` up to 2026-10-18, not the
+original proposal. Results are summarized in
 [`experiment_earl/shape_results/README.md`](../../experiment_earl/shape_results/README.md).
 
 **Aim.** Find out whether the geometric shape of a user's short mouse movements is personal enough to tell them
 apart from other users, and so protect the legitimate user through continuous authentication.
 
-**Scope.** Experimental only. Geometry (shape) is the main point. Short signals: a user's mannerism within a short
-stroke (target ≈ 0.5 s). Explainable: every measure is a closed-form calculation.
+---
 
-## Overview
+## 1. Research design
 
-```
- 1. Data            Balabit raw session logs (10 users, 114–253 sessions each)
-        │
- 2. Cleaning        drop scroll rows and glitch rows (x or y = 65535), stable time sort
-        │
- 3. Session draw    seeded shuffle per user → profile sessions | own test | impostor test
-        │
- 4. Segmentation    cut each session into short strokes at pauses and clicks
-        │
- 5. Normalization   start at (0, 0), scale to size 1, 64 points evenly spaced along the path
-        │
- 6. Profile         the user's strokes from k registration sessions
-        │
- 7. Comparison      new stroke vs profile: DTW / Euclidean / convex hull / geometric measures
-        │
- 8. Decision        stroke matches → session passes → user accepted or rejected
-        │
- 9. Evaluation      FRR, FAR, EER over users, splits and random draws
-```
+- **Quantitative:** every result is a measured number (distances, error rates), not an opinion or interview.
+- **Experimental:** the study changes settings on purpose (sensitivity, number of registration sessions, comparison
+  method) and measures what happens to the error rates.
+- **Comparative:** six shape-comparison methods are run on the same data and the same session draw, so they can be
+  compared like for like.
+- **Scope:** geometry (shape) is the main point; short signals (a user's mannerism within a short stroke, target
+  ≈ 0.5 s); explainable, closed-form measures only (no black-box models).
 
-## 1. Data
+**Research questions**
 
-- **Dataset:** Balabit Mouse Dynamics Challenge, 10 users (`user7, 9, 12, 15, 16, 20, 21, 23, 29, 35`).
-- The original training and test files are merged into one folder per user (`datasets/balabit/users/<user>/`), 114–253
-  sessions each. A session belongs to the user whose folder it is in; `public_labels.csv` is not used.
-- Columns used: `client timestamp` (seconds), `button`, `state` (Move, Drag, Pressed, Released), `x`, `y`
-  (screen pixels, y grows downward).
+1. Is a user's short-stroke geometry distinct from other users'?
+2. Which sensitivity and how many registration sessions give the best profile?
+3. Does the profile protect the legitimate user: accept them while rejecting impostors?
 
-## 2. Cleaning
+---
 
-- Drop rows with missing time or position, scroll rows (no path), and glitch rows where x or y is 65535.
-- Sort by time with a **stable** sort, because many timestamps tie, then set the first event to t = 0.
+## 2. Participants / sample
 
-## 3. Session draw
+No people were recruited. The study uses an existing public dataset of recorded mouse behavior.
 
-One random draw from a fixed `seed` (945; repeated draws use 945–949) fixes every user's session order:
-each user's sessions are shuffled once with `Random(f"{seed}-{user}")`.
+| Item | Value |
+|---|---|
+| Dataset | Balabit Mouse Dynamics Challenge |
+| Users | 10 (`user7, 9, 12, 15, 16, 20, 21, 23, 29, 35`) |
+| Sessions per user | 114–253 (training and test files merged per user) |
+| Labels | a session belongs to the user whose folder it is in; `public_labels.csv` is not used |
+| Unit of analysis | a **stroke** (one short movement), grouped into **sessions** |
+
+**Sampling of sessions.** One random draw from a fixed seed (945; repeated draws use 945–949) shuffles each user's
+sessions once with `Random(f"{seed}-{user}")`:
 
 | Role | Sessions used | Purpose |
 |---|---|---|
@@ -56,10 +49,52 @@ each user's sessions are shuffled once with `Random(f"{seed}-{user}")`.
 | **Own test** | last k of the user's list (never in a profile) | should be **accepted** |
 | **Impostor test** | other users' sessions (never in this profile) | should be **rejected** |
 
-Users are split into `n_legitimate` legitimate and `n_impostor` impostor users, with
-`n_legitimate + n_impostor = 10`; the batch tests all 9 splits (1/9 … 9/1).
+Users are split into `n_legitimate` legitimate and `n_impostor` impostor users
+(`n_legitimate + n_impostor = 10`); the batch tests all 9 splits (1/9 … 9/1).
 
-## 4. Segmentation into short strokes
+---
+
+## 3. Materials and tools
+
+| Kind | What |
+|---|---|
+| Data | Balabit raw session logs: `client timestamp` (s), `button`, `state` (Move, Drag, Pressed, Released), `x`, `y` (screen pixels, y grows downward) |
+| Language | Python 3 (project virtual environment `.venv`) |
+| Libraries | NumPy, pandas, SciPy (convex hull, statistics), Numba (fast DTW), Matplotlib (figures), PyYAML (settings), Jupyter (notebook) |
+| Settings | `experiment_earl/config.yaml` (every value below), `experiment_earl/batch.yaml` (sweep grid) |
+| Code | numbered scripts in `experiment_earl/src/` (see the script map at the end) |
+| Output | one folder per configuration under `experiment_earl/runs/`, with a copy of its settings |
+
+---
+
+## 4. Procedure
+
+```
+ 1. Cleaning        drop scroll and glitch rows, stable time sort
+        │
+ 2. Session draw    seeded shuffle per user → profile | own test | impostor test
+        │
+ 3. Segmentation    cut each session into short strokes at pauses and clicks
+        │
+ 4. Normalization   start at (0, 0), scale to size 1, 64 points evenly spaced along the path
+        │
+ 5. Profile         the user's strokes from k registration sessions
+        │
+ 6. Comparison      new stroke vs profile: DTW / Euclidean / convex hull / geometric measures
+        │
+ 7. Decision        stroke matches → session passes → user accepted or rejected
+```
+
+### Step 1. Cleaning
+
+- Drop rows with missing time or position, scroll rows (no path), and glitch rows where x or y is 65535.
+- Sort by time with a **stable** sort, because many timestamps tie, then set the first event to t = 0.
+
+### Step 2. Session draw
+
+As described in Section 2: profile = first k sessions, own test = last k, impostor test = other users' sessions.
+
+### Step 3. Segmentation into short strokes
 
 A stroke is one movement between pauses or clicks:
 
@@ -77,7 +112,7 @@ only compared with their own kind.
 > **Note.** τ = 0.5 s is a *pause* threshold, so a stroke can last longer than 0.5 s. Cutting strokes to the first
 > 0.5 s of each movement would match the short-signal scope exactly; this has not been run yet.
 
-## 5. Normalization
+### Step 4. Normalization
 
 So that strokes compare regardless of screen position, size and logging rate:
 
@@ -88,16 +123,15 @@ So that strokes compare regardless of screen position, size and logging rate:
 
 Optional for some methods: **rotation** so the stroke's end point lies on the +x axis (removes direction).
 
-## 6. Profile (registration)
+### Step 5. Profile (registration)
 
 The profile of a user is the set of their normalized strokes from the **k registration sessions** (the user's
-"library"). Tested k: 2–10 (DTW batch, up to 50 still running), 4 and 8 for the other methods.
+"library"). Tested k: 2–10 (DTW batch; up to 50 still running), 4 and 8 for the other methods.
 
-## 7. Comparison methods
+### Step 6. Comparison
 
-### 7.1 Banded DTW shape matching (main pipeline)
-
-A new stroke $a$ matches the profile when some profile stroke $b$ of the same kind lies within the sensitivity:
+**6a. Banded DTW shape matching (main pipeline).** A new stroke $a$ matches the profile when some profile stroke $b$
+of the same kind lies within the sensitivity:
 
 $$D(i, j) = \lVert a_i - b_j \rVert + \min\{D(i-1, j-1),\, D(i-1, j),\, D(i, j-1)\}, \quad |i - j| \le w$$
 
@@ -108,10 +142,8 @@ $$\text{match} \iff \frac{D(n, n)}{n} \le \text{sensitivity}$$
 | `dtw_band` | 0.1 → w = 6 points | how far DTW may stretch one stroke against the other |
 | `sensitivity` | 0.02–1.00 (batch) | mean distance per point allowed for a match; lower is stricter |
 
-### 7.2 Methods compared against DTW
-
-Each was run on the same session draw (k = 4, seeds 945–949). Scripts were removed after the comparison and are in git
-history.
+**6b. Methods compared against DTW.** Each was run on the same session draw (k = 4, seeds 945–949). The scripts were
+removed after the comparison and are in git history.
 
 | Method | Unit compared | Distance or rule |
 |---|---|---|
@@ -133,7 +165,7 @@ history.
 | Overshoot | $\max(\max_i x_i - 1,\; 0)$ |
 | Hull fill | area of the stroke's own convex hull |
 
-## 8. Decision rules
+### Step 7. Decision
 
 From strokes to a verdict on the user (DTW pipeline):
 
@@ -142,10 +174,12 @@ $$\text{session passes} \iff \frac{\text{matched strokes}}{\text{strokes}} \ge \
 $$\text{user accepted} \iff \frac{\text{sessions passed}}{\text{sessions tested}} \ge \texttt{match\_session\_ratio} = 0.5$$
 
 An impostor is tested against every legitimate profile and counts as through if **any** profile accepts them.
-For the distance-based methods (7.2), a session is accepted when its distance is at most a threshold $t$, and $t$ is
-set at the equal error point.
+For the distance-based methods (6b), a session is accepted when its distance is at most a threshold $t$, set at the
+equal error point.
 
-## 9. Evaluation
+---
+
+## 5. Analysis methods
 
 | Measure | Meaning | Goal |
 |---|---|---|
@@ -153,13 +187,16 @@ set at the equal error point.
 | **FAR** (false acceptance rate) | share of impostor sessions accepted | low |
 | **EER** (equal error rate) | the rate where FRR = FAR | low; 50% = chance |
 
-- **Sweep (DTW):** 9 splits × sensitivity 0.02–1.00 (step 0.02) × 2–50 registration sessions, run by
-  `17_batch.py` into `runs/efdc92/`; best setting = lowest mean of FRR and FAR over all splits.
-- **Repeatability:** the other methods are run on 5 draws (seeds 945–949), reported as mean ± standard deviation.
+- **Choosing the best setting (DTW):** 9 splits × sensitivity 0.02–1.00 (step 0.02) × 2–50 registration sessions,
+  run by `17_batch.py` into `runs/efdc92/`; best setting = lowest mean of FRR and FAR, totalled over all splits.
+- **Comparing methods:** EER of each method on the same draw, repeated over 5 draws (seeds 945–949) and reported as
+  mean ± standard deviation, so one lucky draw cannot decide the result.
 - **Distinctiveness:** for each geometric measure, the share of its variation explained by the user
-  (Kruskal–Wallis ε²).
+  (Kruskal–Wallis ε²). Near 0 means users are not distinct on that measure.
+- **Visual checks:** figures of each user's profile against their own and other users' sessions
+  (`experiment_earl/shape_results/`).
 
-## 10. Results so far
+### Results so far
 
 | Method | EER |
 |---|---|
@@ -176,21 +213,23 @@ set at the equal error point.
 - **Answer so far:** short-stroke geometry carries only a faint personal trace; on its own it does not protect the
   legitimate user.
 
-## 11. Limitations
+### Limitations
 
 - One dataset (Balabit) with 10 users.
 - 2–10 registration sessions summarized (the 50-session sweep is still running).
 - Strokes cut at 0.5 s pauses, not fixed 0.5 s pieces.
 - Decisions per session; a sliding window of strokes (planned in Chapter 3, W = 30) is not yet evaluated.
 
-## Scripts
+---
 
-| Step | Script (`experiment_earl/src/`) |
+## Script map
+
+| Procedure step | Script (`experiment_earl/src/`) |
 |---|---|
-| Settings, data loading, session draw | `00_config.py` |
+| Settings, cleaning, session draw | `00_config.py` |
 | User and session sampling | `01_sample_users.py`, `02_sample_sessions.py` |
 | Segmentation and normalization | `03_chunk_shapes.py` |
-| DTW matching | `04_match_shapes.py` |
-| Sensitivity, sweep, plots | `05_sensitivity.py` … `08_run_notebook.py` |
+| DTW comparison and decision | `04_match_shapes.py`, `05_sensitivity.py` |
+| Sweep, plots, notebook | `06_sweep.py`, `07_plot_shapes.py`, `08_run_notebook.py` |
 | Matched shapes, genuine check, accuracy | `14_plot_matches.py`, `15_genuine_check.py`, `16_plot_accuracy.py` |
 | Batch over splits × sensitivity × sessions | `17_batch.py` |
