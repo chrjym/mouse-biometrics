@@ -41,7 +41,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 14 | [14_plot_matches.md](14_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
 | 15 | [15_genuine_check.md](15_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
 | 16 | [16_plot_accuracy.md](16_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
-| 18 | [18_pick_best.md](18_pick_best.md) | Balanced accuracy per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
+| 18 | [18_pick_best.md](18_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
 
 ## Words used on every page
 

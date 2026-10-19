@@ -184,14 +184,14 @@ Outputs, in the hash folder: `runs/<hash>/accuracy.csv` (one row per run and use
 
 ### J. The best sensitivity and sessions per split
 
-After I, this reads `runs/<hash>/accuracy.csv` and scores every (split, sensitivity, sessions) cell by **balanced accuracy** = (legitimate sessions accepted + impostor sessions rejected) / 2, where 0.5 = chance (accepting or rejecting everyone). Per split it keeps the best cell (ties: fewer sessions, then lower sensitivity).
+After I, this reads `runs/<hash>/accuracy.csv` and scores every (split, sensitivity, sessions) cell twice, both as (legitimate accepted + impostors rejected) / 2 with 0.5 = chance: **user accuracy** counts users through (the group's 2026-10-14 rule) and ranks; **session accuracy** counts sessions and breaks ties (then fewer sessions, then lower sensitivity). Per split it keeps the best cell.
 
 ```bash
 .venv/bin/python experiment_earl/src/18_pick_best.py            # the hash folder config.yaml selects
 .venv/bin/python experiment_earl/src/18_pick_best.py 251ea4     # a specific hash folder
 ```
 
-Outputs, in `runs/<hash>/best/` (rewritten each time): `best.csv` (one row per split, `beats_chance` = better than 0.5), `scores.csv` (every cell), `best_rows.csv` (the `accuracy.csv` rows of the chosen cells), `best_heatmaps.png` (sensitivity × sessions per split, chosen cell boxed) and a copy of I's figure for each chosen split and sensitivity.
+Outputs, in `runs/<hash>/best/` (rewritten each time): `best.csv` (one row per split, both accuracies, `beats_chance` = user accuracy above 0.5), `scores.csv` (every cell), `best_rows.csv` (the `accuracy.csv` rows of the chosen cells), `best_heatmaps.png` (sensitivity × sessions per split, colour = user accuracy, chosen cell boxed) and a copy of I's figure for each chosen split and sensitivity.
 
 ## 4. Where the results are
 
