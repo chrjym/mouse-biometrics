@@ -30,6 +30,7 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/18_pick_best.py        # best sensitivity + sessions per split -> runs/<hash>/best/
 .venv/bin/python experiment_earl/src/19_cohort_score.py     # cohort scoring vs 18 (EER per split) -> runs/<hash>/cohort/
 .venv/bin/python experiment_earl/src/20_seed_check.py       # 18's and 19's choices tested on new seeds -> runs/<hash>/seed_check/
+.venv/bin/python experiment_earl/src/21_plot_cohort.py      # draw 19's scoring (claims, scores per split) -> runs/<hash>/cohort/plots/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools

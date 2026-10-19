@@ -118,6 +118,25 @@ def fill(user: str, entries: list, budget: int, config: dict) -> list:
     return sessions
 
 
+def build_libraries(users: list[str], order: dict, k: int, per_session: int, reserve: int,
+                    config: dict) -> tuple[dict, dict]:
+    """Per (role, user): the sessions used, and (cache name, library of k x `per_session` strokes). Profiles come
+    from the front half of the pool minus the last `reserve` sessions, backgrounds from the back half."""
+    budget = k * per_session
+    sources = {}
+    for u in users:
+        half = (len(order[u]) - reserve) // 2
+        sources[("profile", u)] = fill(u, order[u][:half], budget, config)
+        sources[("background", u)] = fill(u, order[u][half:2 * half], budget, config)
+    sizes = {key: sum(len(p) for s in sessions for p in s.paths.values()) for key, sessions in sources.items()}
+    short = {f"{role} {u}": n for (role, u), n in sizes.items() if n < budget}
+    if short:
+        print(f"  {k} sessions: libraries below {budget} strokes, used whole: {short}")
+    libraries = {key: ((*key, budget, tuple(s.key for s in sessions)), build_library(sessions, budget))
+                 for key, sessions in sources.items()}
+    return sources, libraries
+
+
 def score_sessions(users: list[str], order: dict, k_values: list[int], per_session: int, config: dict,
                    cap: float, reserve: int | None = None) -> pd.DataFrame:
     """Every claim needed by any split: each user's last k sessions as themselves, and each user's first k sessions
@@ -127,17 +146,7 @@ def score_sessions(users: list[str], order: dict, k_values: list[int], per_sessi
     rows = []
     for k in k_values:
         budget = k * per_session
-        sources = {}
-        for u in users:
-            half = (len(order[u]) - reserve) // 2
-            sources[("profile", u)] = fill(u, order[u][:half], budget, config)
-            sources[("background", u)] = fill(u, order[u][half:2 * half], budget, config)
-        sizes = {key: sum(len(p) for s in sessions for p in s.paths.values()) for key, sessions in sources.items()}
-        short = {f"{role} {u}": n for (role, u), n in sizes.items() if n < budget}
-        if short:
-            print(f"  {k} sessions: libraries below {budget} strokes, used whole: {short}")
-        libraries = {key: ((*key, budget, tuple(s.key for s in sessions)), build_library(sessions, budget))
-                     for key, sessions in sources.items()}
+        sources, libraries = build_libraries(users, order, k, per_session, reserve, config)
         for author in users:
             claims = [(author, entry, True) for entry in order[author][-k:]]
             claims += [(claimed, entry, False) for claimed in users if claimed != author for entry in order[author][:k]]

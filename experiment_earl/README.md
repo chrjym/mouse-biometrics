@@ -215,6 +215,17 @@ J and K pick their best setting on the same runs they score. This takes each met
 
 Outputs, in `runs/<hash>/seed_check/`: `results.csv` (per split, method and seed: setting, users through, accuracies, EER), `summary.csv` (training value vs test mean / min / max) and `seed_check.png`.
 
+### M. Draw what cohort scoring does
+
+After K, this draws one genuine, one typical impostor and the top impostor claim for a user: each stroke next to its nearest stroke in the claimed user's library and in every other person's (red = closer than the claimed user's, against the claim; grey = farther, for it), plus every claim's score per split with the chosen threshold.
+
+```bash
+.venv/bin/python experiment_earl/src/21_plot_cohort.py 251ea4
+.venv/bin/python experiment_earl/src/21_plot_cohort.py 251ea4 --user user9 --sessions 2 --strokes 8
+```
+
+Outputs, in `runs/<hash>/cohort/plots/`: `claim_<user>_{genuine,impostor_typical,impostor_top}.png` and `scores_per_split.png`.
+
 ## 4. Where the results are
 
 ```

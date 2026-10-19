@@ -1,6 +1,6 @@
 # `20_seed_check.py`: do the chosen settings hold on new seeds?
 
-[← index](README.md) · previous: [19](19_cohort_score.md)
+[← index](README.md) · previous: [19](19_cohort_score.md) · next: [21](21_plot_cohort.md)
 
 ## What it does
 
