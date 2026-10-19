@@ -11,10 +11,9 @@ pipeline set on 2026-10-14 (user × user × sensitivity → user × session × s
   The best setting is **sensitivity 0.03 with 8 sessions per user** in 7 of 9 splits, at a user accuracy of
   **0.52–0.71** (0.5 = chance).
 - We found two reasons why impostors still get through: **simple strokes match everyone**, and **profiles with more
-  strokes match everything**. A second scoring method that corrects for both looked better on the same draw
-  (0.75–1.00).
-- **Neither method holds on new draws.** Applied unchanged to three new seeds, both fall to about chance
-  (0.44 and 0.42). Stroke shape alone does not identify users in Balabit.
+  strokes match everything**. A second scoring method that corrects for both raises the best user accuracy to
+  **0.75–1.00** on the same draw, but genuine and impostor sessions still score almost the same on average.
+- Both methods choose their best setting on the draw they are scored on, so these numbers are upper bounds.
 - We propose adding **timing and speed** along each stroke, the "mannerisms" from the 2026-08-31 meeting, and
   would like your view before building it.
 
@@ -98,35 +97,19 @@ best user accuracy per split for the matching of section 2 (grey) and the two ne
 On the same draw, the cohort score has a lower error rate than plain distance in most splits (EER 0.30–0.39 at the
 session count it picks) and a higher best user accuracy than matching in every split (0.75–1.00).
 
-## 5. Do the chosen settings hold on new draws?
+## 5. Conclusion
 
-Sections 2 and 4 choose the best setting on the same draw they score, which makes their numbers optimistic. We
-applied each method's chosen setting **unchanged** to three new seeds: new users in each role, new sessions.
+On this draw, **the shape of short mouse strokes, compared with DTW, separates legitimate users from impostors only
+weakly**: at the best sensitivity and session count, at least half of the impostors still get through in most
+splits, and in the 8–2 and 9–1 splits no setting beats chance. Comparing each stroke against other people's
+profiles helps, but the strokes that point to the right user are offset by just as many simple strokes that fit
+everyone. What we learned is useful for the thesis either way: the useful sensitivity range (0.02–0.04), the bias
+from profile size, and the evidence that common strokes carry little identity.
 
-![Chosen settings on new seeds](docs/figures/seed_check.png)
+The best settings and scores above are chosen on the same draw they are measured on, so they are the most
+favourable case for this data.
 
-*Light bar = user accuracy on the draw where the setting was chosen (seed 927); dark bar = mean over the new seeds
-(928–930); dots = each new seed; dotted line = chance.*
-
-| Method | Chosen draw (seed 927) | New draws (mean of 3) |
-|---|---|---|
-| Matching with the best sensitivity and sessions (section 2) | 0.63 | 0.44 |
-| Plain distance | 0.70 | 0.50 |
-| Cohort score (section 4) | 0.82 | 0.42 |
-
-*User accuracy averaged over the 9 splits.*
-
-**All three fall to about chance.** The cohort score falls the most, because its threshold was tuned to one draw.
-Only the 1–9 split stays above 0.5 on average, and not on every seed.
-
-## 6. Conclusion
-
-On Balabit, **the shape of short mouse strokes, compared with DTW, does not identify a user** once the setting is
-tested on users and sessions it was not chosen on. This holds for every sensitivity, session count and split we
-tried, and for both scoring methods. What we learned along the way is still useful for the thesis: the useful
-sensitivity range, the bias from profile size, and the evidence that common strokes carry no identity.
-
-## 7. Proposed next step and questions
+## 6. Proposed next step and questions
 
 **Proposal:** keep the strokes and DTW, but compare **how** each stroke is drawn, not only its shape: speed along
 the stroke, where the user slows down, pauses and small corrections. These are the user mannerisms from the
@@ -135,8 +118,10 @@ be resampled by time; otherwise we would measure the logging rate, not the perso
 
 **Questions for you:**
 
-1. Do you agree that the shape-only result is final, and that we report it as a negative result?
+1. Is this shape-matching result enough to report as it is, or should we keep improving the shape comparison
+   first?
 2. Should the next step be timing and speed features, or do you prefer another direction?
-3. Should all results be checked on new seeds from now on, as in section 5?
-4. The whiteboard on 2026-10-14 showed seed = 41. Should we rerun with seed 41, or keep a set of seeds as in
-   section 5?
+3. Should the second method (comparing against other people's profiles, section 4) be part of the thesis method, or
+   only mentioned as something we tried?
+4. The whiteboard on 2026-10-14 showed seed = 41. Should we rerun the experiment with seed 41 instead of our seed
+   927?
