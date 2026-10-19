@@ -1,6 +1,6 @@
 # `16_plot_accuracy.py`: how many sessions go through, per user, across runs
 
-[← index](README.md) · previous: [15](15_genuine_check.md)
+[← index](README.md) · previous: [15](15_genuine_check.md) · next: [18](18_pick_best.md)
 
 ## What it does
 
