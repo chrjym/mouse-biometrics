@@ -1,0 +1,33 @@
+# Every script in src/ and the notebook read this file; nothing is hardcoded there.
+# Results go to runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/; the hash covers every other
+# setting, so any change gives a new folder and older results are kept.
+# Every setting is explained in CONFIG.md.
+
+# --- Experiment size (main configuration: 01-05, the notebook, 09, 10, 14 and 15) ---
+# One RNG draw from `seed` fixes the legitimate users, the impostor users and each user's session order for the whole run.
+seed: 927                   # picks the users and sessions once; the same seed gives the same users and sessions (the sweep uses seed, seed + 1, ...)
+n_legitimate: 6            # users whose shapes form the legitimate profiles
+n_impostor: 4              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
+sessions_per_user: 14       # sessions per user; the notebook and 10 test 1, 2, ... up to this (max: printed by every script)
+n_trials: 1                # sweep (06) only: random draws each cell is averaged over; the notebook, 14 and 15 use one fixed draw
+
+# --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
+# training_files and test_files are merged into one folder per user (adviser, 2026-10-14).
+# A session belongs to the user whose folder it is in. No label file is used.
+dataset_dir: datasets/balabit/users   # relative to experiment_earl/
+
+# --- Chunking (03): cut a session into strokes ---
+pause_gap_s: 0.5           # a pause longer than this many seconds starts a new chunk (clicks also split chunks)
+min_points: 10             # chunks with fewer recorded points are dropped as jitter
+min_length_px: 0           # chunks whose path is shorter than this are dropped (0 = no filter)
+resample_n: 64             # every chunk is redrawn with this many evenly spaced points before matching
+
+# --- Matching (04): when do two shapes, a session and a user match ---
+dtw_band: 0.1              # DTW may stretch a shape by at most this share of resample_n
+sensitivity: 0.15          # (formerly dtw_tolerance; the value 09 and 10 test) chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
+match_shape_ratio: 0.2     # a session matches a profile when at least this share of its chunks match
+match_session_ratio: 0.5   # an impostor user is "matched" when at least this share of their sessions match
+
+# --- Full sweep (06): every sessions x legitimate x impostor combination that fits in 10 users ---
+sweep_sessions_max: 5      # tries 1 up to this many sessions per user (max: printed by every script)
+sweep_delta: 0.05          # a step that changes the mean sensitivity by less than this counts as "flat" (saturated)
