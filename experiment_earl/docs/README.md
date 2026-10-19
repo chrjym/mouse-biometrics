@@ -2,7 +2,7 @@
 
 One page per script: what it does, the algorithm step by step, the formulas it uses, and why we chose that
 algorithm or formula. Setting names in `code` are keys of [`config.yaml`](../config.yaml) (all explained in
-[`CONFIG.md`](../CONFIG.md)); how to run each script is in [`README.md`](../README.md).
+[`CONFIG.md`](../CONFIG.md)); how to run each script is in [`README.md`](../README.md); how to read the figures is in [`READING_FIGURES.md`](../READING_FIGURES.md).
 Each page ends with its own **References** (IEEE style, with DOI or link); all of them are collected in
 [REFERENCES.md](REFERENCES.md).
 
