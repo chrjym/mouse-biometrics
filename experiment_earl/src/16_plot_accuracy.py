@@ -68,6 +68,23 @@ def drop_new_pairs(sensitivity: float, known: set) -> None:
         del match_mod._PAIRS[key]
 
 
+def finished_part(path: Path, folders: list[Path]) -> pd.DataFrame | None:
+    """The saved rows of one sensitivity, if they cover exactly these run folders (else that sensitivity is rescored)."""
+    if not path.exists():
+        return None
+    part = pd.read_csv(path)
+    return part if set(part["run"]) == {f.name for f in folders} else None
+
+
+def save_part(part: pd.DataFrame, path: Path) -> pd.DataFrame:
+    """Write via a temporary file, so a kill mid-write never leaves a half file that looks finished."""
+    path.parent.mkdir(exist_ok=True)
+    tmp = path.with_suffix(".tmp")
+    part.to_csv(tmp, index=False)
+    tmp.replace(path)
+    return part
+
+
 def plot(table: pd.DataFrame, path: Path, title: str) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.8), sharey=True,
                              gridspec_kw={"width_ratios": [max(table[table.kind == k].user.nunique(), 2)
@@ -108,15 +125,25 @@ def main() -> None:
     keep = cfg_mod.load_config()["sensitivity"]
 
     match_mod.load_cache()
-    rows = []
+    parts, skipped = [], 0
     for sens, part in by_sensitivity(folders).items():
+        path = group / "accuracy_parts" / f"sensitivity_{sens:g}.csv"
+        done = finished_part(path, part)
+        if done is not None:
+            parts.append(done)
+            skipped += len(part)
+            continue
         known = set(match_mod._PAIRS)
+        rows = []
         for folder in part:
             rows += score_run(folder)
             print(f"{folder.name} done", flush=True)
         if sens != keep:
             drop_new_pairs(sens, known)
-    table = pd.DataFrame(rows)
+        parts.append(save_part(pd.DataFrame(rows), path))
+    if skipped:
+        print(f"Reused {skipped} runs from {group / 'accuracy_parts'}")
+    table = pd.concat(parts, ignore_index=True)
     table.to_csv(group / "accuracy.csv", index=False)
     match_mod.save_cache()
 
