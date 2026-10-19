@@ -47,6 +47,11 @@ at most `sensitivity` (see [04](04_match_shapes.md)).
 - **Last k sessions as the legitimate test:** the pool holds 114–253 sessions per user, so the last ones are never
   in a profile of 1 … 10 sessions, and the legitimate user is tested on as many sessions as each impostor.
 - **Best profile for impostors:** an impostor is matched when any legitimate profile lets them through.
+- **One sensitivity at a time:** runs are scored grouped by sensitivity, and the DTW pairs computed for a
+  sensitivity are dropped once its group is done (the sensitivity is part of every cache key, so no later group
+  could reuse them). Only the pairs at `config.yaml`'s current `sensitivity` are added to the shared cache. Keeping
+  everything ran a 6,750-run hash folder (50 sensitivities) out of memory at ~5 GB. `accuracy.csv` is written before
+  the cache is saved, so a failed save no longer loses the results.
 
 ## References
 

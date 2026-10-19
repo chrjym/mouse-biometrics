@@ -129,7 +129,8 @@ def load_cache() -> None:
 
 def save_cache() -> None:
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    CACHE_PATH.write_bytes(pickle.dumps(_PAIRS))
+    with CACHE_PATH.open("wb") as f:  # stream: dumps() would hold a second copy of the cache in memory
+        pickle.dump(_PAIRS, f)
 
 
 def main() -> None:

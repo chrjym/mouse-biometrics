@@ -53,6 +53,21 @@ def score_run(folder: Path) -> list[dict]:
     return rows
 
 
+def by_sensitivity(folders: list[Path]) -> dict[float, list[Path]]:
+    """Run folders grouped by their snapshot's sensitivity, in folder order inside each group."""
+    groups: dict[float, list[Path]] = {}
+    for folder in folders:
+        groups.setdefault(cfg_mod.load_config(folder / "config.yaml")["sensitivity"], []).append(folder)
+    return dict(sorted(groups.items()))
+
+
+def drop_new_pairs(sensitivity: float, known: set) -> None:
+    """Forget the pairs computed at `sensitivity` in this script, so memory stays at one sensitivity's worth.
+    No pair is shared across sensitivities (it is part of the key), so later groups lose nothing."""
+    for key in [k for k in match_mod._PAIRS if k[-1] == sensitivity and k not in known]:
+        del match_mod._PAIRS[key]
+
+
 def plot(table: pd.DataFrame, path: Path, title: str) -> None:
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.8), sharey=True,
                              gridspec_kw={"width_ratios": [max(table[table.kind == k].user.nunique(), 2)
@@ -90,16 +105,21 @@ def main() -> None:
     folders = sorted(p.parent for p in group.glob("*/config.yaml"))
     if not folders:
         raise SystemExit(f"No runs under {group}")
+    keep = cfg_mod.load_config()["sensitivity"]
 
     match_mod.load_cache()
     rows = []
-    for folder in folders:
-        rows += score_run(folder)
-        print(f"{folder.name} done", flush=True)
-    match_mod.save_cache()
-
+    for sens, part in by_sensitivity(folders).items():
+        known = set(match_mod._PAIRS)
+        for folder in part:
+            rows += score_run(folder)
+            print(f"{folder.name} done", flush=True)
+        if sens != keep:
+            drop_new_pairs(sens, known)
     table = pd.DataFrame(rows)
     table.to_csv(group / "accuracy.csv", index=False)
+    match_mod.save_cache()
+
     config = cfg_mod.load_config(folders[0] / "config.yaml")
     figures = []
     for (n_legit, n_impostor, sens), part in table.groupby(["n_legitimate", "n_impostor", "sensitivity"]):
