@@ -193,6 +193,17 @@ After I, this reads `runs/<hash>/accuracy.csv` and scores every (split, sensitiv
 
 Outputs, in `runs/<hash>/best/` (rewritten each time): `best.csv` (one row per split, both accuracies, `beats_chance` = user accuracy above 0.5), `scores.csv` (every cell), `best_rows.csv` (the `accuracy.csv` rows of the chosen cells), `best_heatmaps.png` (sensitivity × sessions per split, colour = user accuracy, chosen cell boxed) and a copy of I's figure for each chosen split and sensitivity.
 
+### K. Cohort scoring: does a session look more like its user than like other people?
+
+Instead of 16's yes/no stroke match, this scores every session continuously: **raw** = how close its strokes are to the claimed user's library, **cohort** = for each stroke, the share of other people whose library is farther away than the claimed user's (0.5 = no evidence). Every library holds the same number of strokes (sessions × 40), because bigger libraries are closer to everything. It reports the EER and the best user accuracy per split next to J's best.
+
+```bash
+.venv/bin/python experiment_earl/src/19_cohort_score.py 251ea4                     # sessions 2–10 (minutes)
+.venv/bin/python experiment_earl/src/19_cohort_score.py 251ea4 --max-sessions 30   # the whole batch range (much slower)
+```
+
+Outputs, in `runs/<hash>/cohort/`: `sessions.csv` (every claim with both scores), `cells.csv` (per split, sessions and method: EER, best threshold, users through, user and session accuracy), `best.csv` (best per split next to J's) and `cohort.png`.
+
 ## 4. Where the results are
 
 ```

@@ -28,6 +28,7 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/10_find_session.py     # then E_k x sessions + sensitivity heatmap
 .venv/bin/python experiment_earl/src/16_plot_accuracy.py    # sessions through per user, one figure per sensitivity of runs/<hash>/
 .venv/bin/python experiment_earl/src/18_pick_best.py        # best sensitivity + sessions per split -> runs/<hash>/best/
+.venv/bin/python experiment_earl/src/19_cohort_score.py     # cohort scoring vs 18 (EER per split) -> runs/<hash>/cohort/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools

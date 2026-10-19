@@ -1,6 +1,6 @@
 # `18_pick_best.py`: the best sensitivity and sessions per split
 
-[← index](README.md) · previous: [16](16_plot_accuracy.md)
+[← index](README.md) · previous: [16](16_plot_accuracy.md) · next: [19](19_cohort_score.md)
 
 ## What it does
 
