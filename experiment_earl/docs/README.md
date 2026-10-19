@@ -19,6 +19,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    │   16 accuracy per user across the runs of one hash folder                               │
    │   18 best sensitivity and sessions per split (from 16's accuracy.csv)                   │
    │   19 cohort scoring: closer to the claimed user than to other people? (EER vs 18)       │
+   │   20 new-seed check: 18's and 19's chosen settings, unchanged, on new seeds             │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
    ┌──────────────────────────────────────────────────────────────────────────────────────────┐
    │ B. Adviser pipeline (2026-10-14), main configuration (seed, L, I, sessions, sensitivity) │
@@ -44,6 +45,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 16 | [16_plot_accuracy.md](16_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
 | 18 | [18_pick_best.md](18_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
 | 19 | [19_cohort_score.md](19_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
+| 20 | [20_seed_check.md](20_seed_check.md) | Settings chosen on the training seed by 18 and 19, applied unchanged to new seeds; train vs test user accuracy |
 
 ## Words used on every page
 

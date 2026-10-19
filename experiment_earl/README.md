@@ -204,6 +204,17 @@ Instead of 16's yes/no stroke match, this scores every session continuously: **r
 
 Outputs, in `runs/<hash>/cohort/`: `sessions.csv` (every claim with both scores), `cells.csv` (per split, sessions and method: EER, best threshold, users through, user and session accuracy), `best.csv` (best per split next to J's) and `cohort.png`.
 
+### L. New-seed check: do the chosen settings hold?
+
+J and K pick their best setting on the same runs they score. This takes each method's choice on the hash folder's seed (J: sensitivity + sessions; K: sessions + threshold, raw and cohort) and applies it unchanged to new seeds (new user order and sessions). Run I and J first.
+
+```bash
+.venv/bin/python experiment_earl/src/20_seed_check.py 251ea4                          # test seeds = seed + 1 ... + 3
+.venv/bin/python experiment_earl/src/20_seed_check.py 251ea4 --test-seeds 11 22 33 44
+```
+
+Outputs, in `runs/<hash>/seed_check/`: `results.csv` (per split, method and seed: setting, users through, accuracies, EER), `summary.csv` (training value vs test mean / min / max) and `seed_check.png`.
+
 ## 4. Where the results are
 
 ```

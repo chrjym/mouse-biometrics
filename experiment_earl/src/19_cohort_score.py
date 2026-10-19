@@ -25,6 +25,17 @@ METHODS = ("raw", "cohort")
 _NEAREST: dict = {}  # (query session, library name, settings) -> nearest DTW cost per query stroke
 
 
+def load_nearest() -> None:
+    if CACHE_PATH.exists():
+        _NEAREST.update(pickle.loads(CACHE_PATH.read_bytes()))
+
+
+def save_nearest() -> None:
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with CACHE_PATH.open("wb") as handle:  # stream, so the cache is never held twice in memory
+        pickle.dump(_NEAREST, handle)
+
+
 @njit(cache=True)
 def _dtw_cost(a, b, band, limit, prev, cur):
     """Banded DTW cost between paths a and b, or inf once every cell of a row exceeds `limit`."""
@@ -108,16 +119,17 @@ def fill(user: str, entries: list, budget: int, config: dict) -> list:
 
 
 def score_sessions(users: list[str], order: dict, k_values: list[int], per_session: int, config: dict,
-                   cap: float) -> pd.DataFrame:
+                   cap: float, reserve: int | None = None) -> pd.DataFrame:
     """Every claim needed by any split: each user's last k sessions as themselves, and each user's first k sessions
     as every other user. Every library holds k x `per_session` strokes: a profile from the front half of the user's
-    pool (minus the last max-k test sessions), another person's background from the back half."""
+    pool (minus the last `reserve` (default: max k) test sessions), another person's background from the back half."""
+    reserve = reserve or max(k_values)
     rows = []
     for k in k_values:
         budget = k * per_session
         sources = {}
         for u in users:
-            half = (len(order[u]) - max(k_values)) // 2
+            half = (len(order[u]) - reserve) // 2
             sources[("profile", u)] = fill(u, order[u][:half], budget, config)
             sources[("background", u)] = fill(u, order[u][half:2 * half], budget, config)
         sizes = {key: sum(len(p) for s in sessions for p in s.paths.values()) for key, sessions in sources.items()}
@@ -151,25 +163,38 @@ def eer(genuine: np.ndarray, impostor: np.ndarray) -> float:
     return float((frr[i] + far[i]) / 2)
 
 
+def at_threshold(part: pd.DataFrame, legit: list[str], method: str, ratio: float, t: float) -> dict:
+    """Users through at acceptance threshold `t` (18's rule: a user is through at `ratio` of their sessions accepted;
+    an impostor at `ratio` against any one legitimate user), user accuracy and session accuracy."""
+    genuine, impostor = part[part.genuine], part[~part.genuine]
+    legit_share = genuine.assign(ok=genuine[method] >= t).groupby("author")["ok"].mean()
+    impostor_share = impostor.assign(ok=impostor[method] >= t).groupby(["author", "claimed"])["ok"].mean()
+    legit_through = int((legit_share >= ratio).sum())
+    impostor_through = int((impostor_share.groupby(level=0).max() >= ratio).sum())
+    n_impostor = impostor["author"].nunique()
+    return {"threshold": t, "legit_through": legit_through, "legit_users": len(legit),
+            "impostor_through": impostor_through, "impostor_users": n_impostor,
+            "user_accuracy": (legit_through / len(legit) + 1 - impostor_through / n_impostor) / 2,
+            "session_accuracy": ((genuine[method] >= t).mean() + 1 - (impostor[method] >= t).mean()) / 2}
+
+
 def best_threshold(part: pd.DataFrame, legit: list[str], method: str, ratio: float) -> dict:
-    """The acceptance threshold with the highest user accuracy (18's rule: a user is through at `ratio` of their
-    sessions accepted; an impostor at `ratio` against any one legitimate user); ties go to session accuracy."""
-    genuine = part[part.genuine]
-    impostor = part[~part.genuine]
-    best = None
-    for t in np.unique(np.concatenate([part[method].to_numpy(), [np.inf]])):
-        legit_share = genuine.assign(ok=genuine[method] >= t).groupby("author")["ok"].mean()
-        impostor_share = impostor.assign(ok=impostor[method] >= t).groupby(["author", "claimed"])["ok"].mean()
-        legit_through = int((legit_share >= ratio).sum())
-        impostor_through = int((impostor_share.groupby(level=0).max() >= ratio).sum())
-        n_impostor = impostor["author"].nunique()
-        user_acc = (legit_through / len(legit) + 1 - impostor_through / n_impostor) / 2
-        session_acc = ((genuine[method] >= t).mean() + 1 - (impostor[method] >= t).mean()) / 2
-        if best is None or (user_acc, session_acc) > (best["user_accuracy"], best["session_accuracy"]):
-            best = {"threshold": t, "legit_through": legit_through, "legit_users": len(legit),
-                    "impostor_through": impostor_through, "impostor_users": n_impostor,
-                    "user_accuracy": user_acc, "session_accuracy": session_acc}
-    return best
+    """The acceptance threshold with the highest user accuracy; ties go to session accuracy."""
+    candidates = [at_threshold(part, legit, method, ratio, t)
+                  for t in np.unique(np.concatenate([part[method].to_numpy(), [np.inf]]))]
+    return max(candidates, key=lambda c: (c["user_accuracy"], c["session_accuracy"]))
+
+
+def split_claims(at_k: pd.DataFrame, legit: list[str], impostor: list[str]) -> pd.DataFrame:
+    """The claims one split tests: legitimate users as themselves, impostors as each legitimate user."""
+    return at_k[(at_k.genuine & at_k.author.isin(legit)) |
+                (~at_k.genuine & at_k.author.isin(impostor) & at_k.claimed.isin(legit))]
+
+
+def draw_all(config: dict, seed: int) -> tuple[list[str], dict]:
+    """All 10 users in draw order (every split's legitimate users are a prefix of it) and their session orders."""
+    legit, impostor, order = plot_mod.draw_users({**config, "n_legitimate": 9, "n_impostor": 1}, seed)
+    return legit + impostor, order
 
 
 def score_cells(sessions: pd.DataFrame, users: list[str], splits: list[tuple[int, int]], ratio: float) -> pd.DataFrame:
@@ -178,8 +203,7 @@ def score_cells(sessions: pd.DataFrame, users: list[str], splits: list[tuple[int
     for n_legit, n_impostor in splits:
         legit, impostor = users[:n_legit], users[n_legit:n_legit + n_impostor]
         for k, at_k in sessions.groupby("sessions"):
-            part = at_k[(at_k.genuine & at_k.author.isin(legit)) |
-                        (~at_k.genuine & at_k.author.isin(impostor) & at_k.claimed.isin(legit))]
+            part = split_claims(at_k, legit, impostor)
             for method in METHODS:
                 rows.append({"n_legitimate": n_legit, "n_impostor": n_impostor, "sessions": k, "method": method,
                              "eer": eer(part[part.genuine][method].to_numpy(), part[~part.genuine][method].to_numpy()),
@@ -264,21 +288,15 @@ def main() -> None:
     if not k_values:
         raise SystemExit(f"No runs with at most {args.max_sessions} sessions per user")
 
-    # Every split takes its legitimate users from the front of the same draw order, so the 9-legitimate draw orders all users.
-    legit, impostor, order = plot_mod.draw_users({**config, "n_legitimate": max(l for l, _ in splits),
-                                                  "n_impostor": 10 - max(l for l, _ in splits)}, config["seed"])
-    users = legit + impostor
+    users, order = draw_all(config, config["seed"])
     short = [u for u in users if len(order[u]) < 3 * max(k_values)]
     if short:
         raise SystemExit(f"Pools too small for {max(k_values)} sessions: {short}")
 
-    if CACHE_PATH.exists():
-        _NEAREST.update(pickle.loads(CACHE_PATH.read_bytes()))
+    load_nearest()
     began = time.monotonic()
     sessions = score_sessions(users, order, k_values, args.strokes_per_session, config, args.cap)
-    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    with CACHE_PATH.open("wb") as handle:
-        pickle.dump(_NEAREST, handle)
+    save_nearest()
 
     cells = score_cells(sessions, users, splits, config["match_session_ratio"])
     baseline_path = group / "best" / "best.csv"

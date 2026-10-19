@@ -32,13 +32,17 @@ def score(user: str, sessions: list[tuple[str, str]], library: list, config: dic
 
 
 def score_run(folder: Path) -> list[dict]:
+    """Every user's row of one run folder, scored with the folder's own config snapshot."""
+    return score_config(cfg_mod.load_config(folder / "config.yaml"), folder.name)
+
+
+def score_config(config: dict, name: str) -> list[dict]:
     """Legitimate: own last sessions_per_user pool sessions (never in a profile) against own profile. Impostor: first
     sessions_per_user sessions (the notebook's) against the legitimate profile that passes most of them."""
-    config = cfg_mod.load_config(folder / "config.yaml")
     k = config["sessions_per_user"]
     legit, impostor, order = plot_mod.draw_users(config, config["seed"])
     libraries = {u: [match_mod.dataset_session(u, n, config, f) for f, n in order[u][:k]] for u in legit}
-    run = {"run": folder.name, "sensitivity": config["sensitivity"], "sessions": k,
+    run = {"run": name, "sensitivity": config["sensitivity"], "sessions": k,
            "n_legitimate": config["n_legitimate"], "n_impostor": config["n_impostor"]}
     rows = []
     for user in legit:

@@ -1,6 +1,6 @@
 # `19_cohort_score.py`: cohort scoring, a session must look more like its user than like other people
 
-[← index](README.md) · previous: [18](18_pick_best.md)
+[← index](README.md) · previous: [18](18_pick_best.md) · next: [20](20_seed_check.md)
 
 ## What it does
 
@@ -83,7 +83,7 @@ equals the share of impostor sessions accepted.
   first k sessions, but the author's own libraries are never used in their claims.
 - **EER and the best threshold.** EER needs no threshold, so it is the fairest comparison between raw and cohort.
   The user accuracy uses the threshold that maximizes it on the same claims, like 18 picks its best sensitivity on
-  the same runs, so both are optimistic; check a chosen setting on another seed before reporting it.
+  the same runs, so both are optimistic; [20](20_seed_check.md) checks the chosen settings on new seeds.
 - **`--cap` 0.5.** Above a cost of about 0.1 per point the batch matched everything, so costs above 0.5 are treated as
   equally far; the cap also lets the DTW stop early.
 
