@@ -1,6 +1,6 @@
 # `16_plot_accuracy.py`: how many sessions go through, per user, across runs
 
-[← index](README.md) · previous: [15](15_genuine_check.md)
+[← index](README.md) · previous: [15](15_genuine_check.md) · next: [18](18_pick_best.md)
 
 ## What it does
 
@@ -47,6 +47,15 @@ at most `sensitivity` (see [04](04_match_shapes.md)).
 - **Last k sessions as the legitimate test:** the pool holds 114–253 sessions per user, so the last ones are never
   in a profile of 1 … 10 sessions, and the legitimate user is tested on as many sessions as each impostor.
 - **Best profile for impostors:** an impostor is matched when any legitimate profile lets them through.
+- **Resumable:** each finished sensitivity is saved to `runs/<hash>/accuracy_parts/sensitivity_<value>.csv`. A
+  rerun reuses every part whose runs match the folders now on disk and scores only the rest, so a kill loses at most
+  the sensitivity in progress. A part is rescored when runs of that sensitivity were added or removed; delete
+  `accuracy_parts/` to rescore everything (e.g. after changing the scoring code).
+- **One sensitivity at a time:** runs are scored grouped by sensitivity, and the DTW pairs computed for a
+  sensitivity are dropped once its group is done (the sensitivity is part of every cache key, so no later group
+  could reuse them). Only the pairs at `config.yaml`'s current `sensitivity` are added to the shared cache. Keeping
+  everything ran a 6,750-run hash folder (50 sensitivities) out of memory at ~5 GB. `accuracy.csv` is written before
+  the cache is saved, so a failed save no longer loses the results.
 
 ## References
 

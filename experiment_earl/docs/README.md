@@ -2,7 +2,7 @@
 
 One page per script: what it does, the algorithm step by step, the formulas it uses, and why we chose that
 algorithm or formula. Setting names in `code` are keys of [`config.yaml`](../config.yaml) (all explained in
-[`CONFIG.md`](../CONFIG.md)); how to run each script is in [`README.md`](../README.md).
+[`CONFIG.md`](../CONFIG.md)); how to run each script is in [`README.md`](../README.md); how to read the figures is in [`READING_FIGURES.md`](../READING_FIGURES.md).
 Each page ends with its own **References** (IEEE style, with DOI or link); all of them are collected in
 [REFERENCES.md](REFERENCES.md).
 
@@ -17,6 +17,10 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    │   06 sweep every (sessions × legitimate × impostor) cell                                 │
    │   07 draw the strokes   08 run the notebook   14 draw matched pairs   15 genuine check   │
    │   16 accuracy per user across the runs of one hash folder                               │
+   │   18 best sensitivity and sessions per split (from 16's accuracy.csv)                   │
+   │   19 cohort scoring: closer to the claimed user than to other people? (EER vs 18)       │
+   │   20 new-seed check: 18's and 19's chosen settings, unchanged, on new seeds             │
+   │   21 draw 19's scoring: strokes vs nearest strokes per library; scores per split        │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
    ┌──────────────────────────────────────────────────────────────────────────────────────────┐
    │ B. Adviser pipeline (2026-10-14), main configuration (seed, L, I, sessions, sensitivity) │
@@ -40,6 +44,10 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 14 | [14_plot_matches.md](14_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
 | 15 | [15_genuine_check.md](15_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
 | 16 | [16_plot_accuracy.md](16_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
+| 18 | [18_pick_best.md](18_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
+| 19 | [19_cohort_score.md](19_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
+| 20 | [20_seed_check.md](20_seed_check.md) | Settings chosen on the training seed by 18 and 19, applied unchanged to new seeds; train vs test user accuracy |
+| 21 | [21_plot_cohort.md](21_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
 
 ## Words used on every page
 

@@ -27,6 +27,10 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/09_find_sensitivity.py # adviser pipeline: E_k x sensitivity
 .venv/bin/python experiment_earl/src/10_find_session.py     # then E_k x sessions + sensitivity heatmap
 .venv/bin/python experiment_earl/src/16_plot_accuracy.py    # sessions through per user, one figure per sensitivity of runs/<hash>/
+.venv/bin/python experiment_earl/src/18_pick_best.py        # best sensitivity + sessions per split -> runs/<hash>/best/
+.venv/bin/python experiment_earl/src/19_cohort_score.py     # cohort scoring vs 18 (EER per split) -> runs/<hash>/cohort/
+.venv/bin/python experiment_earl/src/20_seed_check.py       # 18's and 19's choices tested on new seeds -> runs/<hash>/seed_check/
+.venv/bin/python experiment_earl/src/21_plot_cohort.py      # draw 19's scoring (claims, scores per split) -> runs/<hash>/cohort/plots/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
@@ -56,7 +60,7 @@ Datasets are under `experiment_earl/datasets/` and are committed to git (~1,900 
 
 ## EARL shape-matching experiment (`experiment_earl/src/`, Balabit only)
 
-Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/CONFIG.md`, `experiment_earl/README.md` is the user-facing run guide, and `experiment_earl/docs/NN_*.md` explain each script's algorithm, formulas and reasons (keep both in sync when commands, outputs or algorithms change). Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`): 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03, 08 executes the notebook, 09 → 10 is the adviser's 2026-10-14 pipeline, 16 compares the runs of one hash folder; settings in `experiment_earl/config.yaml`.
+Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/CONFIG.md`, `experiment_earl/README.md` is the user-facing run guide, `experiment_earl/READING_FIGURES.md` explains how to read every figure (example images in `experiment_earl/docs/figures/`, since `runs/` is git-ignored), and `experiment_earl/docs/NN_*.md` explain each script's algorithm, formulas and reasons (keep both in sync when commands, outputs or algorithms change). Run with `.venv/bin/python experiment_earl/src/NN_*.py` (numba lives in the git-ignored `.venv`): 01 → 05 is one file-based trial (`temp/` → `shapes/` → `results/trial_0.json`, `summary.csv`), 06 is the sweep, 07 draws the chunks saved by 03, 08 executes the notebook, 09 → 10 is the adviser's 2026-10-14 pipeline, 16 compares the runs of one hash folder; settings in `experiment_earl/config.yaml`.
 
 **Runs:** nothing writes into fixed folders. `00_config.open_run()` maps the current config to `experiment_earl/runs/<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>/` (hash = every other setting; `run_name` was dropped 2026-10-15, older runs are flat `<run_name>_<hash>` folders), creating it with a `config.yaml` snapshot and `run.json` on first use. `results/`, `figures/`, `shapes/`, `temp/` and `notebooks/` (executed notebook) live inside it. Any config change → new folder, so earlier results are never overwritten. Every script takes `--run <hash>/<name>` (the notebook reads `EARL_RUN`) to reuse an old run with its own settings. The whole `runs/` folder and the shared DTW cache (`experiment_earl/cache/`) are git-ignored: results stay on disk for reference but are not committed.
 
@@ -64,6 +68,7 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
 - **Sensitivity = former threshold** (adviser, 2026-10-14): every "threshold" was renamed, so `05_sensitivity.py`, the sweep and the notebook report `sensitivity` = impostors matched / impostors. The DTW tolerance key itself is `sensitivity` too (renamed from `dtw_tolerance` 2026-10-14; `00.load_config` maps the old name in old run snapshots), and in 09/10 it is the value being tried; there the share is the CSV column `impostor_sensitivity`. **DTW only**: the One-Class SVM and every hull/anomaly script (old 09–13) were removed the same day; they are in git history (last in `edcfcf5`).
 - **Known result:** chunk matching does not discriminate. At `sensitivity` (formerly `dtw_tolerance`) 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
+- **Seed check (2026-10-19, `20_seed_check.py` on `251ea4`):** settings chosen on seed 927 and applied unchanged to seeds 928–930 fall to chance: mean user accuracy 18's matching 0.63 → 0.44, 19 raw 0.70 → 0.50, 19 cohort 0.82 → 0.42 (test EER 0.44–0.46). Equal-size libraries matter (bigger profiles let more impostors through), but neither cohort scoring nor tuning makes stroke shape identify users.
 
 ### Full sweep (`src/06_sweep.py`)
 
