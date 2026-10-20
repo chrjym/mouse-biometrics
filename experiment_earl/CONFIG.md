@@ -38,24 +38,22 @@ runs/1a2b3c/1_9_0.04_10/
 06_sweep             repeats the whole thing over many user/session counts
 07_plot_shapes       draws every chunk as a PNG
 08_run_notebook      executes the notebook and saves the copy in the run folder
-09_find_sensitivity  the drawn legitimate users and impostors at the configured sensitivity, user by user
-10_find_session      the same at 1, 2, ... sessions_per_user profile sessions; sensitivity heatmap
-14_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
-15_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
-16_plot_accuracy     every run of one runs/<hash>/ folder: sessions through per legitimate and impostor user
+09_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
+10_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
+11_plot_accuracy     every run of one runs/<hash>/ folder: sessions through per legitimate and impostor user
 ```
 
-**One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 09, 10, 14 and 15 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 09 and 10 use the same draw and settings (the main configuration). Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
+**One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 09 and 10 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 09 and 10 use the same draw and settings (the main configuration). Script 06 runs the **full sweep** and is the only one that uses `n_trials`: it ignores `n_legitimate`, `n_impostor` and `sessions_per_user` and tries every combination itself over `n_trials` draws.
 
 ## Data and sampling
 
 | Setting | Default | Used by | Meaning |
 |---|---|---|---|
-| `seed` | 934 | 01, 02, 06, 09, 10, 14, 15, notebook | Picks the users and sessions once (which users are legitimate, which are impostors, the order of each user's sessions). The same seed gives the same users and sessions, so a result can be repeated. Only the sweep makes more draws, with `seed`, `seed + 1`, ... |
+| `seed` | 934 | 01, 02, 06, 09, 10, notebook | Picks the users and sessions once (which users are legitimate, which are impostors, the order of each user's sessions). The same seed gives the same users and sessions, so a result can be repeated. Only the sweep makes more draws, with `seed`, `seed + 1`, ... |
 | `dataset_dir` | `datasets/balabit/users` | all | Balabit sessions, one folder per user (training and test files merged, adviser 2026-10-14), relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
-| `n_legitimate` | 3 | 01, notebook, 09, 10, 14, 15 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
-| `n_impostor` | 2 | 01, notebook, 09, 10, 14, 15 | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
-| `sessions_per_user` | 5 | 02, notebook, 09, 10, 14, 15 | Sessions drawn per user in a single trial and 09's profile size. In the notebook and 10 it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 114 (user20); every script prints the limit. |
+| `n_legitimate` | 3 | 01, notebook, 09, 10 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
+| `n_impostor` | 2 | 01, notebook, 09, 10 | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
+| `sessions_per_user` | 5 | 02, notebook, 09, 10 | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 114 (user20); every script prints the limit. |
 
 ## Chunking (script 03)
 
@@ -85,7 +83,7 @@ The **sensitivity** (called *threshold* before 2026-10-14) is `matched impostor 
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `n_trials` | 20 | Sweep only: random draws of users and sessions that every sweep cell is averaged over. It does not change what is tested, only how steady the averages are: more draws give steadier numbers but take longer. The notebook, 09, 10, 14 and 15 ignore it: they use one fixed draw from `seed`. |
+| `n_trials` | 15 | Sweep only: random draws of users and sessions that every sweep cell is averaged over. It does not change what is tested, only how steady the averages are: more draws give steadier numbers but take longer. The notebook, 09 and 10 ignore it: they use one fixed draw from `seed`. |
 | `sweep_sessions_max` | 5 | The sweep tries 1 up to this many sessions per user. Every Balabit user has at least 5. |
 | `sweep_delta` | 0.05 | A step (one more session or one more user) that changes the mean sensitivity by less than this counts as "flat" (saturated). Used for the `flat_from` column in `results/sweep/saturation.csv`. |
 

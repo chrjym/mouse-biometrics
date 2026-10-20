@@ -37,7 +37,7 @@ each legitimate profile, using the rules of [04](04_match_shapes.md). It draws:
 - the same count, one panel per legitimate user;
 - a heatmap of the sensitivity (formerly threshold), using the first 1 … `n_legitimate` legitimate users.
 
-Script [14](14_plot_matches.md) and script [15](15_genuine_check.md) reproduce its draw.
+Script [09](09_plot_matches.md) and script [10](10_genuine_check.md) reproduce its draw.
 
 ## References
 

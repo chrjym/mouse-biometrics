@@ -26,11 +26,11 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/07_plot_shapes.py     # PNG per chunk under shapes/
 .venv/bin/python experiment_earl/src/09_find_sensitivity.py # adviser pipeline: E_k x sensitivity
 .venv/bin/python experiment_earl/src/10_find_session.py     # then E_k x sessions + sensitivity heatmap
-.venv/bin/python experiment_earl/src/16_plot_accuracy.py    # sessions through per user, one figure per sensitivity of runs/<hash>/
-.venv/bin/python experiment_earl/src/18_pick_best.py        # best sensitivity + sessions per split -> runs/<hash>/best/
-.venv/bin/python experiment_earl/src/19_cohort_score.py     # cohort scoring vs 18 (EER per split) -> runs/<hash>/cohort/
-.venv/bin/python experiment_earl/src/20_seed_check.py       # 18's and 19's choices tested on new seeds -> runs/<hash>/seed_check/
-.venv/bin/python experiment_earl/src/21_plot_cohort.py      # draw 19's scoring (claims, scores per split) -> runs/<hash>/cohort/plots/
+.venv/bin/python experiment_earl/src/11_plot_accuracy.py    # sessions through per user, one figure per sensitivity of runs/<hash>/
+.venv/bin/python experiment_earl/src/13_pick_best.py        # best sensitivity + sessions per split -> runs/<hash>/best/
+.venv/bin/python experiment_earl/src/14_cohort_score.py     # cohort scoring vs 13 (EER per split) -> runs/<hash>/cohort/
+.venv/bin/python experiment_earl/src/15_seed_check.py       # 13's and 14's choices tested on new seeds -> runs/<hash>/seed_check/
+.venv/bin/python experiment_earl/src/16_plot_cohort.py      # draw 14's scoring (claims, scores per split) -> runs/<hash>/cohort/plots/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
@@ -68,7 +68,7 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 - Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
 - **Sensitivity = former threshold** (adviser, 2026-10-14): every "threshold" was renamed, so `05_sensitivity.py`, the sweep and the notebook report `sensitivity` = impostors matched / impostors. The DTW tolerance key itself is `sensitivity` too (renamed from `dtw_tolerance` 2026-10-14; `00.load_config` maps the old name in old run snapshots), and in 09/10 it is the value being tried; there the share is the CSV column `impostor_sensitivity`. **DTW only**: the One-Class SVM and every hull/anomaly script (old 09–13) were removed the same day; they are in git history (last in `edcfcf5`).
 - **Known result:** chunk matching does not discriminate. At `sensitivity` (formerly `dtw_tolerance`) 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
-- **Seed check (2026-10-19, `20_seed_check.py` on `251ea4`):** settings chosen on seed 927 and applied unchanged to seeds 928–930 fall to chance: mean user accuracy 18's matching 0.63 → 0.44, 19 raw 0.70 → 0.50, 19 cohort 0.82 → 0.42 (test EER 0.44–0.46). Equal-size libraries matter (bigger profiles let more impostors through), but neither cohort scoring nor tuning makes stroke shape identify users.
+- **Seed check (2026-10-19, `15_seed_check.py` on `251ea4`):** settings chosen on seed 927 and applied unchanged to seeds 928–930 fall to chance: mean user accuracy 13's matching 0.63 → 0.44, 14 raw 0.70 → 0.50, 14 cohort 0.82 → 0.42 (test EER 0.44–0.46). Equal-size libraries matter (bigger profiles let more impostors through), but neither cohort scoring nor tuning makes stroke shape identify users.
 
 ### Full sweep (`src/06_sweep.py`)
 
@@ -80,22 +80,22 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 ### Find the sensitivity / sessions (`src/09_find_sensitivity.py`, `src/10_find_session.py`)
 
 - Adviser pipeline (2026-10-14, `Queries.pdf`): raw → RNG (legitimate, impostor, sessions) → chunks → user × user × sensitivity (09) → user × session × sensitivity (10) → sensitivity heatmap (10).
-- **Main configuration only** (user decision 2026-10-14): no 09/10 settings of their own. `09.draw` = `14.draw_users` (the notebook's draw: `n_legitimate` legitimate in draw order, `n_impostor` sorted impostors, session orders); tested sessions = each user's `HELD_OUT` (2) sessions after `sessions_per_user`. Earlier the same day they used hand-set `experiments`, `sensitivity_values` (0.2–1.0), `session_values`, `test_sessions`, and before that an automatic direct-opposite split; all removed.
+- **Main configuration only** (user decision 2026-10-14): no 09/10 settings of their own. `09.draw` = `09.draw_users` (the notebook's draw: `n_legitimate` legitimate in draw order, `n_impostor` sorted impostors, session orders); tested sessions = each user's `HELD_OUT` (2) sessions after `sessions_per_user`. Earlier the same day they used hand-set `experiments`, `sensitivity_values` (0.2–1.0), `session_values`, `test_sessions`, and before that an automatic direct-opposite split; all removed.
 - `09.session_hits` → per (profile, user) a bool per tested session (`04.matched_chunks` ≥ `match_shape_ratio`); `09.user_rows`: legitimate accuracy = own sessions matched by own profile, impostor accuracy = sessions no profile matches; accepted / through at `match_session_ratio`. `09.summarize`: user-level legit accuracy, impostor accuracy, mean, `impostor_sensitivity` (= former threshold).
 - 09 scores the configured `sensitivity` at `sessions_per_user` (`results/sensitivity/{users,summary}.csv`, `figures/find_sensitivity.png`: legitimate and impostor panels, x = each user, line per sensitivity). 10 reads that sensitivity from `summary.csv` and steps 1 … `sessions_per_user` (`results/session/{users,summary,heatmap}.csv`, `find_session.png`, `sensitivity_heatmap.png` = sessions × first 1 … L legitimate users, colour = impostors through / impostors).
 - Results: tolerances 0.2–1.0 (earlier version) let everyone through. `oct14_exp1_c8f010` (sensitivity 0.02, seed 97445, user20 vs user21/23/29/35, 1–2 sessions): no impostor through, but user20's own 2 sessions rejected too (accuracy 0.50).
 
-### Matched shapes (`src/14_plot_matches.py`)
+### Matched shapes (`src/09_plot_matches.py`)
 
 - Reproduces the notebook's single draw (`seed`; legitimate users in draw order, the same set as script 01's sorted draw) and, per legitimate user and session step, finds for every impostor stroke the first matching stroke in the user's first k sessions (`first_match`, same banded DTW search as `04.has_match`). Draws matched pairs (impostor red dashed on the user's stroke) to `figures/matches/<user>_sessions<k>.png`, all pairs to `results/matches.csv`. Titles repeat the bar graph's per-impostor verdict; on `oct12_test2_d4015c` and `oct12_test2_e36855` all 30 agree with `session_progression_users.csv`. ~2 min for 6 users × 5 steps.
 - Seen so far: matched pairs are mostly near-straight lines, which is why shapes match across users.
 
-### Genuine check (`src/15_genuine_check.py`)
+### Genuine check (`src/10_genuine_check.py`)
 
-- Same draw and profiles as the notebook (`14.draw_users`); per legitimate user and step k, scores the user's next `--held-out` (default 2) sessions after the first `sessions_per_user` (never in the profile) and the impostors' first k sessions against the user's first-k-session library with `04.matched_chunks` (shared DTW cache) and the `match_shape_ratio` rule. Outputs `results/genuine_check{,_summary}.csv`, `figures/genuine_check.png`.
+- Same draw and profiles as the notebook (`09.draw_users`); per legitimate user and step k, scores the user's next `--held-out` (default 2) sessions after the first `sessions_per_user` (never in the profile) and the impostors' first k sessions against the user's first-k-session library with `04.matched_chunks` (shared DTW cache) and the `match_shape_ratio` rule. Outputs `results/genuine_check{,_summary}.csv`, `figures/genuine_check.png`.
 - First result (`oct12_test3_d05fb2`, impostors user16 + user21): own sessions pass only for user9 and user20 (2/2 from 1–2 sessions, 35–57% of strokes matched) and user29 at 4–5 sessions (1/2); user12, user15, user35 never pass (11–21%). Own share beats the impostors' for 5 of 6 users, but user9/user20 are also the users that get through as impostors, so passing tracks a user's straight-stroke style more than identity. user15/user35 held-out sessions include short test files (44–61 strokes). This run predates the data merge.
 
-### Sessions through across runs (`src/16_plot_accuracy.py`)
+### Sessions through across runs (`src/11_plot_accuracy.py`)
 
 - Takes a hash folder (`runs/<hash>/`, default the current config's) and scores every run in it with its own snapshot, using the notebook's **fixed counts** (user request 2026-10-15; an earlier version plotted the share of strokes matched): y = sessions that go through (≥ `match_shape_ratio` of strokes match). Legitimate = the user's last `sessions_per_user` pool sessions (never in a profile) against their own library; impostor = their first `sessions_per_user` sessions against the legitimate library that passes most of them. Filled marker = user through (≥ `match_session_ratio`). Outputs `runs/<hash>/accuracy.csv` and one `accuracy_sensitivity_<value>.png` per sensitivity (x = each user, line per `sessions_per_user`). Impostor counts equal the notebook's `sessions_matched` and "impostors matched" on all 11 runs of `efdc92`. ~10 s with a warm DTW cache.
 - First result (`efdc92`, seed 945, user29 legitimate vs 9 impostors): at 0.02 almost nothing goes through (user29 1/10 at 10 sessions, impostors 0–5 of 90 sessions); at 0.04 user29 goes through from 4 sessions (3/4 … 10/10) but so do 4, 7, 9, 9 of 9 impostors at 4, 6, 8, 10 sessions; at 0.06 / 2 sessions user29 2/2 and 8 of 9 impostors. No sensitivity accepts the user while rejecting impostors.

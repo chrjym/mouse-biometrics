@@ -38,10 +38,10 @@ for reproducibility; they are not academic citations. Before citing any of these
 ## Dynamic Time Warping
 
 - H. Sakoe and S. Chiba, "Dynamic programming algorithm optimization for spoken word recognition," *IEEE Trans. Acoust., Speech, Signal Process.*, vol. 26, no. 1, pp. 43–49, Feb. 1978, doi: [10.1109/TASSP.1978.1163055](https://doi.org/10.1109/TASSP.1978.1163055).  
-  Used in: [04](04_match_shapes.md), [09](09_find_sensitivity.md), [10](10_find_session.md), [14](14_plot_matches.md), [15](15_genuine_check.md)
+  Used in: [04](04_match_shapes.md), [09](09_plot_matches.md), [10](10_genuine_check.md)
 
 - E. Keogh and C. A. Ratanamahatana, "Exact indexing of dynamic time warping," *Knowl. Inf. Syst.*, vol. 7, no. 3, pp. 358–386, Mar. 2005, doi: [10.1007/s10115-004-0154-9](https://doi.org/10.1007/s10115-004-0154-9).  
-  Used in: [04](04_match_shapes.md), [14](14_plot_matches.md), [15](15_genuine_check.md)
+  Used in: [04](04_match_shapes.md), [09](09_plot_matches.md), [10](10_genuine_check.md)
 
 - T. Rakthanmanon, B. Campana, A. Mueen, G. Batista, B. Westover, Q. Zhu, J. Zakaria, and E. Keogh, "Searching and mining trillions of time series subsequences under dynamic time warping," in *Proc. 18th ACM SIGKDD Int. Conf. Knowl. Discov. Data Min. (KDD)*, 2012, pp. 262–270, doi: [10.1145/2339530.2339576](https://doi.org/10.1145/2339530.2339576).  
   Used in: [04](04_match_shapes.md)
@@ -67,7 +67,7 @@ for reproducibility; they are not academic citations. Before citing any of these
   Used in: [03](03_chunk_shapes.md)
 
 - S. K. Lam, A. Pitrou, and S. Seibert, "Numba: A LLVM-based Python JIT compiler," in *Proc. 2nd Workshop LLVM Compiler Infrastructure HPC*, 2015, pp. 1–6, doi: [10.1145/2833157.2833162](https://doi.org/10.1145/2833157.2833162).  
-  Used in: [04](04_match_shapes.md), [14](14_plot_matches.md)
+  Used in: [04](04_match_shapes.md), [09](09_plot_matches.md)
 
 - Numba developers, "Automatic parallelization with @jit (prange)," Numba documentation. [Online]. Available: https://numba.readthedocs.io/en/stable/user/parallel.html  
   Used in: [04](04_match_shapes.md)

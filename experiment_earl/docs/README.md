@@ -15,16 +15,12 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    │ A. Shape matching (does an impostor's stroke look like one of the user's strokes?)       │
    │   01 draw users → 02 draw sessions → 03 cut into strokes → 04 DTW match → 05 sensitivity │
    │   06 sweep every (sessions × legitimate × impostor) cell                                 │
-   │   07 draw the strokes   08 run the notebook   14 draw matched pairs   15 genuine check   │
-   │   16 accuracy per user across the runs of one hash folder                               │
-   │   18 best sensitivity and sessions per split (from 16's accuracy.csv)                   │
-   │   19 cohort scoring: closer to the claimed user than to other people? (EER vs 18)       │
-   │   20 new-seed check: 18's and 19's chosen settings, unchanged, on new seeds             │
-   │   21 draw 19's scoring: strokes vs nearest strokes per library; scores per split        │
-   └──────────────────────────────────────────────────────────────────────────────────────────┘
-   ┌──────────────────────────────────────────────────────────────────────────────────────────┐
-   │ B. Adviser pipeline (2026-10-14), main configuration (seed, L, I, sessions, sensitivity) │
-   │   09 user × user × sensitivity   →   10 user × session × sensitivity → heatmap           │
+   │   07 draw the strokes   08 run the notebook   09 draw matched pairs   10 genuine check   │
+   │   11 accuracy per user across the runs of one hash folder                               │
+   │   13 best sensitivity and sessions per split (from 11's accuracy.csv)                   │
+   │   14 cohort scoring: closer to the claimed user than to other people? (EER vs 13)       │
+   │   15 new-seed check: 13's and 14's chosen settings, unchanged, on new seeds             │
+   │   16 draw 14's scoring: strokes vs nearest strokes per library; scores per split        │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -39,15 +35,13 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 06 | [06_sweep.md](06_sweep.md) | Full factorial sweep with nested draws; saturation (flat-from) and biggest-jump detection |
 | 07 | [07_plot_shapes.md](07_plot_shapes.md) | Plot every raw stroke (parallel workers) |
 | 08 | [08_run_notebook.md](08_run_notebook.md) | Execute the session-progression notebook for a run |
-| 09 | [09_find_sensitivity.md](09_find_sensitivity.md) | The notebook's draw at the configured sensitivity; accuracy per legitimate user and per impostor |
-| 10 | [10_find_session.md](10_find_session.md) | The same at 1 … `sessions_per_user` profile sessions; sensitivity heatmap (sessions × legitimate users) |
-| 14 | [14_plot_matches.md](14_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
-| 15 | [15_genuine_check.md](15_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
-| 16 | [16_plot_accuracy.md](16_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
-| 18 | [18_pick_best.md](18_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
-| 19 | [19_cohort_score.md](19_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
-| 20 | [20_seed_check.md](20_seed_check.md) | Settings chosen on the training seed by 18 and 19, applied unchanged to new seeds; train vs test user accuracy |
-| 21 | [21_plot_cohort.md](21_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
+| 09 | [09_plot_matches.md](09_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
+| 10 | [10_genuine_check.md](10_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
+| 11 | [11_plot_accuracy.md](11_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
+| 13 | [13_pick_best.md](13_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
+| 14 | [14_cohort_score.md](14_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
+| 15 | [15_seed_check.md](15_seed_check.md) | Settings chosen on the training seed by 13 and 14, applied unchanged to new seeds; train vs test user accuracy |
+| 16 | [16_plot_cohort.md](16_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
 
 ## Words used on every page
 
@@ -69,7 +63,7 @@ Path length of a stroke with points $p_1, \dots, p_m$:
 
 $$L = \sum_{i=1}^{m-1} d(p_i, p_{i+1})$$
 
-Session match ratio (04, 06, 09, 10, 14, 15): the share of a session's strokes that have a matching stroke in the profile:
+Session match ratio (04, 06, 09, 10): the share of a session's strokes that have a matching stroke in the profile:
 
 $$r = \frac{\text{strokes with a match}}{\text{all strokes of the session}}$$
 
@@ -77,6 +71,6 @@ $$r = \frac{\text{strokes with a match}}{\text{all strokes of the session}}$$
 
 The numbers come from the runs described in the repository's `CLAUDE.md`. Each page gives its own numbers.
 
-- Shape matching (01–06, 14, 15) does **not** tell users apart. Most matched strokes are near-straight lines, and almost every user draws those.
+- Shape matching (01–06, 09, 10) does **not** tell users apart. Most matched strokes are near-straight lines, and almost every user draws those.
 - Find the sensitivity / sessions (09, 10): at the adviser's grid (`sensitivity` 0.2–1.0) every legitimate user is accepted and every impostor goes through, for every E_k and 2–10 sessions.
 - The hull, One-Class SVM and DTW anomaly tests (old scripts 09–13) were removed on 2026-10-14 (DTW only from now on); they are in git history before that date.

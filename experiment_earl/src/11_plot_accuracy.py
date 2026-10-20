@@ -14,7 +14,7 @@ from matplotlib.ticker import MaxNLocator
 
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
-plot_mod = import_module("14_plot_matches")
+plot_mod = import_module("09_plot_matches")
 
 ROOT = Path(__file__).resolve().parents[1]
 

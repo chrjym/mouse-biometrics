@@ -134,18 +134,18 @@ every impostor went through (legitimate graph at 1, impostor graph at 0).
 
 ## 7. Matched shapes and the genuine check (G, H)
 
-- **`figures/matches/<user>_sessions<k>.png`** (script 14): each panel is one matched pair after normalization: the
+- **`figures/matches/<user>_sessions<k>.png`** (script 09): each panel is one matched pair after normalization: the
   legitimate user's stroke (blue) and the impostor stroke that matched it (red dashed), start in green, with the DTW
   cost per point. The title repeats each impostor's verdict. **What we saw:** most matched pairs are near-straight
   lines, which look the same for everyone after normalization.
-- **`figures/genuine_check.png`** (script 15): one panel per legitimate user; blue bars = share of strokes matched
+- **`figures/genuine_check.png`** (script 10): one panel per legitimate user; blue bars = share of strokes matched
   in the user's **own** unused sessions, red bars = the impostors' share, per session step; labels =
   sessions passed / tested; dotted line = `match_shape_ratio`. **Good result:** blue clearly above red and above the
   dotted line.
 
 ## 8. Sessions through across the runs of a batch (I)
 
-**File:** `runs/<hash>/accuracy_<L>_<I>_sensitivity_<value>.png` (script 16), one per split and sensitivity
+**File:** `runs/<hash>/accuracy_<L>_<I>_sensitivity_<value>.png` (script 11), one per split and sensitivity
 (450 for `251ea4`).
 
 ![Sessions through, 3 vs 7, sensitivity 0.03](docs/figures/accuracy_3_7_sensitivity_0.03.png)
@@ -163,12 +163,12 @@ the same height. At 30 sessions, user7 passes 26 of 30 own sessions, but user29 
 The method cannot separate them: whatever lets the legitimate user in also lets the impostors in. Only user21 is
 consistently harder to pass as.
 
-**Also in the hash folder:** `summary/README.md` (written by the batch, script 17): a table of every run (legitimate
+**Also in the hash folder:** `summary/README.md` (written by the batch, script 12): a table of every run (legitimate
 passed and accepted, impostors passed and through) with links to these figures.
 
 ## 9. The best sensitivity and sessions (J)
 
-**File:** `runs/<hash>/best/best_heatmaps.png` (script 18).
+**File:** `runs/<hash>/best/best_heatmaps.png` (script 13).
 
 ![Best heatmaps](docs/figures/best_heatmaps.png)
 
@@ -188,13 +188,13 @@ each chosen split and sensitivity.
 
 ## 10. Cohort scoring (K)
 
-**File:** `runs/<hash>/cohort/cohort.png` (script 19).
+**File:** `runs/<hash>/cohort/cohort.png` (script 14).
 
 ![Cohort scoring](docs/figures/cohort.png)
 
 - **Left, EER per split:** x = sessions per user, **y = EER (lower = better, 0.5 = chance, dotted line)**. Solid
   lines with dots = cohort score, dashed = raw distance; one colour per split.
-- **Right, best user accuracy per split:** grey = script 18's sensitivity matching, light blue = raw distance,
+- **Right, best user accuracy per split:** grey = script 13's sensitivity matching, light blue = raw distance,
   dark blue = cohort. **Higher = better, 0.5 = chance.** The title warns that these are tuned on the same sessions.
 
 **How to read the example:** the solid lines sit below the dashed ones in most splits and session counts (at 2–4
@@ -205,7 +205,7 @@ survives on new seeds.
 
 ## 11. What cohort scoring does, stroke by stroke (M)
 
-Folder: `runs/<hash>/cohort/plots/` (script 21).
+Folder: `runs/<hash>/cohort/plots/` (script 16).
 
 ### `claim_<user>_genuine.png`, `claim_<user>_impostor_typical.png`, `claim_<user>_impostor_top.png`
 
@@ -246,11 +246,11 @@ session with **one stroke** that happens to rank 1.00, so the whole session scor
 
 ## 12. New-seed check (L)
 
-**File:** `runs/<hash>/seed_check/seed_check.png` (script 20).
+**File:** `runs/<hash>/seed_check/seed_check.png` (script 15).
 
 ![Seed check](docs/figures/seed_check.png)
 
-- **One panel per method:** script 18's sensitivity matching, script 19's raw distance, script 19's cohort.
+- **One panel per method:** script 13's sensitivity matching, script 14's raw distance, script 14's cohort.
 - Per split: **light bar** = user accuracy on the seed where the setting was chosen (927); **dark bar** = the mean
   over the new seeds (928–930), with the setting **unchanged**; **black dots** = each new seed.
 - **0.5 = chance** (dotted line).

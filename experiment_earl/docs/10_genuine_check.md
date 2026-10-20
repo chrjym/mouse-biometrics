@@ -1,6 +1,6 @@
-# `15_genuine_check.py`: does the user's own unseen data match their profile?
+# `10_genuine_check.py`: does the user's own unseen data match their profile?
 
-[← index](README.md) · previous: [14](14_plot_matches.md) · next: [16](16_plot_accuracy.md)
+[← index](README.md) · previous: [09](09_plot_matches.md) · next: [11](11_plot_accuracy.md)
 
 ## What it does
 
@@ -17,7 +17,7 @@ Outputs: `runs/<run>/results/genuine_check.csv`, `results/genuine_check_summary.
 ## Algorithm
 
 ```
-legitimate, impostors, order ← 14.draw_users(config, seed)          # the notebook's draw
+legitimate, impostors, order ← 09.draw_users(config, seed)          # the notebook's draw
 held_out[u] ← order[u][sessions_per_user : sessions_per_user + held_out]
 for each legitimate user u, for k in 1 … sessions_per_user:
     library ← u's first k sessions

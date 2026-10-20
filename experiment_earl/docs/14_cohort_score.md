@@ -1,13 +1,13 @@
-# `19_cohort_score.py`: cohort scoring, a session must look more like its user than like other people
+# `14_cohort_score.py`: cohort scoring, a session must look more like its user than like other people
 
-[← index](README.md) · previous: [18](18_pick_best.md) · next: [20](20_seed_check.md)
+[← index](README.md) · previous: [13](13_pick_best.md) · next: [15](15_seed_check.md)
 
 ## What it does
 
-Scripts 16 and 18 accept a stroke when it lies within `sensitivity` of **any** stroke in the claimed user's library.
+Scripts 11 and 13 accept a stroke when it lies within `sensitivity` of **any** stroke in the claimed user's library.
 That rule has two weak points: common strokes (near-straight lines) match everyone, and a library with more strokes
 is closer to everything. This script replaces the yes/no match with two continuous scores per session and compares
-them with 18's best result on the same hash folder (same seed, users and session orders):
+them with 13's best result on the same hash folder (same seed, users and session orders):
 
 - **raw**: minus the mean nearest DTW cost per point from the session's strokes to the claimed user's library.
 - **cohort**: for each stroke, the share of *other people* whose library is farther from it than the claimed user's
@@ -19,13 +19,13 @@ Outputs, in `runs/<hash>/cohort/`:
 - `sessions.csv`: one row per claim (session, author, claimed user, genuine or not) with both scores.
 - `cells.csv`: per (split, sessions per user, method) the EER and, at the threshold with the best user accuracy,
   users through on each side, user accuracy and session accuracy.
-- `best.csv`: per split, the best session count for each method next to 18's best (`match_*` columns).
+- `best.csv`: per split, the best session count for each method next to 13's best (`match_*` columns).
 - `cohort.png`: left, EER per sessions per user, one line per split (solid = cohort, dashed = raw); right, best user
-  accuracy per split for 18's matching, raw and cohort.
+  accuracy per split for 13's matching, raw and cohort.
 
 ```bash
-.venv/bin/python experiment_earl/src/19_cohort_score.py 251ea4                     # sessions 2–10
-.venv/bin/python experiment_earl/src/19_cohort_score.py 251ea4 --max-sessions 30   # the whole batch range, much slower
+.venv/bin/python experiment_earl/src/14_cohort_score.py 251ea4                     # sessions 2–10
+.venv/bin/python experiment_earl/src/14_cohort_score.py 251ea4 --max-sessions 30   # the whole batch range, much slower
 ```
 
 The settings are flags, not `config.yaml` keys, because a new key would change every run hash. Nearest costs are
@@ -34,7 +34,7 @@ cached in `experiment_earl/cache/nearest.pkl` (git-ignored); a rerun with the sa
 ## Algorithm
 
 ```
-users, session orders ← 14.draw_users(seed) with 9 legitimate users   # every split takes its legitimate users
+users, session orders ← 09.draw_users(seed) with 9 legitimate users   # every split takes its legitimate users
                                                                         # from the front of this order
 for k in the hash folder's session counts (≤ --max-sessions):
     budget ← k × strokes_per_session
@@ -50,7 +50,7 @@ for k in the hash folder's session counts (≤ --max-sessions):
         cohort ← mean_s ( share of w with d_w(s) > d_u(s), ties count ½ )
 per split (L legitimate, I impostors), k, method:
     EER over the split's claims (legitimate users' genuine claims; impostors' claims of the legitimate users)
-    threshold t with the best user accuracy (18's rule; ties: session accuracy)
+    threshold t with the best user accuracy (13's rule; ties: session accuracy)
 per split and method: the k with the best user accuracy (ties: session accuracy, then fewer sessions)
 ```
 
@@ -82,8 +82,8 @@ equals the share of impostor sessions accepted.
   halves of the pool before the last max-k sessions, which are the genuine tests. Impostor tests are the author's
   first k sessions, but the author's own libraries are never used in their claims.
 - **EER and the best threshold.** EER needs no threshold, so it is the fairest comparison between raw and cohort.
-  The user accuracy uses the threshold that maximizes it on the same claims, like 18 picks its best sensitivity on
-  the same runs, so both are optimistic; [20](20_seed_check.md) checks the chosen settings on new seeds.
+  The user accuracy uses the threshold that maximizes it on the same claims, like 13 picks its best sensitivity on
+  the same runs, so both are optimistic; [15](15_seed_check.md) checks the chosen settings on new seeds.
 - **`--cap` 0.5.** Above a cost of about 0.1 per point the batch matched everything, so costs above 0.5 are treated as
   equally far; the cap also lets the DTW stop early.
 

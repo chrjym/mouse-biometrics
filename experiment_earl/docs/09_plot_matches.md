@@ -1,6 +1,6 @@
-# `14_plot_matches.py`: draw the impostor strokes that matched a user
+# `09_plot_matches.py`: draw the impostor strokes that matched a user
 
-[← index](README.md) · next: [15](15_genuine_check.md)
+[← index](README.md) · next: [10](10_genuine_check.md)
 
 ## What it does
 
@@ -22,7 +22,7 @@ order[u]   ← session_pool(u, seed) for every chosen user
 ```
 
 These are the same calls as script 01, so the users are the same (only the order of the legitimate users
-differs). Script 15 reuses this function.
+differs). Script 10 reuses this function.
 
 ### 2. For each legitimate user and session step k (`step_matches`)
 

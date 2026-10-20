@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pick the best sensitivity and sessions per split (user-level accuracy, session-level tie-break) from runs/<hash>/accuracy.csv (script 16) into runs/<hash>/best/."""
+"""Pick the best sensitivity and sessions per split (user-level accuracy, session-level tie-break) from runs/<hash>/accuracy.csv (script 11) into runs/<hash>/best/."""
 
 import argparse
 import shutil
@@ -98,7 +98,7 @@ def main() -> None:
     group = cfg_mod.RUNS / (args.hash or cfg_mod.run_folder_name(cfg_mod.load_config()).split("/")[0])
     source = group / "accuracy.csv"
     if not source.exists():
-        raise SystemExit(f"No {source}: run 16_plot_accuracy.py {group.name} first")
+        raise SystemExit(f"No {source}: run 11_plot_accuracy.py {group.name} first")
 
     table = pd.read_csv(source)
     cells = score_cells(table)
