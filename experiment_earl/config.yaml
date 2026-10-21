@@ -3,12 +3,12 @@
 # setting, so any change gives a new folder and older results are kept.
 # Every setting is explained in CONFIG.md.
 
-# --- Experiment size (main configuration: 01-05, the notebook, 09 and 10) ---
+# --- Experiment size (main configuration: 01-05, the notebook, 08 and 09) ---
 # One RNG draw from `seed` fixes the legitimate users, the impostor users and each user's session order for the whole run.
 seed: 945                   # picks the users and sessions once; the same seed gives the same users and sessions
 n_legitimate: 1            # users whose shapes form the legitimate profiles
 n_impostor: 9              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
-sessions_per_user: 2       # sessions per user; the notebook and 10 test 1, 2, ... up to this (max: printed by every script)
+sessions_per_user: 2       # sessions per user; the notebook tests 1, 2, ... up to this (max: printed by every script)
 
 # --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
 # training_files and test_files are merged into one folder per user (adviser, 2026-10-14).
@@ -23,6 +23,6 @@ resample_n: 64             # every chunk is redrawn with this many evenly spaced
 
 # --- Matching (04): when do two shapes, a session and a user match ---
 dtw_band: 0.1              # DTW may stretch a shape by at most this share of resample_n
-sensitivity: 0.06          # (formerly dtw_tolerance; the value 09 and 10 test) chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
+sensitivity: 0.06          # (formerly dtw_tolerance) chunks match when their mean DTW distance per point is <= this (lower = stricter; 0.15 matched ~99% of everything)
 match_shape_ratio: 0.2     # a session matches a profile when at least this share of its chunks match
 match_session_ratio: 0.5   # an impostor user is "matched" when at least this share of their sessions match

@@ -23,8 +23,6 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 # EARL shape matching (see section below)
 .venv/bin/python experiment_earl/src/01_sample_users.py   # then 02 ... 05 (one trial)
 .venv/bin/python experiment_earl/src/06_plot_shapes.py     # PNG per chunk under shapes/
-.venv/bin/python experiment_earl/src/09_find_sensitivity.py # adviser pipeline: E_k x sensitivity
-.venv/bin/python experiment_earl/src/10_find_session.py     # then E_k x sessions + sensitivity heatmap
 .venv/bin/python experiment_earl/src/10_plot_accuracy.py    # sessions through per user, one figure per sensitivity of runs/<hash>/
 .venv/bin/python experiment_earl/src/12_pick_best.py        # best sensitivity + sessions per split -> runs/<hash>/best/
 .venv/bin/python experiment_earl/src/13_cohort_score.py     # cohort scoring vs 12 (EER per split) -> runs/<hash>/cohort/
@@ -65,17 +63,9 @@ Plan: `EARL_EXECUTION_PLAN.md`; every setting is explained in `experiment_earl/C
 
 - Scripts are numbered, so modules load with `import_module("00_config")`. `08_plot_matches.py` and `09_genuine_check.py` reuse `dataset_session` and `matched_chunks` from `04_match_shapes.py`; pair results are cached in `experiment_earl/cache/pairs.pkl` (shared by all runs).
 - Balabit has only 10 users, so `n_legitimate + n_impostor <= 10` (plan's 5/10/15/20 impostors are impossible). Step 02 clears only `temp/legitimate` and `temp/impostor`.
-- **Sensitivity = former threshold** (adviser, 2026-10-14): every "threshold" was renamed, so `05_sensitivity.py` and the notebook report `sensitivity` = impostors matched / impostors. The DTW tolerance key itself is `sensitivity` too (renamed from `dtw_tolerance` 2026-10-14; `00.load_config` maps the old name in old run snapshots), and in 09/10 it is the value being tried; there the share is the CSV column `impostor_sensitivity`. **DTW only**: the One-Class SVM and every hull/anomaly script (old 09–13) were removed the same day; they are in git history (last in `edcfcf5`).
+- **Sensitivity = former threshold** (adviser, 2026-10-14): every "threshold" was renamed, so `05_sensitivity.py` and the notebook report `sensitivity` = impostors matched / impostors. The DTW tolerance key itself is `sensitivity` too (renamed from `dtw_tolerance` 2026-10-14; `00.load_config` maps the old name in old run snapshots). **DTW only**: the One-Class SVM and every hull/anomaly script (old 09–13) were removed the same day; they are in git history (last in `edcfcf5`).
 - **Known result:** chunk matching does not discriminate. At `sensitivity` (formerly `dtw_tolerance`) 0.15 about 99% of all chunks match; at 0.01–0.06 and with longer chunks (gap 1–3 s, min length 100–300 px) a user's own held-out sessions never match more than impostors do (AUC 0.27–0.50). The current 0.02 is only the value that keeps the heatmap non-trivial. Treat bar/heatmap numbers as a baseline, not evidence of unique shapes.
 - **Seed check (2026-10-19, `14_seed_check.py` on `251ea4`):** settings chosen on seed 927 and applied unchanged to seeds 928–930 fall to chance: mean user accuracy 12's matching 0.63 → 0.44, 13 raw 0.70 → 0.50, 13 cohort 0.82 → 0.42 (test EER 0.44–0.46). Equal-size libraries matter (bigger profiles let more impostors through), but neither cohort scoring nor tuning makes stroke shape identify users.
-
-### Find the sensitivity / sessions (`src/09_find_sensitivity.py`, `src/10_find_session.py`)
-
-- Adviser pipeline (2026-10-14, `Queries.pdf`): raw → RNG (legitimate, impostor, sessions) → chunks → user × user × sensitivity (09) → user × session × sensitivity (10) → sensitivity heatmap (10).
-- **Main configuration only** (user decision 2026-10-14): no 09/10 settings of their own. `09.draw` = `08.draw_users` (the notebook's draw: `n_legitimate` legitimate in draw order, `n_impostor` sorted impostors, session orders); tested sessions = each user's `HELD_OUT` (2) sessions after `sessions_per_user`. Earlier the same day they used hand-set `experiments`, `sensitivity_values` (0.2–1.0), `session_values`, `test_sessions`, and before that an automatic direct-opposite split; all removed.
-- `09.session_hits` → per (profile, user) a bool per tested session (`04.matched_chunks` ≥ `match_shape_ratio`); `09.user_rows`: legitimate accuracy = own sessions matched by own profile, impostor accuracy = sessions no profile matches; accepted / through at `match_session_ratio`. `09.summarize`: user-level legit accuracy, impostor accuracy, mean, `impostor_sensitivity` (= former threshold).
-- 09 scores the configured `sensitivity` at `sessions_per_user` (`results/sensitivity/{users,summary}.csv`, `figures/find_sensitivity.png`: legitimate and impostor panels, x = each user, line per sensitivity). 10 reads that sensitivity from `summary.csv` and steps 1 … `sessions_per_user` (`results/session/{users,summary,heatmap}.csv`, `find_session.png`, `sensitivity_heatmap.png` = sessions × first 1 … L legitimate users, colour = impostors through / impostors).
-- Results: tolerances 0.2–1.0 (earlier version) let everyone through. `oct14_exp1_c8f010` (sensitivity 0.02, seed 97445, user20 vs user21/23/29/35, 1–2 sessions): no impostor through, but user20's own 2 sessions rejected too (accuracy 0.50).
 
 ### Matched shapes (`src/08_plot_matches.py`)
 

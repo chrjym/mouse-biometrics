@@ -48,8 +48,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 - **Move / drag**: a stroke made with no button held (move) or with a button held (drag). They are only ever compared with strokes of the same kind.
 - **Legitimate user / profile**: the user whose sessions form a shape library.
 - **Impostor**: any other user whose sessions are tested against that profile.
-- **Sensitivity**: in 05, 06 and the notebook, impostors matched / impostors (called *threshold* before 2026-10-14). In 09 and 10 it also names the DTW tolerance being tried, the config key `sensitivity` (formerly `dtw_tolerance`).
-- **Accuracy** (09, 10): per user, the share of tested sessions decided correctly; overall, legitimate users accepted / legitimate users and impostors kept out / impostors.
+- **Sensitivity**: in 05, 06 and the notebook, impostors matched / impostors (called *threshold* before 2026-10-14).
 
 ## Formulas shared by several scripts
 
@@ -61,7 +60,7 @@ Path length of a stroke with points $p_1, \dots, p_m$:
 
 $$L = \sum_{i=1}^{m-1} d(p_i, p_{i+1})$$
 
-Session match ratio (04, 06, 09, 10): the share of a session's strokes that have a matching stroke in the profile:
+Session match ratio (04, 08, 09): the share of a session's strokes that have a matching stroke in the profile:
 
 $$r = \frac{\text{strokes with a match}}{\text{all strokes of the session}}$$
 
@@ -69,6 +68,5 @@ $$r = \frac{\text{strokes with a match}}{\text{all strokes of the session}}$$
 
 The numbers come from the runs described in the repository's `CLAUDE.md`. Each page gives its own numbers.
 
-- Shape matching (01–06, 09, 10) does **not** tell users apart. Most matched strokes are near-straight lines, and almost every user draws those.
-- Find the sensitivity / sessions (09, 10): at the adviser's grid (`sensitivity` 0.2–1.0) every legitimate user is accepted and every impostor goes through, for every E_k and 2–10 sessions.
+- Shape matching (01–05, 08, 09) does **not** tell users apart. Most matched strokes are near-straight lines, and almost every user draws those.
 - The hull, One-Class SVM and DTW anomaly tests (old scripts 09–13) were removed on 2026-10-14 (DTW only from now on); they are in git history before that date.

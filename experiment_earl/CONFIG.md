@@ -78,10 +78,6 @@ Chunks that are not comparable (zero length) still count in the denominator of a
 
 The **sensitivity** (called *threshold* before 2026-10-14) is `matched impostor users / total impostor users`. 0 is best: impostors never look like the legitimate users.
 
-## Find the sensitivity (09) and the sessions (10)
-
-No settings of their own (user decision 2026-10-14): they use `seed`, `n_legitimate`, `n_impostor`, `sessions_per_user` and `sensitivity` from above, plus the matching ratios. Each user's 2 sessions after `sessions_per_user` are the tested sessions. To compare sensitivities, change `sensitivity` and rerun; every value gets its own run folder.
-
 ## When you change a setting
 
 Any change to a value makes the next script run create a new folder under `runs/`, so nothing needs deleting or resetting. Then:
