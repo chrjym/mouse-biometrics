@@ -1,4 +1,4 @@
-# What src/17_batch.py runs: every split x every sensitivity x every session count below, one notebook run each.
+# What src/11_batch.py runs: every split x every sensitivity x every session count below, one notebook run each.
 # Edit these lists to choose what to run; every other setting comes from config.yaml as it is.
 seed: 945
 splits:                                        # [n_legitimate, n_impostor]; legitimate goes up as impostors go down
