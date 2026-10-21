@@ -1,10 +1,10 @@
-# `09_plot_matches.py`: draw the impostor strokes that matched a user
+# `08_plot_matches.py`: draw the impostor strokes that matched a user
 
-[← index](README.md) · next: [10](10_genuine_check.md)
+[← index](README.md) · next: [09](09_genuine_check.md)
 
 ## What it does
 
-The notebook ([08](08_run_notebook.md)) only *counts* impostors that match each legitimate user. This script
+The notebook ([07](07_run_notebook.md)) only *counts* impostors that match each legitimate user. This script
 shows **which strokes** matched, by drawing each matched impostor stroke on top of the user's stroke it matched.
 It answers the question "what shapes make two different people look the same?"
 
@@ -22,7 +22,7 @@ order[u]   ← session_pool(u, seed) for every chosen user
 ```
 
 These are the same calls as script 01, so the users are the same (only the order of the legitimate users
-differs). Script 10 reuses this function.
+differs). Script 09 reuses this function.
 
 ### 2. For each legitimate user and session step k (`step_matches`)
 

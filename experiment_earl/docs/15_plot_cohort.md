@@ -1,15 +1,15 @@
-# `16_plot_cohort.py`: what cohort scoring looks like
+# `15_plot_cohort.py`: what cohort scoring looks like
 
-[← index](README.md) · previous: [15](15_seed_check.md)
+[← index](README.md) · previous: [14](14_seed_check.md)
 
 ## What it does
 
-Draws what [14](14_cohort_score.md) computes, from 14's saved scores and the same libraries (rebuilt with
-`14.build_libraries`, so the strokes shown are the ones 14 scored against). Run 14 first.
+Draws what [13](13_cohort_score.md) computes, from 13's saved scores and the same libraries (rebuilt with
+`13.build_libraries`, so the strokes shown are the ones 13 scored against). Run 13 first.
 
 ```bash
-.venv/bin/python experiment_earl/src/16_plot_cohort.py 251ea4                          # first legitimate user, 14's sessions for 1–9
-.venv/bin/python experiment_earl/src/16_plot_cohort.py 251ea4 --user user9 --sessions 2 --strokes 8
+.venv/bin/python experiment_earl/src/15_plot_cohort.py 251ea4                          # first legitimate user, 13's sessions for 1–9
+.venv/bin/python experiment_earl/src/15_plot_cohort.py 251ea4 --user user9 --sessions 2 --strokes 8
 ```
 
 Outputs, in `runs/<hash>/cohort/plots/`:
@@ -21,8 +21,8 @@ Outputs, in `runs/<hash>/cohort/plots/`:
   stroke in each other person's background library: **red = closer than the claimed user's** (counts against the
   claim), **grey = farther** (counts for it). The number is the DTW cost per point. The row label is the stroke's
   rank; the histogram at the bottom shows every stroke's rank and the session score (their mean).
-- `scores_per_split.png`: per split, at 14's chosen sessions, every claim's cohort score (genuine above, impostor
-  below) with 14's chosen threshold; claims right of the line are accepted, the EER is in the title.
+- `scores_per_split.png`: per split, at 13's chosen sessions, every claim's cohort score (genuine above, impostor
+  below) with 13's chosen threshold; claims right of the line are accepted, the EER is in the title.
 
 The script recomputes each drawn session's score and warns if it differs from `sessions.csv`.
 

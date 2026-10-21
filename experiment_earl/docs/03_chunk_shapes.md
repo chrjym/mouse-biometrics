@@ -4,7 +4,7 @@
 
 ## What it does
 
-Step 3 of the single trial, and the core preprocessing of the whole experiment. Scripts 04, 07 and 09 call its functions directly. It turns a long session (thousands of mouse events) into many short
+Step 3 of the single trial, and the core preprocessing of the whole experiment. Scripts 04, 06 and 08 call its functions directly. It turns a long session (thousands of mouse events) into many short
 **strokes** (chunks), then turns each stroke into a **normalized shape** that can be compared with any other
 stroke, from any user, on any screen.
 
@@ -111,7 +111,7 @@ $(m, n, 2)$ array per kind). For a legitimate user, `main()` stacks the shapes o
 ## What we learned
 
 Most strokes, after normalization, are close to a straight line from the start to the target. That makes many
-strokes of different users look alike (see 04 and 09), which is the main limit of shape matching on Balabit.
+strokes of different users look alike (see 04 and 08), which is the main limit of shape matching on Balabit.
 
 ## References
 

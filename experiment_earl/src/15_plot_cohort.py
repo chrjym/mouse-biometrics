@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw what 14 does: for a genuine, a typical impostor and the top impostor claim, each stroke next to its nearest stroke in the claimed user's library and in every other person's; plus genuine vs impostor scores per split, in runs/<hash>/cohort/plots/."""
+"""Draw what 13 does: for a genuine, a typical impostor and the top impostor claim, each stroke next to its nearest stroke in the claimed user's library and in every other person's; plus genuine vs impostor scores per split, in runs/<hash>/cohort/plots/."""
 
 import argparse
 from importlib import import_module
@@ -15,7 +15,7 @@ from numba import njit, prange
 
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
-cohort_mod = import_module("14_cohort_score")
+cohort_mod = import_module("13_cohort_score")
 
 ROOT = Path(__file__).resolve().parents[1]
 _dtw_cost = cohort_mod._dtw_cost
@@ -38,7 +38,7 @@ def nearest_index(queries, library, band, cap):
 
 
 def strokes_of(session) -> list[tuple[int, np.ndarray]]:
-    """(kind, path) per stroke, kinds in 14's fixed order, so position i matches 14's per-stroke arrays."""
+    """(kind, path) per stroke, kinds in 13's fixed order, so position i matches 13's per-stroke arrays."""
     return [(kind, path) for kind in sorted(session.paths) for path in session.paths[kind]]
 
 
@@ -116,7 +116,7 @@ def plot_claim(claim: pd.Series, users: list[str], libraries: dict, config: dict
 
 def plot_scores(sessions: pd.DataFrame, cells: pd.DataFrame, best: pd.DataFrame, users: list[str], path: Path,
                 title: str) -> None:
-    """Per split at its chosen sessions: every claim's cohort score, genuine above, impostor below, with 14's chosen
+    """Per split at its chosen sessions: every claim's cohort score, genuine above, impostor below, with 13's chosen
     threshold; claims right of the line are accepted."""
     splits = list(best[["n_legitimate", "n_impostor"]].itertuples(index=False, name=None))
     cols = 3
@@ -155,16 +155,16 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("hash", nargs="?", help="folder under runs/ (default: the one config.yaml selects)")
     parser.add_argument("--user", help="claimed user to draw (default: the first legitimate user of the draw)")
-    parser.add_argument("--sessions", type=int, help="sessions per user (default: 14's choice for the 1-legitimate split)")
+    parser.add_argument("--sessions", type=int, help="sessions per user (default: 13's choice for the 1-legitimate split)")
     parser.add_argument("--strokes", type=int, default=6, help="strokes per claim figure, spread over their rank range")
-    parser.add_argument("--max-sessions", type=int, default=10, help="as in 14")
-    parser.add_argument("--strokes-per-session", type=int, default=40, help="as in 14")
-    parser.add_argument("--cap", type=float, default=0.5, help="as in 14")
+    parser.add_argument("--max-sessions", type=int, default=10, help="as in 13")
+    parser.add_argument("--strokes-per-session", type=int, default=40, help="as in 13")
+    parser.add_argument("--cap", type=float, default=0.5, help="as in 13")
     args = parser.parse_args()
     group = cfg_mod.RUNS / (args.hash or cfg_mod.run_folder_name(cfg_mod.load_config()).split("/")[0])
     folder = group / "cohort"
     if not (folder / "sessions.csv").exists():
-        raise SystemExit(f"No {folder / 'sessions.csv'}: run 14_cohort_score.py {group.name} first")
+        raise SystemExit(f"No {folder / 'sessions.csv'}: run 13_cohort_score.py {group.name} first")
     sessions = pd.read_csv(folder / "sessions.csv")
     cells = pd.read_csv(folder / "cells.csv")
     best = pd.read_csv(folder / "best.csv")
@@ -173,7 +173,7 @@ def main() -> None:
     user = args.user or users[0]
     k = args.sessions or int(best[best.n_legitimate == best.n_legitimate.min()].cohort_sessions.iloc[0])
     if k not in set(sessions.sessions):
-        raise SystemExit(f"14 scored sessions {sorted(set(sessions.sessions))}, not {k}")
+        raise SystemExit(f"13 scored sessions {sorted(set(sessions.sessions))}, not {k}")
 
     cohort_mod.load_nearest()
     _, libraries = cohort_mod.build_libraries(users, order, k, args.strokes_per_session, max(sessions.sessions), config)
@@ -190,7 +190,7 @@ def main() -> None:
     for claim, why, name in claims:
         plot_claim(claim, users, libraries, config, args.cap, args.strokes, out / name, why)
     plot_scores(sessions, cells, best, users, out / "scores_per_split.png",
-                f"runs/{group.name}: cohort score of every claim per split, at 14's chosen sessions "
+                f"runs/{group.name}: cohort score of every claim per split, at 13's chosen sessions "
                 f"(dots jittered vertically; dotted = 0.5, no evidence)")
     cohort_mod.save_nearest()
     print(f"Claimed user: {user}  Sessions: {k}  Scores: genuine {claims[0][0].cohort:.3f}, typical impostor "

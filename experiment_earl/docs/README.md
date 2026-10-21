@@ -14,13 +14,12 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    ┌──────────────────────────┼─────────────────────────────────────────────────────────────┐
    │ A. Shape matching (does an impostor's stroke look like one of the user's strokes?)       │
    │   01 draw users → 02 draw sessions → 03 cut into strokes → 04 DTW match → 05 sensitivity │
-   │   06 sweep every (sessions × legitimate × impostor) cell                                 │
-   │   07 draw the strokes   08 run the notebook   09 draw matched pairs   10 genuine check   │
-   │   11 accuracy per user across the runs of one hash folder                               │
-   │   13 best sensitivity and sessions per split (from 11's accuracy.csv)                   │
-   │   14 cohort scoring: closer to the claimed user than to other people? (EER vs 13)       │
-   │   15 new-seed check: 13's and 14's chosen settings, unchanged, on new seeds             │
-   │   16 draw 14's scoring: strokes vs nearest strokes per library; scores per split        │
+   │   06 draw the strokes   07 run the notebook   08 draw matched pairs   09 genuine check   │
+   │   10 accuracy per user across the runs of one hash folder                               │
+   │   12 best sensitivity and sessions per split (from 10's accuracy.csv)                   │
+   │   13 cohort scoring: closer to the claimed user than to other people? (EER vs 12)       │
+   │   14 new-seed check: 12's and 13's chosen settings, unchanged, on new seeds             │
+   │   15 draw 13's scoring: strokes vs nearest strokes per library; scores per split        │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -32,16 +31,15 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 03 | [03_chunk_shapes.md](03_chunk_shapes.md) | Pause/click segmentation into strokes; translation + scale normalization; arc-length resampling |
 | 04 | [04_match_shapes.md](04_match_shapes.md) | Banded (Sakoe–Chiba) Dynamic Time Warping with early abandoning; ratio rules for session and user |
 | 05 | [05_sensitivity.md](05_sensitivity.md) | Sensitivity (formerly threshold) = matched impostor users / all impostor users |
-| 06 | [06_sweep.md](06_sweep.md) | Full factorial sweep with nested draws; saturation (flat-from) and biggest-jump detection |
-| 07 | [07_plot_shapes.md](07_plot_shapes.md) | Plot every raw stroke (parallel workers) |
-| 08 | [08_run_notebook.md](08_run_notebook.md) | Execute the session-progression notebook for a run |
-| 09 | [09_plot_matches.md](09_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
-| 10 | [10_genuine_check.md](10_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
-| 11 | [11_plot_accuracy.md](11_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
-| 13 | [13_pick_best.md](13_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
-| 14 | [14_cohort_score.md](14_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
-| 15 | [15_seed_check.md](15_seed_check.md) | Settings chosen on the training seed by 13 and 14, applied unchanged to new seeds; train vs test user accuracy |
-| 16 | [16_plot_cohort.md](16_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
+| 06 | [06_plot_shapes.md](06_plot_shapes.md) | Plot every raw stroke (parallel workers) |
+| 07 | [07_run_notebook.md](07_run_notebook.md) | Execute the session-progression notebook for a run |
+| 08 | [08_plot_matches.md](08_plot_matches.md) | Find and draw the first matching user stroke for every matched impostor stroke |
+| 09 | [09_genuine_check.md](09_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
+| 10 | [10_plot_accuracy.md](10_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
+| 12 | [12_pick_best.md](12_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
+| 13 | [13_cohort_score.md](13_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
+| 14 | [14_seed_check.md](14_seed_check.md) | Settings chosen on the training seed by 12 and 13, applied unchanged to new seeds; train vs test user accuracy |
+| 15 | [15_plot_cohort.md](15_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
 
 ## Words used on every page
 

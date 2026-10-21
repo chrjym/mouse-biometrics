@@ -4,7 +4,7 @@
 
 ## What it does
 
-Step 4 of the single trial, and the matching engine used by scripts 06, 09 and 10. For every impostor
+Step 4 of the single trial, and the matching engine used by scripts 08 and 09. For every impostor
 session it asks: **how many of its strokes have a near-identical stroke in a legitimate user's library?** Then it
 decides, in three levels (stroke → session → user), whether the impostor "matched" that user.
 

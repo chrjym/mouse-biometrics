@@ -14,15 +14,14 @@ unless a section says otherwise. `runs/` is git-ignored, so copies of the exampl
 2. [Which figures to read, in what order](#2-which-figures-to-read-in-what-order)
 3. [Shapes of single strokes](#3-shapes-of-single-strokes-d) (D)
 4. [Notebook: one run, sessions 1 → N](#4-notebook-one-run-sessions-1--n-a) (A)
-5. [Sweep](#5-sweep-b) (B)
-6. [Find the sensitivity and the sessions](#6-find-the-sensitivity-and-the-sessions-e-f) (E, F)
-7. [Matched shapes and the genuine check](#7-matched-shapes-and-the-genuine-check-g-h) (G, H)
-8. [Sessions through across the runs of a batch](#8-sessions-through-across-the-runs-of-a-batch-i) (I)
-9. [The best sensitivity and sessions](#9-the-best-sensitivity-and-sessions-j) (J)
-10. [Cohort scoring](#10-cohort-scoring-k) (K)
-11. [What cohort scoring does, stroke by stroke](#11-what-cohort-scoring-does-stroke-by-stroke-m) (M)
-12. [New-seed check](#12-new-seed-check-l) (L)
-13. [Mistakes to avoid when reading them](#13-mistakes-to-avoid-when-reading-them)
+5. [Find the sensitivity and the sessions](#5-find-the-sensitivity-and-the-sessions-e-f) (E, F)
+6. [Matched shapes and the genuine check](#6-matched-shapes-and-the-genuine-check-g-h) (G, H)
+7. [Sessions through across the runs of a batch](#7-sessions-through-across-the-runs-of-a-batch-i) (I)
+8. [The best sensitivity and sessions](#8-the-best-sensitivity-and-sessions-j) (J)
+9. [Cohort scoring](#9-cohort-scoring-k) (K)
+10. [What cohort scoring does, stroke by stroke](#10-what-cohort-scoring-does-stroke-by-stroke-m) (M)
+11. [New-seed check](#11-new-seed-check-l) (L)
+12. [Mistakes to avoid when reading them](#12-mistakes-to-avoid-when-reading-them)
 
 The letters match the sections of [README.md](README.md).
 
@@ -55,12 +54,12 @@ apart in that setting, however the bars or colours look.
 
 For the thesis question ("do short mouse strokes identify a user?"):
 
-1. **Section 3 (shape PNGs)** and **section 7 (matched shapes)**: what strokes look like, and why they match across
+1. **Section 3 (shape PNGs)** and **section 6 (matched shapes)**: what strokes look like, and why they match across
    users.
-2. **Section 8 (sessions through)**: the raw counts per user for every run.
-3. **Section 9 (best heatmaps)**: which sensitivity and session count work best per split.
-4. **Sections 10 and 11 (cohort)**: whether comparing against other people helps, and why it mostly does not.
-5. **Section 12 (seed check)**: whether any of the "best" settings hold on new users and sessions. **This is the
+2. **Section 7 (sessions through)**: the raw counts per user for every run.
+3. **Section 8 (best heatmaps)**: which sensitivity and session count work best per split.
+4. **Sections 9 and 10 (cohort)**: whether comparing against other people helps, and why it mostly does not.
+5. **Section 11 (seed check)**: whether any of the "best" settings hold on new users and sessions. **This is the
    figure that decides what can be claimed.**
 
 ---
@@ -105,20 +104,7 @@ session at a time (step *k* + 1 keeps the sessions of step *k*).
 - Columns that are all the same (as in the example) mean the first legitimate user already matches every impostor
   that the others would; adding users adds nothing.
 
-## 5. Sweep (B)
-
-Folder: `runs/<hash>/<run>/figures/`. Averages over `n_trials` random draws.
-
-- **`sweep_heatmaps.png`**: one heatmap per session count; **x** = legitimate users, **y** = impostors, colour = mean
-  sensitivity (share of impostors matched, 0.1 steps). Darker = more impostors got in.
-- **`sweep_lines.png`**: the same sensitivity against one axis (sessions, legitimate users or impostors), one line per
-  value of a second axis, averaged over the third. A flat line means that axis does not matter; `saturation.csv`
-  says where each line flattens.
-
-Earlier result (sensitivity 0.02): sessions per user drive the share (1 → 2 sessions jumps about 0.2, flat from
-about 4), more legitimate users add a slow rise, and the impostor count barely matters.
-
-## 6. Find the sensitivity and the sessions (E, F)
+## 5. Find the sensitivity and the sessions (E, F)
 
 Folder: `runs/<hash>/<run>/figures/`.
 
@@ -132,20 +118,20 @@ Folder: `runs/<hash>/<run>/figures/`.
 **Good result:** both graphs high at the same line. With the adviser's tolerances 0.2–1.0, every legitimate user and
 every impostor went through (legitimate graph at 1, impostor graph at 0).
 
-## 7. Matched shapes and the genuine check (G, H)
+## 6. Matched shapes and the genuine check (G, H)
 
-- **`figures/matches/<user>_sessions<k>.png`** (script 09): each panel is one matched pair after normalization: the
+- **`figures/matches/<user>_sessions<k>.png`** (script 08): each panel is one matched pair after normalization: the
   legitimate user's stroke (blue) and the impostor stroke that matched it (red dashed), start in green, with the DTW
   cost per point. The title repeats each impostor's verdict. **What we saw:** most matched pairs are near-straight
   lines, which look the same for everyone after normalization.
-- **`figures/genuine_check.png`** (script 10): one panel per legitimate user; blue bars = share of strokes matched
+- **`figures/genuine_check.png`** (script 09): one panel per legitimate user; blue bars = share of strokes matched
   in the user's **own** unused sessions, red bars = the impostors' share, per session step; labels =
   sessions passed / tested; dotted line = `match_shape_ratio`. **Good result:** blue clearly above red and above the
   dotted line.
 
-## 8. Sessions through across the runs of a batch (I)
+## 7. Sessions through across the runs of a batch (I)
 
-**File:** `runs/<hash>/accuracy_<L>_<I>_sensitivity_<value>.png` (script 11), one per split and sensitivity
+**File:** `runs/<hash>/accuracy_<L>_<I>_sensitivity_<value>.png` (script 10), one per split and sensitivity
 (450 for `251ea4`).
 
 ![Sessions through, 3 vs 7, sensitivity 0.03](docs/figures/accuracy_3_7_sensitivity_0.03.png)
@@ -163,12 +149,12 @@ the same height. At 30 sessions, user7 passes 26 of 30 own sessions, but user29 
 The method cannot separate them: whatever lets the legitimate user in also lets the impostors in. Only user21 is
 consistently harder to pass as.
 
-**Also in the hash folder:** `summary/README.md` (written by the batch, script 12): a table of every run (legitimate
+**Also in the hash folder:** `summary/README.md` (written by the batch, script 11): a table of every run (legitimate
 passed and accepted, impostors passed and through) with links to these figures.
 
-## 9. The best sensitivity and sessions (J)
+## 8. The best sensitivity and sessions (J)
 
-**File:** `runs/<hash>/best/best_heatmaps.png` (script 13).
+**File:** `runs/<hash>/best/best_heatmaps.png` (script 12).
 
 ![Best heatmaps](docs/figures/best_heatmaps.png)
 
@@ -183,29 +169,29 @@ passed and accepted, impostors passed and through) with links to these figures.
 white. The best cell is 0.03 / 8 sessions in 7 of 9 splits, at 0.52–0.71. In 8–2 and 9–1 nothing beats chance, so
 the "best" box sits on 0.01 / 2 sessions, where nobody goes through.
 
-**Also in `best/`:** `best.csv` (the boxed cells), `scores.csv` (every cell) and a copy of section 8's figure for
+**Also in `best/`:** `best.csv` (the boxed cells), `scores.csv` (every cell) and a copy of section 7's figure for
 each chosen split and sensitivity.
 
-## 10. Cohort scoring (K)
+## 9. Cohort scoring (K)
 
-**File:** `runs/<hash>/cohort/cohort.png` (script 14).
+**File:** `runs/<hash>/cohort/cohort.png` (script 13).
 
 ![Cohort scoring](docs/figures/cohort.png)
 
 - **Left, EER per split:** x = sessions per user, **y = EER (lower = better, 0.5 = chance, dotted line)**. Solid
   lines with dots = cohort score, dashed = raw distance; one colour per split.
-- **Right, best user accuracy per split:** grey = script 13's sensitivity matching, light blue = raw distance,
+- **Right, best user accuracy per split:** grey = script 12's sensitivity matching, light blue = raw distance,
   dark blue = cohort. **Higher = better, 0.5 = chance.** The title warns that these are tuned on the same sessions.
 
 **How to read the example:** the solid lines sit below the dashed ones in most splits and session counts (at 2–4
 sessions, cohort EER 0.25–0.50 against raw 0.30–0.72), so comparing with other people helps there; both rise
 toward 0.45–0.50 by 10 sessions. On the
-right, cohort is the tallest bar in every split. The right panel is optimistic: section 12 shows how much of it
+right, cohort is the tallest bar in every split. The right panel is optimistic: section 11 shows how much of it
 survives on new seeds.
 
-## 11. What cohort scoring does, stroke by stroke (M)
+## 10. What cohort scoring does, stroke by stroke (M)
 
-Folder: `runs/<hash>/cohort/plots/` (script 16).
+Folder: `runs/<hash>/cohort/plots/` (script 15).
 
 ### `claim_<user>_genuine.png`, `claim_<user>_impostor_typical.png`, `claim_<user>_impostor_top.png`
 
@@ -244,13 +230,13 @@ session with **one stroke** that happens to rank 1.00, so the whole session scor
   rows overlap almost completely around 0.4–0.6. On sessions with 30+ strokes, genuine claims average 0.514 and
   impostor claims 0.499.
 
-## 12. New-seed check (L)
+## 11. New-seed check (L)
 
-**File:** `runs/<hash>/seed_check/seed_check.png` (script 15).
+**File:** `runs/<hash>/seed_check/seed_check.png` (script 14).
 
 ![Seed check](docs/figures/seed_check.png)
 
-- **One panel per method:** script 13's sensitivity matching, script 14's raw distance, script 14's cohort.
+- **One panel per method:** script 12's sensitivity matching, script 13's raw distance, script 13's cohort.
 - Per split: **light bar** = user accuracy on the seed where the setting was chosen (927); **dark bar** = the mean
   over the new seeds (928–930), with the setting **unchanged**; **black dots** = each new seed.
 - **0.5 = chance** (dotted line).
@@ -264,14 +250,14 @@ and 0.82 → 0.42 (cohort). Cohort falls the most because it tunes a threshold p
 **below** 0.5 mean the threshold from seed 927 rejects the new users' own sessions while still letting their
 impostors in.
 
-## 13. Mistakes to avoid when reading them
+## 12. Mistakes to avoid when reading them
 
-- **Treating a "best" value as a result.** Sections 9 and 10 show the best of thousands of settings, chosen on the
-  same data. Only section 12 tests a setting on data it was not chosen on.
-- **Comparing y axes across figures.** In section 8 the y axis is a session *count* that goes up to *k*; compare a
+- **Treating a "best" value as a result.** Sections 8 and 9 show the best of thousands of settings, chosen on the
+  same data. Only section 11 tests a setting on data it was not chosen on.
+- **Comparing y axes across figures.** In section 7 the y axis is a session *count* that goes up to *k*; compare a
   line with its own maximum, not with another figure.
-- **Reading "sensitivity" the same way everywhere.** In sections 8–10 it is the DTW tolerance (lower = stricter). In
-  the notebook and sweep heatmaps (sections 4–6) the colour called sensitivity is the **share of impostors
+- **Reading "sensitivity" the same way everywhere.** In sections 7–9 it is the DTW tolerance (lower = stricter). In
+  the notebook heatmaps (section 4) the colour called sensitivity is the **share of impostors
   matched** (lower = better).
 - **Reading colour without the midpoint.** In `best_heatmaps.png` white is chance (0.5), not zero; red cells are
   *worse* than chance.
