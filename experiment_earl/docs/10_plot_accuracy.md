@@ -1,6 +1,6 @@
-# `16_plot_accuracy.py`: how many sessions go through, per user, across runs
+# `10_plot_accuracy.py`: how many sessions go through, per user, across runs
 
-[← index](README.md) · previous: [15](15_genuine_check.md) · next: [18](18_pick_best.md)
+[← index](README.md) · previous: [09](09_genuine_check.md) · next: [12](12_pick_best.md)
 
 ## What it does
 
@@ -24,7 +24,7 @@ through, best profile per run and user) and `runs/<hash>/accuracy_<n_legitimate>
 
 ```
 for each run folder under runs/<hash>/ (its own config.yaml snapshot):
-    legitimate, impostors, order ← 14.draw_users(config, seed)       # the notebook's draw
+    legitimate, impostors, order ← 08.draw_users(config, seed)       # the notebook's draw
     k ← sessions_per_user;  library[u] ← u's first k sessions
     legitimate u: test u's last k sessions of the pool against library[u]
     impostor v:   test v's first k sessions against every library[u]; keep the profile with most sessions passed

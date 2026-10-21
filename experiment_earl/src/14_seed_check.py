@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""New-seed check: the settings 18 (sensitivity matching) and 19 (raw, cohort) choose on the hash folder's seed, applied unchanged to new seeds; saved to runs/<hash>/seed_check/."""
+"""New-seed check: the settings 12 (sensitivity matching) and 13 (raw, cohort) choose on the hash folder's seed, applied unchanged to new seeds; saved to runs/<hash>/seed_check/."""
 
 import argparse
 from importlib import import_module
@@ -14,17 +14,17 @@ import pandas as pd
 
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
-accuracy_mod = import_module("16_plot_accuracy")
-cohort_mod = import_module("19_cohort_score")
+accuracy_mod = import_module("10_plot_accuracy")
+cohort_mod = import_module("13_cohort_score")
 
 ROOT = Path(__file__).resolve().parents[1]
 SPLIT = ["n_legitimate", "n_impostor"]
 METHODS = ("match", "raw", "cohort")
-LABELS = {"match": "18: sensitivity matching", "raw": "19: raw distance", "cohort": "19: cohort"}
+LABELS = {"match": "12: sensitivity matching", "raw": "13: raw distance", "cohort": "13: cohort"}
 
 
 def choose_cohort(cells: pd.DataFrame) -> pd.DataFrame:
-    """19's choice per split and method on the training seed: sessions and threshold with the best user accuracy
+    """13's choice per split and method on the training seed: sessions and threshold with the best user accuracy
     (ties: session accuracy, then fewer sessions)."""
     ranked = cells.sort_values(SPLIT + ["method", "user_accuracy", "session_accuracy", "sessions"],
                                ascending=[True, True, True, False, False, True])
@@ -48,7 +48,7 @@ def test_cohort(chosen: pd.DataFrame, sessions: pd.DataFrame, users: list[str], 
 
 
 def test_match(chosen: pd.DataFrame, config: dict, seed: int) -> list[dict]:
-    """18's chosen sensitivity and sessions per split, scored with 16's rules on another seed's draw."""
+    """12's chosen sensitivity and sessions per split, scored with 10's rules on another seed's draw."""
     rows = []
     for row in chosen.itertuples():
         run = {**config, "seed": seed, "n_legitimate": row.n_legitimate, "n_impostor": row.n_impostor,
@@ -117,15 +117,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("hash", nargs="?", help="folder under runs/ (default: the one config.yaml selects)")
     parser.add_argument("--test-seeds", type=int, nargs="+", help="new seeds to test on (default: seed + 1 ... seed + 3)")
-    parser.add_argument("--max-sessions", type=int, default=10, help="as in 19: highest sessions per user to choose from")
-    parser.add_argument("--strokes-per-session", type=int, default=40, help="as in 19: library strokes per session")
-    parser.add_argument("--cap", type=float, default=0.5, help="as in 19: DTW cost per point treated as equally far")
+    parser.add_argument("--max-sessions", type=int, default=10, help="as in 13: highest sessions per user to choose from")
+    parser.add_argument("--strokes-per-session", type=int, default=40, help="as in 13: library strokes per session")
+    parser.add_argument("--cap", type=float, default=0.5, help="as in 13: DTW cost per point treated as equally far")
     args = parser.parse_args()
     group = cfg_mod.RUNS / (args.hash or cfg_mod.run_folder_name(cfg_mod.load_config()).split("/")[0])
     folders = sorted(p.parent for p in group.glob("*/config.yaml"))
     baseline_path = group / "best" / "best.csv"
     if not folders or not baseline_path.exists():
-        raise SystemExit(f"Needs run folders and {baseline_path}: run 16 and 18 on {group.name} first")
+        raise SystemExit(f"Needs run folders and {baseline_path}: run 10 and 12 on {group.name} first")
     config = cfg_mod.load_config(folders[0] / "config.yaml")
     runs = [cfg_mod.load_config(f / "config.yaml") for f in folders]
     splits = sorted({(c["n_legitimate"], c["n_impostor"]) for c in runs})

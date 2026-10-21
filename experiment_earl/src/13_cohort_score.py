@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cohort scoring for one hash folder: a session counts for its claimed user only if its strokes lie closer to that user's library than to other people's; EER and best user accuracy per split, next to 18's, in runs/<hash>/cohort/."""
+"""Cohort scoring for one hash folder: a session counts for its claimed user only if its strokes lie closer to that user's library than to other people's; EER and best user accuracy per split, next to 12's, in runs/<hash>/cohort/."""
 
 import argparse
 import pickle
@@ -17,7 +17,7 @@ from numba import njit, prange
 
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
-plot_mod = import_module("14_plot_matches")
+plot_mod = import_module("08_plot_matches")
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE_PATH = cfg_mod.CACHE_DIR / "nearest.pkl"
@@ -173,7 +173,7 @@ def eer(genuine: np.ndarray, impostor: np.ndarray) -> float:
 
 
 def at_threshold(part: pd.DataFrame, legit: list[str], method: str, ratio: float, t: float) -> dict:
-    """Users through at acceptance threshold `t` (18's rule: a user is through at `ratio` of their sessions accepted;
+    """Users through at acceptance threshold `t` (12's rule: a user is through at `ratio` of their sessions accepted;
     an impostor at `ratio` against any one legitimate user), user accuracy and session accuracy."""
     genuine, impostor = part[part.genuine], part[~part.genuine]
     legit_share = genuine.assign(ok=genuine[method] >= t).groupby("author")["ok"].mean()
@@ -222,7 +222,7 @@ def score_cells(sessions: pd.DataFrame, users: list[str], splits: list[tuple[int
 
 def pick_best(cells: pd.DataFrame, baseline: pd.DataFrame | None) -> pd.DataFrame:
     """Per split and method, the session count with the highest user accuracy (ties: session accuracy, then fewer
-    sessions), next to 18's best (sensitivity matching) for the same split."""
+    sessions), next to 12's best (sensitivity matching) for the same split."""
     ranked = cells.sort_values(["n_legitimate", "n_impostor", "method", "user_accuracy", "session_accuracy", "sessions"],
                                ascending=[True, True, True, False, False, True])
     best = ranked.groupby(["n_legitimate", "n_impostor", "method"], as_index=False).head(1)
@@ -240,7 +240,7 @@ def pick_best(cells: pd.DataFrame, baseline: pd.DataFrame | None) -> pd.DataFram
 
 def plot(cells: pd.DataFrame, best: pd.DataFrame, path: Path, title: str) -> None:
     """Left: EER per sessions per user, one line per split (solid = cohort, dashed = raw). Right: best user accuracy
-    per split for 18's sensitivity matching and the two scores here."""
+    per split for 12's sensitivity matching and the two scores here."""
     fig, (left, right) = plt.subplots(1, 2, figsize=(14, 5), layout="constrained")
     splits = list(best[["n_legitimate", "n_impostor"]].itertuples(index=False, name=None))
     colours = plt.cm.viridis(np.linspace(0, 0.9, len(splits)))
@@ -258,7 +258,7 @@ def plot(cells: pd.DataFrame, best: pd.DataFrame, path: Path, title: str) -> Non
     left.grid(alpha=0.3)
 
     x = np.arange(len(splits))
-    bars = [("match", "18: sensitivity matching", "#bbbbbb"), ("raw", "raw distance", "#7aa6c2"),
+    bars = [("match", "12: sensitivity matching", "#bbbbbb"), ("raw", "raw distance", "#7aa6c2"),
             ("cohort", "cohort", "#1f5f8b")]
     bars = [b for b in bars if f"{b[0]}_user_accuracy" in best]
     width = 0.8 / len(bars)

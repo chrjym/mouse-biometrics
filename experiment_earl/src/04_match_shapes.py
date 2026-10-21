@@ -13,7 +13,7 @@ cfg_mod = import_module("00_config")
 chunk_mod = import_module("03_chunk_shapes")
 
 _PAIRS: dict = {}     # (query session, library session, settings) -> {kind: bool array per query chunk}
-_SESSIONS: dict = {}  # (dataset path, segmentation) -> Session, so sweeps chunk each file once
+_SESSIONS: dict = {}  # (dataset path, segmentation) -> Session, so each file is chunked once
 CACHE_PATH = cfg_mod.CACHE_DIR / "pairs.pkl"
 
 

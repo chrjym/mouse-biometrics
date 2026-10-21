@@ -1,4 +1,4 @@
-# `07_plot_shapes.py`: draw every stroke as an image
+# `06_plot_shapes.py`: draw every stroke as an image
 
 [← index](README.md)
 

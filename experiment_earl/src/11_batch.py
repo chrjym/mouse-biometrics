@@ -62,7 +62,7 @@ def run_one(name: str, overrides: dict, original: str, timeout: int) -> tuple[st
     else:
         cfg_mod.create_run(folder, set_values(original, overrides))
     try:
-        result = subprocess.run([sys.executable, str(ROOT / "src" / "08_run_notebook.py"), "--run", name,
+        result = subprocess.run([sys.executable, str(ROOT / "src" / "07_run_notebook.py"), "--run", name,
                                  "--timeout", str(timeout)],
                                 cwd=ROOT.parent, capture_output=True, text=True)
     except OSError as error:
@@ -79,7 +79,7 @@ def main() -> None:
     parser.add_argument("--only", type=float, help="run a single sensitivity, e.g. 0.2 (quick test)")
     parser.add_argument("--dry-run", action="store_true", help="list the runs and whether each is done, run nothing")
     parser.add_argument("--timeout", type=int, default=3600, help="seconds allowed per notebook run")
-    parser.add_argument("--no-plot", action="store_true", help="skip the accuracy plots (16_plot_accuracy.py) at the end")
+    parser.add_argument("--no-plot", action="store_true", help="skip the accuracy plots (10_plot_accuracy.py) at the end")
     args = parser.parse_args()
 
     runs = plan_runs(yaml.safe_load(args.plan.read_text()), args.only)
@@ -131,13 +131,13 @@ def main() -> None:
 
 
 def plot_groups(groups: list[str]) -> None:
-    """Run 16_plot_accuracy.py on each hash folder the plan used."""
+    """Run 10_plot_accuracy.py on each hash folder the plan used."""
     for group in groups:
-        print(f"\nPlotting runs/{group} (16_plot_accuracy.py) ...", flush=True)
-        result = subprocess.run([sys.executable, str(ROOT / "src" / "16_plot_accuracy.py"), group], cwd=ROOT.parent)
+        print(f"\nPlotting runs/{group} (10_plot_accuracy.py) ...", flush=True)
+        result = subprocess.run([sys.executable, str(ROOT / "src" / "10_plot_accuracy.py"), group], cwd=ROOT.parent)
         if result.returncode != 0:
             print(f"Plotting runs/{group} failed (exit code {result.returncode}); rerun: "
-                  f".venv/bin/python experiment_earl/src/16_plot_accuracy.py {group}")
+                  f".venv/bin/python experiment_earl/src/10_plot_accuracy.py {group}")
         else:
             summarize_group(cfg_mod.RUNS / group)
 
@@ -161,7 +161,7 @@ def summarize_group(group: Path) -> None:
     summary.to_csv(out / "summary.csv", index=False)
 
     lines = [f"# Results of runs/{group.name}", "",
-             f"Updated {datetime.now():%Y-%m-%d %H:%M} by `17_batch.py`. Settings shared by every run: "
+             f"Updated {datetime.now():%Y-%m-%d %H:%M} by `11_batch.py`. Settings shared by every run: "
              f"[`{summary.run.iloc[0]}/config.yaml`](../{summary.run.iloc[0]}/config.yaml).", "",
              "## Results per run", "",
              "Legitimate = own tested sessions that pass their own profile (higher is better). "
@@ -177,7 +177,7 @@ def summarize_group(group: Path) -> None:
                                                  for s in sorted(part.sensitivity.unique())))
     lines += ["", "## Files", "",
               "- `summary/summary.csv`: the table above",
-              "- `accuracy.csv`: every run and user (from `16_plot_accuracy.py`)",
+              "- `accuracy.csv`: every run and user (from `10_plot_accuracy.py`)",
               "- `accuracy_<legit>_<impostor>_sensitivity_<value>.png`: the plots",
               "- `<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>/`: one folder per run (results/, figures/, notebooks/)",
               "- `../batch_log.csv`: which runs finished or failed, and how long each took", ""]

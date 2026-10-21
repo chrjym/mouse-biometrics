@@ -8,7 +8,7 @@ Step 1 of the single file-based trial (01 → 05). It randomly picks which Balab
 users (their strokes form the profiles) and which act as **impostors** (their strokes are tested against the
 profiles). It writes the choice to `runs/<run>/temp/manifest.json`.
 
-Scripts 10, 11, 12 and 13 also call its `draw_users()` to choose the users of their headline row, so all methods
+Scripts 08, 09, 10 and 13 also call its `draw_users()` to choose the users of their headline row, so all methods
 are scored on the same people.
 
 ## Algorithm: seeded sampling without replacement
@@ -40,7 +40,7 @@ original plan's 5/10/15/20 impostors cannot be done here. The script stops with 
 - **One draw per run (user decision, 2026-10-12):** once the seed picks the users, they stay fixed for the whole
   run. Every step and every figure is then about the same people.
 
-Script 14's `draw_users` makes the same two `sample` calls with the same generator, so it picks the **same
+Script 08's `draw_users` makes the same two `sample` calls with the same generator, so it picks the **same
 sets**. It keeps the legitimate users in draw order instead of sorting them; this matters only for the
 notebook's heatmap columns.
 

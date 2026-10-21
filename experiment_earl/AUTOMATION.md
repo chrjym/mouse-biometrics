@@ -1,6 +1,6 @@
-# How to run the automation (`17_batch.py`)
+# How to run the automation (`11_batch.py`)
 
-`src/17_batch.py` runs every simulation listed in `batch.yaml` with one command, then plots and summarizes the results. You only edit `batch.yaml`: the script never changes `config.yaml`. Each run gets its own `config.yaml` snapshot in its run folder.
+`src/11_batch.py` runs every simulation listed in `batch.yaml` with one command, then plots and summarizes the results. You only edit `batch.yaml`: the script never changes `config.yaml`. Each run gets its own `config.yaml` snapshot in its run folder.
 
 Run every command from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -9,7 +9,7 @@ Run every command from the **repository root** (`thesis-mouse-biometrics/`). On 
 | | |
 |---|---|
 | **Input** | `experiment_earl/batch.yaml` (what to run) + `experiment_earl/config.yaml` (every other setting) |
-| **Command** | `.venv/bin/python experiment_earl/src/17_batch.py` |
+| **Command** | `.venv/bin/python experiment_earl/src/11_batch.py` |
 | **Output** | `experiment_earl/runs/<hash>/`: one folder per run, accuracy plots, `summary/` overview; `runs/batch_log.csv` |
 
 ---
@@ -52,7 +52,7 @@ Every other setting (chunking, `dtw_band`, `match_shape_ratio`, `match_session_r
 ## Step 3: Check the plan (dry run)
 
 ```bash
-.venv/bin/python experiment_earl/src/17_batch.py --dry-run
+.venv/bin/python experiment_earl/src/11_batch.py --dry-run
 ```
 
 Lists every run and whether it is done already. Runs nothing and changes nothing.
@@ -69,7 +69,7 @@ The run name is `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>`, s
 ## Step 4: Run the batch
 
 ```bash
-.venv/bin/python experiment_earl/src/17_batch.py
+.venv/bin/python experiment_earl/src/11_batch.py
 ```
 
 What happens, in order:
@@ -77,12 +77,12 @@ What happens, in order:
 1. **For each run:**
    1. **Skip** it if its folder already has `results/session_progression.csv`.
    2. **Write** the run's own `config.yaml` (in its run folder): `config.yaml` with the run's `seed`, split, `sensitivity` and `sessions_per_user`.
-   3. **Simulate:** run `08_run_notebook.py` (pick users and sessions → cut strokes → DTW matching → decide which sessions and users pass).
+   3. **Simulate:** run `07_run_notebook.py` (pick users and sessions → cut strokes → DTW matching → decide which sessions and users pass).
    4. **Print** progress, e.g. `[7/225] efdc92/1_9_0.40_6 ... ok (0m 26s)`.
    5. **Log** one line to `runs/batch_log.csv`.
    6. If the run **fails**, note it and continue with the next.
 2. **Summary:** runs ok, skipped and failed, and a `git add` command for the new run folders.
-3. **Plot:** run `16_plot_accuracy.py` on the hash folder.
+3. **Plot:** run `10_plot_accuracy.py` on the hash folder.
 4. **Summarize:** write `summary/summary.csv` and `summary/README.md`.
 
 Options:
@@ -162,5 +162,5 @@ git pull --rebase && git push
 |---|---|
 | `config.yaml has no line '<key>: ...'` | A key in `config.yaml` was renamed or removed. Put it back as `<key>: <value>` at the start of a line. |
 | A run shows `failed` | Read its `error` in `batch_log.csv`, fix the cause, run the batch again (only missing runs run). |
-| `Plotting runs/<hash> failed` | The runs are kept. Rerun: `.venv/bin/python experiment_earl/src/16_plot_accuracy.py <hash>` |
+| `Plotting runs/<hash> failed` | The runs are kept. Rerun: `.venv/bin/python experiment_earl/src/10_plot_accuracy.py <hash>` |
 | Runs land in a new hash folder | A setting other than the five in `batch.yaml` differs from before. Check `config.yaml` with `git diff`. |

@@ -1,11 +1,11 @@
-# `18_pick_best.py`: the best sensitivity and sessions per split
+# `12_pick_best.py`: the best sensitivity and sessions per split
 
-[← index](README.md) · previous: [16](16_plot_accuracy.md) · next: [19](19_cohort_score.md)
+[← index](README.md) · previous: [10](10_plot_accuracy.md) · next: [13](13_cohort_score.md)
 
 ## What it does
 
-Reads `runs/<hash>/accuracy.csv` (written by [16](16_plot_accuracy.md)), scores every (split, sensitivity,
-`sessions_per_user`) cell, and keeps the best cell of each split (`n_legitimate`, `n_impostor`). Run 16 first.
+Reads `runs/<hash>/accuracy.csv` (written by [10](10_plot_accuracy.md)), scores every (split, sensitivity,
+`sessions_per_user`) cell, and keeps the best cell of each split (`n_legitimate`, `n_impostor`). Run 10 first.
 
 Outputs, in a new folder `runs/<hash>/best/` (emptied and rewritten on every run):
 
@@ -15,7 +15,7 @@ Outputs, in a new folder `runs/<hash>/best/` (emptied and rewritten on every run
 - `best_rows.csv`: the rows of `accuracy.csv` for the chosen cells only (one per user).
 - `best_heatmaps.png`: one heatmap per split (y = sensitivity, x = sessions per user, colour = user accuracy,
   white = chance), the chosen cell boxed. Sensitivities above the last one where any cell differs from 0.5 are cut.
-- `accuracy_<L>_<I>_sensitivity_<value>.png`: a copy of 16's figure for each chosen split and sensitivity.
+- `accuracy_<L>_<I>_sensitivity_<value>.png`: a copy of 10's figure for each chosen split and sensitivity.
 
 ## Algorithm
 

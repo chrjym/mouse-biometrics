@@ -9,6 +9,7 @@ venv/
 experiment_earl/runs/
 experiment_earl/runs_temp/
 experiment_earl/cache/
+experiment_earl/initial_data/
 
 # Local scratch prompt (see CLAUDE.md)
 temp.md

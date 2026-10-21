@@ -13,7 +13,7 @@ import pandas as pd
 
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
-plot_mod = import_module("14_plot_matches")
+plot_mod = import_module("08_plot_matches")
 
 
 def score(user: str, sessions: list[tuple[str, str]], library: list, kind: str, profile: str, k: int,

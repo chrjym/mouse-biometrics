@@ -1,6 +1,6 @@
 # `05_sensitivity.py`: the sensitivity of a trial
 
-[← index](README.md) · previous: [04](04_match_shapes.md) · next: [06](06_sweep.md)
+[← index](README.md) · previous: [04](04_match_shapes.md) · next: [06](06_plot_shapes.md)
 
 ## What it does
 
@@ -27,7 +27,7 @@ drawn on the 0–1 heatmap.
 ## Why a share and not a count
 
 Dividing by the number of impostors puts trials with 1, 2 or 4 impostors on the same 0–1 scale, so they can be
-compared and averaged. As a result, the sensitivity barely changes with the number of impostors in the sweep (06).
+compared and averaged. As a result, the sensitivity barely changes with the number of impostors.
 
 ## Algorithm
 
