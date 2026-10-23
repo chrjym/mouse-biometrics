@@ -171,9 +171,7 @@ def main() -> None:
         part.to_csv(path.with_suffix(".tmp"), index=False)
         path.with_suffix(".tmp").replace(path)
         parts.append(part)
-        best = part.loc[part["balanced_accuracy"].idxmax()]
-        print(f"[{legit_n} L, {impostor_n} I] best balanced accuracy {best['balanced_accuracy']:.3f} at sensitivity "
-              f"{best['sensitivity']:.2f}, {best['sessions']:g} sessions")
+        print(f"[{legit_n} L, {impostor_n} I] done")
     out = folder / "confusion.csv"
     pd.concat(parts).to_csv(out, index=False)
     print(f"{len(plan['splits'])} splits x {plan['max_sessions']} sessions x {len(plan['sensitivities'])} sensitivities "
