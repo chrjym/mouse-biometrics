@@ -83,8 +83,17 @@ def list_users(config: dict) -> list[str]:
 
 
 def list_sessions(config: dict, user: str) -> list[Path]:
-    """Every session of `user`: Balabit's training and test files were merged into one folder per user (adviser, 2026-10-14)."""
-    return sorted(p for p in (ROOT / config["dataset_dir"] / user).iterdir() if p.is_file())
+    """Every session of `user`: Balabit's training and test files were merged into one folder per user (adviser, 2026-10-14).
+    Sessions that `labels_file` marks is_illegal=1 were recorded by someone else and are left out."""
+    illegal = illegal_sessions(config)
+    return sorted(p for p in (ROOT / config["dataset_dir"] / user).iterdir() if p.is_file() and p.name not in illegal)
+
+
+def illegal_sessions(config: dict) -> set[str]:
+    if not config.get("labels_file"):
+        return set()
+    labels = pd.read_csv(ROOT / config["labels_file"])
+    return set(labels.loc[labels["is_illegal"] == 1, "filename"])
 
 
 def session_pool(config: dict, user: str, seed: int | None = None) -> list[tuple[str, str]]:

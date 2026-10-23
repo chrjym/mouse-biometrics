@@ -50,6 +50,7 @@ runs/1a2b3c/1_9_0.04_10/
 |---|---|---|---|
 | `seed` | 934 | 01, 02, 08, 09, notebook | Picks the users and sessions once (which users are legitimate, which are impostors, the order of each user's sessions). The same seed gives the same users and sessions, so a result can be repeated... |
 | `dataset_dir` | `datasets/balabit/users` | all | Balabit sessions, one folder per user (training and test files merged, adviser 2026-10-14), relative to `experiment_earl/`. A session belongs to the user whose folder it is in. |
+| `labels_file` | `datasets/balabit/public_labels.csv` | all | Balabit labels; sessions marked `is_illegal=1` (another person's session in this user's folder) are dropped. `null` keeps every session. |
 | `n_legitimate` | 3 | 01, notebook, 08, 09 | How many users are "legitimate" in a single trial or notebook run. Their shapes form the library that impostors are compared against. The notebook heatmap also shows the first 1, 2, ... up to this many of them. |
 | `n_impostor` | 2 | 01, notebook, 08, 09 | How many other users act as impostors in a single trial. Balabit has only 10 users, so `n_legitimate + n_impostor` must be 10 or less. |
 | `sessions_per_user` | 5 | 02, notebook, 08, 09 | Sessions drawn per user in a single trial. In the notebook it is the maximum: it tests 1, 2, ... up to this value, and the sessions of each step include those of the step before. At most 114 (user20); every script prints the limit. |

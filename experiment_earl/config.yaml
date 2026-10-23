@@ -12,8 +12,10 @@ sessions_per_user: 2       # sessions per user; the notebook tests 1, 2, ... up 
 
 # --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
 # training_files and test_files are merged into one folder per user (adviser, 2026-10-14).
-# A session belongs to the user whose folder it is in. No label file is used.
+# A session belongs to the user whose folder it is in, except Balabit's attack sessions (another person in this
+# user's folder): sessions that `labels_file` marks is_illegal=1 are dropped.
 dataset_dir: datasets/balabit/users   # relative to experiment_earl/
+labels_file: datasets/balabit/public_labels.csv   # null = keep every session (old behaviour)
 
 # --- Chunking (03): cut a session into strokes ---
 pause_gap_s: 0.5           # a pause longer than this many seconds starts a new chunk (clicks also split chunks)

@@ -1,0 +1,184 @@
+#!/usr/bin/env python3
+"""Sensitivity sweep of sweep.yaml: DTW distances once, then a confusion matrix (positive = impostor) per split x sessions x sensitivity -> runs/<hash>/sweep/."""
+
+import argparse
+import pickle
+from importlib import import_module
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import yaml
+from numba import njit, prange
+
+cfg_mod = import_module("00_config")
+match_mod = import_module("04_match_shapes")
+plot_mod = import_module("08_plot_matches")
+
+ROOT = Path(__file__).resolve().parents[1]
+CACHE_PATH = cfg_mod.CACHE_DIR / "distances.pkl"
+_DIST: dict = {}  # (query session, library session, segmentation, band) -> {kind: best DTW distance per query chunk}
+
+
+@njit(cache=True)
+def _dtw_cost(a, b, band, cap, prev, cur):
+    """Banded DTW cost between paths a and b, or inf once every cell exceeds `cap`."""
+    n = a.shape[0]
+    prev[:] = np.inf
+    prev[0] = 0.0
+    for i in range(n):
+        cur[:] = np.inf
+        row_min = np.inf
+        for j in range(max(0, i - band), min(n - 1, i + band) + 1):
+            dx, dy = a[i, 0] - b[j, 0], a[i, 1] - b[j, 1]
+            value = np.sqrt(dx * dx + dy * dy) + min(prev[j], prev[j + 1], cur[j])
+            cur[j + 1] = value
+            row_min = min(row_min, value)
+        if row_min > cap:
+            return np.inf
+        prev, cur = cur, prev
+    return prev[n]
+
+
+@njit(parallel=True, cache=True)
+def best_distance(queries, library, band, cap):
+    """Per query path: smallest DTW cost to any library path (inf if none is within `cap`)."""
+    n = queries.shape[1]
+    best = np.full(queries.shape[0], np.inf)
+    for q in prange(queries.shape[0]):
+        prev, cur = np.empty(n + 1), np.empty(n + 1)
+        for k in range(library.shape[0]):
+            cost = _dtw_cost(queries[q], library[k], band, min(cap, best[q]), prev, cur)
+            if cost < best[q]:
+                best[q] = cost
+    return best
+
+
+def load_plan() -> dict:
+    plan = yaml.safe_load((ROOT / "sweep.yaml").read_text())
+    for legit, impostor in plan["splits"]:
+        if legit + impostor > 10:
+            raise SystemExit(f"Split [{legit}, {impostor}] needs {legit + impostor} users; Balabit has 10")
+    start, stop, step = plan["sensitivity"]
+    plan["sensitivities"] = np.round(np.arange(start, stop + step / 2, step), 4)
+    return plan
+
+
+def pair_distance(query, library, config: dict, cap: float) -> dict[int, np.ndarray]:
+    """Best per-point DTW distance of every query chunk to the library session's chunks of the same kind."""
+    n = config["resample_n"]
+    key = (query.key, library.key, match_mod.segmentation(config), config["dtw_band"], cap)
+    if key not in _DIST:
+        band = int(round(config["dtw_band"] * n))
+        _DIST[key] = {kind: best_distance(paths, library.paths[kind], band, cap * n) / n
+                      if len(paths) and len(library.paths[kind]) else np.full(len(paths), np.inf)
+                      for kind, paths in query.paths.items()}
+    return _DIST[key]
+
+
+def session_curve(query, library: list, config: dict, cap: float) -> np.ndarray:
+    """(chunks, k) best distance of each query chunk to the first 1..k library sessions (running minimum)."""
+    columns = [np.concatenate([pair_distance(query, lib, config, cap)[kind] for kind in query.paths]) for lib in library]
+    return np.minimum.accumulate(np.stack(columns, axis=1), axis=1)
+
+
+def accepted(curve: np.ndarray, n_chunks: int, sensitivities: np.ndarray, ratio: float) -> np.ndarray:
+    """(k, sensitivity) bool: does the session pass a k-session library at each sensitivity?"""
+    matched = (curve[:, :, None] <= sensitivities[None, None, :]).sum(axis=0)
+    return matched / max(n_chunks, 1) >= ratio
+
+
+def sweep_split(legit_n: int, impostor_n: int, plan: dict, base: dict) -> pd.DataFrame:
+    """One row per (sessions, sensitivity) with TP/FP/FN/TN over test sessions and over users."""
+    config = {**base, "seed": plan["seed"], "n_legitimate": legit_n, "n_impostor": impostor_n}
+    legit, impostor, order = plot_mod.draw_users(config, plan["seed"])
+    m, sens, cap = plan["max_sessions"], plan["sensitivities"], float(plan["sensitivities"].max())
+    ratio, through = config["match_shape_ratio"], config["match_session_ratio"]
+    session = lambda user, item: match_mod.dataset_session(user, item[1], config, item[0])
+    libraries = {u: [session(u, s) for s in order[u][:m]] for u in legit}
+
+    def verdicts(user: str, tests: list, profiles: list[str]) -> np.ndarray:
+        """(sessions tested x profiles, k, sensitivity): one attempt per (session, profile) pair."""
+        out = []
+        for item in tests:
+            query = session(user, item)
+            out.extend(accepted(session_curve(query, libraries[p], config, cap), query.n_chunks, sens, ratio)
+                       for p in profiles)
+        return np.array(out)
+
+    # Legitimate: own last m sessions (never in a library) against own library; impostor: first m against each library
+    # as a separate attempt, so an impostor session gets one chance per attempt, like a legitimate session.
+    legit_acc = {u: verdicts(u, order[u][-m:], [u]) for u in legit}
+    impostor_acc = {u: verdicts(u, order[u][:m], legit) for u in impostor}
+    attempts = impostor_n * m * legit_n  # impostor (session, profile) pairs
+    tn = sum(a.sum(axis=0) for a in legit_acc.values())
+    fn = sum(a.sum(axis=0) for a in impostor_acc.values())
+    users_tn = sum(a.mean(axis=0) >= through for a in legit_acc.values())
+    users_fn = sum(a.mean(axis=0) >= through for a in impostor_acc.values())
+
+    k, s = np.meshgrid(np.arange(1, m + 1), sens, indexing="ij")
+    table = pd.DataFrame({"n_legitimate": legit_n, "n_impostor": impostor_n, "sessions": k.ravel(), "sensitivity": s.ravel(),
+                          "TP": (attempts - fn).ravel(), "FP": (legit_n * m - tn).ravel(),
+                          "FN": fn.ravel(), "TN": tn.ravel(),
+                          "users_TP": (impostor_n - users_fn).ravel(), "users_FP": (legit_n - users_tn).ravel(),
+                          "users_FN": users_fn.ravel(), "users_TN": users_tn.ravel()})
+    table["accuracy"] = (table["TP"] + table["TN"]) / (attempts + legit_n * m)
+    table["FAR"] = table["FN"] / attempts            # impostor attempts let in
+    table["FRR"] = table["FP"] / (legit_n * m)      # legitimate sessions rejected
+    table["balanced_accuracy"] = 1 - (table["FAR"] + table["FRR"]) / 2
+    table["users_accuracy"] = (table["users_TP"] + table["users_TN"]) / (legit_n + impostor_n)
+    table["legitimate"] = ",".join(legit)
+    table["impostor"] = ",".join(impostor)
+    return table
+
+
+def load_cache() -> None:
+    if CACHE_PATH.exists():
+        _DIST.update(pickle.loads(CACHE_PATH.read_bytes()))
+
+
+def save_cache() -> None:
+    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tmp = CACHE_PATH.with_suffix(".tmp")
+    with tmp.open("wb") as f:
+        pickle.dump(_DIST, f)
+    tmp.replace(CACHE_PATH)
+
+
+def out_folder(plan: dict, base: dict) -> Path:
+    """runs/<hash>/sweep/, the hash of config.yaml with sweep.yaml's seed (same rule as every other run)."""
+    return cfg_mod.RUNS / cfg_mod.run_folder_name({**base, "seed": plan["seed"]}).split("/")[0] / "sweep"
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.parse_args()
+    plan, base = load_plan(), cfg_mod.load_config()
+    if plan["max_sessions"] * 2 > cfg_mod.max_sessions(base):
+        raise SystemExit(f"max_sessions {plan['max_sessions']} x 2 exceeds the smallest pool ({cfg_mod.max_sessions(base)})")
+    folder = out_folder(plan, base)
+    (folder / "parts").mkdir(parents=True, exist_ok=True)
+    (folder / "sweep.yaml").write_text((ROOT / "sweep.yaml").read_text())
+    load_cache()
+    parts = []
+    for legit_n, impostor_n in plan["splits"]:
+        path = folder / "parts" / f"{legit_n}_{impostor_n}.csv"
+        if path.exists():  # finished earlier: resume
+            parts.append(pd.read_csv(path))
+            continue
+        part = sweep_split(legit_n, impostor_n, plan, base)
+        save_cache()
+        part.to_csv(path.with_suffix(".tmp"), index=False)
+        path.with_suffix(".tmp").replace(path)
+        parts.append(part)
+        best = part.loc[part["balanced_accuracy"].idxmax()]
+        print(f"[{legit_n} L, {impostor_n} I] best balanced accuracy {best['balanced_accuracy']:.3f} at sensitivity "
+              f"{best['sensitivity']:.2f}, {best['sessions']:g} sessions")
+    out = folder / "confusion.csv"
+    pd.concat(parts).to_csv(out, index=False)
+    print(f"{len(plan['splits'])} splits x {plan['max_sessions']} sessions x {len(plan['sensitivities'])} sensitivities "
+          f"= {sum(len(p) for p in parts)} confusion matrices\nOutput: {out}")
+
+
+if __name__ == "__main__":
+    main()
