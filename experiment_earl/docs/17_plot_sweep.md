@@ -5,7 +5,10 @@
 ## What it does
 
 Reads `runs/<hash>/sweep/confusion.csv` (written by [16](16_sweep_sensitivity.md)) and draws four figures into the
-same folder. No best setting is marked: see 16 for why.
+same folder. When [18](18_best_setting.md) has run, its choices are marked: on the line graph the split's best
+library size is an orange dotted line with a star at its best sensitivity, and on the heatmap the split's best is an
+orange star and each legitimate user's best a labelled circle. Each panel's box gives the pick-half and check-half
+balanced accuracy. Run 16 → 18 → 17.
 
 - `accuracy_vs_sensitivity.png`: one panel per split; balanced accuracy against sensitivity, one line per library
   size of 1, m/4, m/2 and m sessions (m = `sweep_sessions_max`), dashed line = chance (0.5).

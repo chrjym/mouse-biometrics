@@ -149,3 +149,6 @@ The check-half score is the one to report: the pick-half score is the highest of
 optimistic. A user is profiled reliably only when the check score stays close to the pick score and clearly
 above 0.5. The same is done per split, with its users' counts added.
 
+In the figures (run 16 → 18 → 17), the split's best is an orange star on the heatmap and on the accuracy line graph
+(with its library size as a dotted line), each user's best is a labelled circle on the heatmap, and each panel shows
+the pick → check balanced accuracy.
