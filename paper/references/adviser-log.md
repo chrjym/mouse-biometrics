@@ -20,6 +20,27 @@ Suggested format per entry:
 
 ---
 
+## [2026-10-24] — Sweep: seed (RNG) dependence and how the confusion matrix is counted
+
+**Context:** Group clarification of the sensitivity sweep (`experiment_earl/src/16_sweep_sensitivity.py`, `sweep.yaml`, run `19399f`), to bring to the adviser. Not adviser feedback yet.
+
+**Feedback:** None yet; to be presented at the next consultation.
+
+**Decisions (as the code stands):**
+- **Seed / RNG:** the whole sweep rests on one seed (`seed: 945` in `sweep.yaml`). It drives the two random draws of Earl's idea (#3 random users, #4 random sessions): `Random(seed)` picks the legitimate and impostor users (no overlap), and `Random(f"{seed}-{user}")` shuffles each user's sessions once. DTW distances and the sensitivity cut are deterministic, so the same seed gives the same results.
+- Each split re-draws from the same seed with a different `n_legitimate`, so the four splits (5L/1I, 1L/5I, 3L/2I, 2L/3I) contain different users; a user's session order is the same in every split.
+- Differences from `EARL_EXECUTION_PLAN.md`: the plan (step 4.2/4.4) averages `n_trials` draws with different seeds and reports mean ± SD; the sweep uses a single draw. Sessions are nested (library k+1 = library k plus one session; group decision 2026-10-12) instead of re-picked each time.
+- **Confusion matrix:** one full 2×2 matrix per (split, library size 1–40, sensitivity 0.01–1.00), 16,000 in `confusion.csv`. Positive class = impostor: TP = impostor rejected, FN = impostor accepted (FAR), FP = legitimate rejected (FRR), TN = legitimate accepted.
+- **What is appended:** every (test session, profile) attempt is one entry. Legitimate: each user's last 40 sessions against their own library only. Impostor: each impostor's first 40 sessions against every legitimate library as separate attempts (40 × L entries). Library sizes are a running minimum over the same distances and sensitivities are cuts on the same saved distances, so neither adds new tests. The four split files are concatenated at the end. A user-level matrix (`users_*`) counts a user as accepted when ≥ `match_session_ratio` of their attempts pass.
+- Caveat: the script reuses existing `sweep/parts/*.csv` files (resume), and the folder hash depends on the config, not the code; delete `parts/` before rerunning after a code change.
+
+**Open questions:**
+- Should the sweep run over several seeds (e.g. 945–954) and report mean ± SD per cell, as in Earl's plan? This overlaps the held-out-seed check (tune on one seed, test on others), which on 2026-10-19 fell to chance.
+- Is impostor = positive class the convention the adviser wants for FAR/FRR?
+- The sweep's `labels_file` filter (drops `is_illegal = 1` sessions) conflicts with the 2026-10-08 "no labels" decision; needs adviser sign-off.
+
+---
+
 ## [2026-10-14] — New experiment pipeline: experiments E_k, find the sensitivity, find the sessions
 
 **Context:** Consultation on the EARL shape-matching experiment; notes and whiteboard photo in `Queries.pdf` (random variables: user, session, sensitivity, data points; experiments: 1. move stroke, 2. user × user × sensitivity, 3. user × session × sensitivity; seed = 41 on the board).
