@@ -49,10 +49,8 @@ def best_text(b) -> str:
 
 
 def mark_best_line(ax, part: pd.DataFrame, b) -> None:
-    """The split's best library size as an orange line, its best sensitivity as a star on it."""
+    """The split's best setting as a star, with its sensitivity and library size in the corner box."""
     line = part[part["sessions"] == b.sessions]
-    ax.plot(line["sensitivity"], line["balanced_accuracy"], color="#eb6834", lw=1.5, ls=":",
-            label="best library size (18)")
     y = line.loc[line["sensitivity"].round(4) == round(b.sensitivity, 4), "balanced_accuracy"].iloc[0]
     ax.scatter([b.sensitivity], [y], marker="*", s=200, color="#eb6834", edgecolor="white", lw=1, zorder=5)
     ax.text(0.97, 0.97, best_text(b), transform=ax.transAxes, ha="right", va="top", fontsize=7,
