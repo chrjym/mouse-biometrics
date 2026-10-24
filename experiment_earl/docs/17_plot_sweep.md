@@ -19,3 +19,6 @@ balanced accuracy. Run 16 → 18 → 17.
   (m sessions). Each 2 × 2 matrix (positive = impostor; rows = rejected / accepted, columns = actual impostor /
   legitimate) shows its counts and each cell's share of its column, which is also the shade. The columns are fixed
   sample points, not a chosen best: they show the move from rejecting everyone (0.01) to accepting everyone (≥ 0.05).
+- `best_sensitivity.png` (needs 18): the simple view. One chart, balanced accuracy in % against sensitivity, one line
+  per split at one shared library size (the median of 18's per-user best sizes), shaded too-strict / just-right /
+  too-loose zones and a star at each split's peak.

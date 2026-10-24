@@ -185,6 +185,38 @@ def plot_confusion(table: pd.DataFrame, sessions: int, sensitivities: list[float
     plt.close(fig)
 
 
+def plot_simple(table: pd.DataFrame, users: pd.DataFrame, path: Path) -> None:
+    """One plain chart: balanced accuracy (%) against sensitivity, one line per split at one shared library size
+    (the median of 18's per-user best sizes), the too-strict / just-right / too-loose zones, a star at each peak."""
+    k = int(users["sessions"].median())
+    fig, ax = plt.subplots(figsize=(8, 4.6), layout="constrained")
+    peaks = []
+    for colour, ((legit, impostor), part) in zip(COLORS, table.groupby(SPLIT, sort=False)):
+        line = part[(part["sessions"] == k) & (part["sensitivity"] <= 0.10)]
+        ax.plot(line["sensitivity"], line["balanced_accuracy"] * 100, color=colour, lw=2, label=label(legit, impostor))
+        peak = line.loc[line["balanced_accuracy"].idxmax()]
+        peaks.append(peak["sensitivity"])
+        ax.scatter([peak["sensitivity"]], [peak["balanced_accuracy"] * 100], marker="*", s=180, color=colour,
+                   edgecolor="white", lw=1, zorder=5)
+    low, high = min(peaks), max(peaks)
+    ax.axvspan(0.005, low - 0.005, color="#eb6834", alpha=0.08, lw=0)
+    ax.axvspan(low - 0.005, high + 0.005, color="#1baf7a", alpha=0.14, lw=0)
+    ax.axvspan(high + 0.005, 0.105, color="0.5", alpha=0.08, lw=0)
+    for x, text in (((0.005 + low - 0.005) / 2, "too\nstrict"), ((low + high) / 2, f"just right\n{low:g}–{high:g}"),
+                    ((high + 0.105) / 2, "too loose: almost everyone accepted")):
+        ax.text(x, 74, text, ha="center", va="top", fontsize=9, color="#1a1a1a")
+    ax.axhline(50, color="0.4", lw=1, ls="--")
+    ax.text(0.104, 50.5, "50% = guessing", ha="right", va="bottom", fontsize=8, color="0.4")
+    ax.set(xlim=(0.005, 0.105), ylim=(45, 75), xlabel="sensitivity (how loosely strokes may match)",
+           ylabel="correct decisions (balanced accuracy, %)")
+    ax.set_title(f"Best sensitivity: about {low:g}–{high:g}  (★ = peak of each mix, {k} sessions per user)", fontsize=11)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.grid(axis="y", alpha=0.25)
+    ax.legend(frameon=False, fontsize=8, loc="upper right", bbox_to_anchor=(1, 0.85))
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.parse_args()
@@ -198,6 +230,8 @@ def main() -> None:
     plot_heatmaps(table, folder / "accuracy_heatmap.png", best, users)
     plot_errors(table, sessions, folder / "far_frr.png")
     plot_confusion(table, m, [0.01, 0.02, 0.05, 0.10], folder / "confusion_matrices.png")
+    if best:
+        plot_simple(table, users, folder / "best_sensitivity.png")
     print(f"{table.groupby(SPLIT).ngroups} splits, {len(table)} confusion matrices plotted")
     print(f"Output: {folder}")
 
