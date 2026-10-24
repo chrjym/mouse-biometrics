@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw the sweep of 16 (accuracy vs sensitivity per split, sessions x sensitivity heatmaps, FAR/FRR) -> runs/<hash>/sweep/."""
+"""Draw the sweep of 16 (accuracy vs sensitivity per split, sessions x sensitivity heatmaps, FAR/FRR, confusion matrices) -> runs/<hash>/sweep/."""
 
 import argparse
 from importlib import import_module
@@ -9,6 +9,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from matplotlib.colors import TwoSlopeNorm
 
@@ -107,6 +108,40 @@ def plot_errors(table: pd.DataFrame, sessions: list[int], path: Path) -> None:
     plt.close(fig)
 
 
+def plot_confusion(table: pd.DataFrame, sessions: int, sensitivities: list[float], path: Path) -> None:
+    """Rows = splits, columns = a few sensitivities at one library size: each 2 x 2 matrix shows its counts and each
+    cell's share of its column (the shade), so a dark TP = most impostors caught, a dark TN = most real users accepted.
+    The columns are fixed sample points, not a chosen best setting."""
+    splits = list(table.groupby(SPLIT, sort=False))
+    fig, axes = plt.subplots(len(splits), len(sensitivities), figsize=(2.6 * len(sensitivities), 2.5 * len(splits)),
+                             squeeze=False, layout="constrained")
+    rows, cols = ["rejected", "accepted"], ["actual\nimpostor", "actual\nlegitimate"]
+    for r, ((legit, impostor), part) in enumerate(splits):
+        for c, sens in enumerate(sensitivities):
+            ax = axes[r][c]
+            cell = part[(part["sessions"] == sessions) & (part["sensitivity"].round(4) == round(sens, 4))].iloc[0]
+            counts = np.array([[cell["TP"], cell["FP"]], [cell["FN"], cell["TN"]]])
+            share = counts / counts.sum(axis=0, keepdims=True)
+            ax.imshow(share, cmap="Blues", vmin=0, vmax=1)
+            for i in range(2):
+                for j in range(2):
+                    name = [["TP", "FP"], ["FN", "TN"]][i][j]
+                    ax.text(j, i, f"{name}\n{counts[i, j]:.0f}\n{share[i, j]:.0%}", ha="center", va="center",
+                            fontsize=8, color="white" if share[i, j] > 0.6 else "#1a1a1a")
+            ax.set_xticks([0, 1], cols if r == len(splits) - 1 else ["", ""], fontsize=7)
+            ax.set_yticks([0, 1], rows if c == 0 else ["", ""], fontsize=7)
+            ax.tick_params(length=0)
+            ax.spines[:].set_visible(False)
+            ba = cell["balanced_accuracy"]
+            ax.set_title(f"sensitivity {sens:g}  ·  BA {ba:.2f}", fontsize=8)
+            if c == 0:
+                ax.set_ylabel(label(legit, impostor), fontsize=8)
+    fig.suptitle(f"Confusion matrices at {sessions} sessions per library (positive = impostor; shade = share of "
+                 f"the column; BA 0.5 = chance)", fontsize=9)
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.parse_args()
@@ -118,6 +153,7 @@ def main() -> None:
     plot_accuracy(table, sessions, folder / "accuracy_vs_sensitivity.png")
     plot_heatmaps(table, folder / "accuracy_heatmap.png")
     plot_errors(table, sessions, folder / "far_frr.png")
+    plot_confusion(table, m, [0.01, 0.02, 0.05, 0.10], folder / "confusion_matrices.png")
     print(f"{table.groupby(SPLIT).ngroups} splits, {len(table)} confusion matrices plotted")
     print(f"Output: {folder}")
 

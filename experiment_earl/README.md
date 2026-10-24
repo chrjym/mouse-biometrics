@@ -211,7 +211,7 @@ For the fixed `splits` of `config.yaml` (only the users are drawn from `seed`), 
 .venv/bin/python experiment_earl/src/17_plot_sweep.py
 ```
 
-Outputs, in `runs/<hash>/sweep/`: `confusion.csv` (one row per split, library size and sensitivity, with session- and user-level counts and the users drawn), `parts/` (one CSV per finished split, reused on a rerun; delete it after a code change), `config.yaml`, and from 17 `accuracy_vs_sensitivity.png`, `accuracy_heatmap.png`, `far_frr.png`. No best setting is picked.
+Outputs, in `runs/<hash>/sweep/`: `confusion.csv` (one row per split, library size and sensitivity, with session- and user-level counts and the users drawn), `parts/` (one CSV per finished split, reused on a rerun; delete it after a code change), `config.yaml`, and from 17 `accuracy_vs_sensitivity.png`, `accuracy_heatmap.png`, `far_frr.png`, `confusion_matrices.png`. No best setting is picked.
 
 ## 4. Where the results are
 

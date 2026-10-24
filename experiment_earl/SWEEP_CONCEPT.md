@@ -116,6 +116,7 @@ when ≥ `match_session_ratio` of their attempts pass.
 | `accuracy_vs_sensitivity.png` | Sensitivity | Balanced accuracy | One panel per mix, lines at 1, 10, 20, 40 sessions; dashed line = 0.5 |
 | `accuracy_heatmap.png` | Sensitivity | Library size | Colour = balanced accuracy: blue = better than chance, white = 0.5, red = worse |
 | `far_frr.png` | Sensitivity | FAR, FRR | Where letting impostors in trades against blocking real users |
+| `confusion_matrices.png` | Actual class | Decision | 2 × 2 matrices per mix at sensitivity 0.01, 0.02, 0.05, 0.10 (40 sessions): counts and share of each column |
 
 ## 8. Why no best setting is picked
 
@@ -129,4 +130,4 @@ above 0.5, so a "best" would overstate the method. The grid is read as a whole i
 - **Everything near 0.5:** the method cannot separate users at any sensitivity or library size.
 - **Below 0.5** (red, e.g. 1-session libraries): real users are blocked more often than impostors.
 
-Outputs: `runs/<hash>/sweep/` (`confusion.csv`, `parts/`, `config.yaml`, the three figures).
+Outputs: `runs/<hash>/sweep/` (`confusion.csv`, `parts/`, `config.yaml`, the four figures).
