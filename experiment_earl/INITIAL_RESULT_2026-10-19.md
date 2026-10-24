@@ -1,7 +1,5 @@
 # Experiment update: finding the sensitivity and the sessions
 
-**Date:** 2026-10-19 · **Experiment:** EARL shape matching on Balabit (10 users, 1,676 sessions) · **Follows:** the
-pipeline set on 2026-10-14 (user × user × sensitivity → user × session × sensitivity → heatmap)
 
 ## Summary
 
@@ -96,32 +94,3 @@ best user accuracy per split for the matching of section 2 (grey) and the two ne
 
 On the same draw, the cohort score has a lower error rate than plain distance in most splits (EER 0.30–0.39 at the
 session count it picks) and a higher best user accuracy than matching in every split (0.75–1.00).
-
-## 5. Conclusion
-
-On this draw, **the shape of short mouse strokes, compared with DTW, separates legitimate users from impostors only
-weakly**: at the best sensitivity and session count, at least half of the impostors still get through in most
-splits, and in the 8–2 and 9–1 splits no setting beats chance. Comparing each stroke against other people's
-profiles helps, but the strokes that point to the right user are offset by just as many simple strokes that fit
-everyone. What we learned is useful for the thesis either way: the useful sensitivity range (0.02–0.04), the bias
-from profile size, and the evidence that common strokes carry little identity.
-
-The best settings and scores above are chosen on the same draw they are measured on, so they are the most
-favourable case for this data.
-
-## 6. Proposed next step and questions
-
-**Proposal:** keep the strokes and DTW, but compare **how** each stroke is drawn, not only its shape: speed along
-the stroke, where the user slows down, pauses and small corrections. These are the user mannerisms from the
-2026-08-31 meeting. Balabit users log at different rates (every 16 ms or every 110 ms), so the strokes would first
-be resampled by time; otherwise we would measure the logging rate, not the person.
-
-**Questions for you:**
-
-1. Is this shape-matching result enough to report as it is, or should we keep improving the shape comparison
-   first?
-2. Should the next step be timing and speed features, or do you prefer another direction?
-3. Should the second method (comparing against other people's profiles, section 4) be part of the thesis method, or
-   only mentioned as something we tried?
-4. The whiteboard on 2026-10-14 showed seed = 41. Should we rerun the experiment with seed 41 instead of our seed
-   927?
