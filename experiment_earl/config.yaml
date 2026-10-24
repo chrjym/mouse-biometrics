@@ -10,6 +10,17 @@ n_legitimate: 1            # users whose shapes form the legitimate profiles
 n_impostor: 9              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
 sessions_per_user: 2       # sessions per user; the notebook tests 1, 2, ... up to this (max: printed by every script)
 
+# --- Sensitivity sweep (16, 17): left out of the run hash, so the sweep writes into runs/<hash>/sweep/ ---
+# The splits are fixed; each [legitimate, impostor] pair is its own draw from `seed`, so only the users are random.
+splits:
+  - [1, 5]
+  - [5, 1]
+  - [3, 2]
+  - [2, 3]
+sweep_sensitivity: [0.01, 1.00, 0.01]  # start, stop, step of the sensitivities scored (each is a cut on the same DTW distances)
+sweep_sessions_max: 40      # library sizes 1, 2, ... up to this many of a legitimate user's first sessions
+sweep_test_sessions: 40     # tested per user: a legitimate user's last this many sessions, an impostor's first this many
+
 # --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
 # training_files and test_files are merged into one folder per user (adviser, 2026-10-14).
 # A session belongs to the user whose folder it is in. No label file is used.

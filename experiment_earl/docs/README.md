@@ -20,6 +20,8 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    │   13 cohort scoring: closer to the claimed user than to other people? (EER vs 12)       │
    │   14 new-seed check: 12's and 13's chosen settings, unchanged, on new seeds             │
    │   15 draw 13's scoring: strokes vs nearest strokes per library; scores per split        │
+   │   16 sensitivity sweep: fixed splits × library size × sensitivity → confusion matrices  │
+   │   17 draw 16's sweep: accuracy vs sensitivity, heatmap, FAR/FRR, best confusion matrix  │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -40,6 +42,8 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 13 | [13_cohort_score.md](13_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
 | 14 | [14_seed_check.md](14_seed_check.md) | Settings chosen on the training seed by 12 and 13, applied unchanged to new seeds; train vs test user accuracy |
 | 15 | [15_plot_cohort.md](15_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
+| 16 | [16_sweep_sensitivity.md](16_sweep_sensitivity.md) | Per fixed split, nearest-DTW cost once per (test, library) session pair; every library size a running minimum, every sensitivity a cut; TP/FP/FN/TN per setting |
+| 17 | [17_plot_sweep.md](17_plot_sweep.md) | Balanced accuracy vs sensitivity and as a heatmap, FAR/FRR at the best library size, confusion matrix of each split's best setting |
 
 ## Words used on every page
 
