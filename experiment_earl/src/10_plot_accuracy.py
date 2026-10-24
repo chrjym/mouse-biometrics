@@ -154,9 +154,9 @@ def main() -> None:
     config = cfg_mod.load_config(folders[0] / "config.yaml")
     figures = []
     for (n_legit, n_impostor, sens), part in table.groupby(["n_legitimate", "n_impostor", "sensitivity"]):
-        path = group / f"accuracy_{n_legit}_{n_impostor}_sensitivity_{sens:g}.png"
+        path = group / f"accuracy_{n_legit}_{n_impostor}_sensitivity_{sens:.2f}.png"
         plot(part, path,
-             f"runs/{group.name}, {n_legit} legitimate vs {n_impostor} impostors, sensitivity {sens:g}: sessions that go through (≥ {config['match_shape_ratio']:.0%} of strokes "
+             f"runs/{group.name}, {n_legit} legitimate vs {n_impostor} impostors, sensitivity {sens:.2f}: sessions that go through (≥ {config['match_shape_ratio']:.0%} of strokes "
              f"match), seed {config['seed']}\nlegitimate = own last <sessions> sessions (never in a profile) vs own profile; "
              f"impostor = first <sessions> sessions vs the best legitimate profile; line = sessions per user; "
              f"filled = user goes through (≥ {config['match_session_ratio']:.0%} of sessions)")

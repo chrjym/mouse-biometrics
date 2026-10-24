@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Run every notebook run of batch.yaml (set config.yaml per run, skip finished runs, log, restore), then plot them."""
+"""Run every notebook run of batch.yaml (skip finished runs, log), then plot them. config.yaml is never changed:
+each run gets its own snapshot (config.yaml with the batch.yaml values) in its run folder."""
 
 import argparse
 import csv
 import re
-import shutil
 import subprocess
 import sys
 import time
@@ -19,7 +19,6 @@ cfg_mod = import_module("00_config")
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "config.yaml"
-BACKUP = ROOT / "config.yaml.batch-backup"
 LOG = cfg_mod.RUNS / "batch_log.csv"
 DONE_MARKER = Path("results") / "session_progression.csv"
 
@@ -37,7 +36,7 @@ def plan_runs(plan: dict, only: float | None) -> list[dict]:
 
 
 def set_values(text: str, overrides: dict) -> str:
-    """Replace each `key: value` line of config.yaml, keeping its comment."""
+    """Replace each `key: value` line of the config text, keeping its comment."""
     for key, value in overrides.items():
         text, count = re.subn(rf"^({key}:\s*)\S+", rf"\g<1>{value}", text, count=1, flags=re.MULTILINE)
         if count != 1:
@@ -55,11 +54,16 @@ def log_row(row: dict) -> None:
         writer.writerow(row)
 
 
-def run_one(overrides: dict, original: str, timeout: int) -> tuple[str, str]:
-    """Write the run's config, execute the notebook, return (status, error)."""
-    CONFIG.write_text(set_values(original, overrides))
+def run_one(name: str, overrides: dict, original: str, timeout: int) -> tuple[str, str]:
+    """Write the run's own config snapshot, execute the notebook on it, return (status, error)."""
+    folder = cfg_mod.RUNS / name
+    if (folder / "config.yaml").exists():  # an earlier attempt that did not finish: start it fresh
+        (folder / "config.yaml").write_text(set_values(original, overrides))
+    else:
+        cfg_mod.create_run(folder, set_values(original, overrides))
     try:
-        result = subprocess.run([sys.executable, str(ROOT / "src" / "07_run_notebook.py"), "--timeout", str(timeout)],
+        result = subprocess.run([sys.executable, str(ROOT / "src" / "07_run_notebook.py"), "--run", name,
+                                 "--timeout", str(timeout)],
                                 cwd=ROOT.parent, capture_output=True, text=True)
     except OSError as error:
         return "failed", str(error)
@@ -79,11 +83,8 @@ def main() -> None:
     args = parser.parse_args()
 
     runs = plan_runs(yaml.safe_load(args.plan.read_text()), args.only)
-    if BACKUP.exists():
-        raise SystemExit(f"{BACKUP} exists: an earlier batch did not finish cleanly. Check config.yaml, "
-                         f"restore it from the backup if needed, then delete the backup.")
     original = CONFIG.read_text()
-    shutil.copy2(CONFIG, BACKUP)
+    set_values(original, runs[0] if runs else {})  # fail early if config.yaml lacks a key
     counts = {"ok": 0, "skipped": 0, "failed": 0}
     new_folders = []
     groups = set()
@@ -102,7 +103,7 @@ def main() -> None:
                 continue
             print(f"{prefix} ...", end=" ", flush=True)
             start = time.monotonic()
-            status, error = run_one(overrides, original, args.timeout)
+            status, error = run_one(name, overrides, original, args.timeout)
             seconds = round(time.monotonic() - start)
             counts[status] += 1
             if status == "ok":
@@ -110,16 +111,16 @@ def main() -> None:
             print(f"{status} ({seconds // 60}m {seconds % 60:02d}s){'  ' + error if error else ''}")
             log_row({"time": datetime.now().isoformat(timespec="seconds"), "run": name,
                      "status": status, "seconds": seconds, "error": error})
-    finally:
-        CONFIG.write_text(original)
-        BACKUP.unlink()
+    except KeyboardInterrupt:
+        print("\nStopped. Run the same command again to continue; finished runs are skipped.")
+        return
 
     to_run = len(runs) - counts["skipped"]
     if args.dry_run:
         print(f"\nDry run: {len(runs)} runs, {counts['skipped']} done, {to_run} to run.")
         return
     print(f"\nBatch: {counts['ok']} ok, {counts['skipped']} skipped, {counts['failed']} failed "
-          f"of {len(runs)}. config.yaml restored. Log: {LOG}")
+          f"of {len(runs)}. Log: {LOG}")
     if counts["failed"]:
         print("Failed runs are listed in the log; rerun the same command to retry only those.")
     if new_folders:
@@ -167,12 +168,12 @@ def summarize_group(group: Path) -> None:
              "Impostor = impostor sessions that pass the profile (lower is better).", "",
              "| Split (legit_impostor) | Sensitivity | Sessions | Legitimate passed | Legitimate accepted | Impostor passed | Impostors through | Run folder |",
              "| --- | --- | --- | --- | --- | --- | --- | --- |"]
-    lines += [f"| {r.split} | {r.sensitivity:g} | {r.sessions} | {r.legit_passed}/{r.legit_tested} | {r.legit_accepted} | "
+    lines += [f"| {r.split} | {r.sensitivity:.2f} | {r.sessions} | {r.legit_passed}/{r.legit_tested} | {r.legit_accepted} | "
               f"{r.impostor_passed}/{r.impostor_tested} | {r.impostors_through} | [{r.run}](../{r.run}/) |"
               for r in summary.itertuples()]
     lines += ["", "## Plots (one per split and sensitivity)", ""]
     for split, part in summary.groupby("split", sort=False):
-        lines.append(f"- {split}: " + ", ".join(f"[{s:g}](../accuracy_{split}_sensitivity_{s:g}.png)"
+        lines.append(f"- {split}: " + ", ".join(f"[{s:.2f}](../accuracy_{split}_sensitivity_{s:.2f}.png)"
                                                  for s in sorted(part.sensitivity.unique())))
     lines += ["", "## Files", "",
               "- `summary/summary.csv`: the table above",

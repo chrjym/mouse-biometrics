@@ -1,0 +1,7 @@
+sessions,matched_detected,sensitivity,n_legit,n_impostor,seed
+1,2,0.5,6,4,945
+2,3,0.75,6,4,945
+3,3,0.75,6,4,945
+4,3,0.75,6,4,945
+5,4,1.0,6,4,945
+6,4,1.0,6,4,945
