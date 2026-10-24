@@ -43,6 +43,7 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 14 | [14_seed_check.md](14_seed_check.md) | Settings chosen on the training seed by 12 and 13, applied unchanged to new seeds; train vs test user accuracy |
 | 15 | [15_plot_cohort.md](15_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
 | 16 | [16_sweep_sensitivity.md](16_sweep_sensitivity.md) | Per fixed split, nearest-DTW cost once per (test, library) session pair; every library size a running minimum, every sensitivity a cut; TP/FP/FN/TN per setting |
+| 18 | [18_best_setting.md](18_best_setting.md) | Best sensitivity and library size per legitimate user and per split, picked on half the test sessions and checked on the other half |
 | 17 | [17_plot_sweep.md](17_plot_sweep.md) | Balanced accuracy vs sensitivity and as a heatmap, FAR/FRR at 1, m/4, m/2, m sessions; no best setting picked |
 
 ## Words used on every page

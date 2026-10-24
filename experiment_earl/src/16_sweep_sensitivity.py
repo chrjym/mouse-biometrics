@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sensitivity sweep of config.yaml's sweep keys: DTW distances once, then a confusion matrix (positive = impostor) per split x sessions x sensitivity -> runs/<hash>/sweep/."""
+"""Sensitivity sweep of config.yaml's sweep keys: DTW distances once, then a confusion matrix (positive = impostor) per split x sessions x sensitivity, overall and per legitimate user -> runs/<hash>/sweep/."""
 
 import argparse
 import pickle
@@ -93,7 +93,7 @@ def accepted(curve: np.ndarray, n_chunks: int, sensitivities: np.ndarray, ratio:
     return matched / max(n_chunks, 1) >= ratio
 
 
-def sweep_split(legit_n: int, impostor_n: int, plan: dict, base: dict) -> pd.DataFrame:
+def sweep_split(legit_n: int, impostor_n: int, plan: dict, base: dict) -> tuple[pd.DataFrame, pd.DataFrame]:
     """One row per (sessions, sensitivity) with TP/FP/FN/TN over test sessions and over users."""
     config = {**base, "seed": plan["seed"], "n_legitimate": legit_n, "n_impostor": impostor_n}
     legit, impostor, order = plot_mod.draw_users(config, plan["seed"])
@@ -135,6 +135,29 @@ def sweep_split(legit_n: int, impostor_n: int, plan: dict, base: dict) -> pd.Dat
     table["users_accuracy"] = (table["users_TP"] + table["users_TN"]) / (legit_n + impostor_n)
     table["legitimate"] = ",".join(legit)
     table["impostor"] = ",".join(impostor)
+    return table, user_table(legit_n, impostor_n, legit, legit_acc, impostor_acc, k, s)
+
+
+def user_table(legit_n: int, impostor_n: int, legit: list[str], legit_acc: dict, impostor_acc: dict,
+               k: np.ndarray, s: np.ndarray) -> pd.DataFrame:
+    """One confusion matrix per (legitimate user, half, sessions, sensitivity): the user's own test sessions and every
+    impostor attempt against the user's library. Test sessions alternate between halves (even = pick, odd = check),
+    so 18 can choose a setting on one half and score it on sessions it never saw."""
+    rows = []
+    for p, u in enumerate(legit):
+        genuine = legit_acc[u]
+        attacks = np.concatenate([a[p::legit_n] for a in impostor_acc.values()])  # attempts are (session, profile)
+        for half, start in (("pick", 0), ("check", 1)):
+            g, a = genuine[start::2], attacks[start::2]
+            tn, fn = g.sum(axis=0), a.sum(axis=0)
+            rows.append(pd.DataFrame({"n_legitimate": legit_n, "n_impostor": impostor_n, "user": u, "half": half,
+                                      "sessions": k.ravel(), "sensitivity": s.ravel(),
+                                      "TP": (len(a) - fn).ravel(), "FP": (len(g) - tn).ravel(),
+                                      "FN": fn.ravel(), "TN": tn.ravel()}))
+    table = pd.concat(rows, ignore_index=True)
+    table["FAR"] = table["FN"] / (table["TP"] + table["FN"])
+    table["FRR"] = table["FP"] / (table["FP"] + table["TN"])
+    table["balanced_accuracy"] = 1 - (table["FAR"] + table["FRR"]) / 2
     return table
 
 
@@ -167,20 +190,25 @@ def main() -> None:
     (folder / "parts").mkdir(parents=True, exist_ok=True)
     (folder / "config.yaml").write_text(yaml.safe_dump(base, sort_keys=False))
     load_cache()
-    parts = []
+    parts, users = [], []
     for legit_n, impostor_n in plan["splits"]:
         path = folder / "parts" / f"{legit_n}_{impostor_n}.csv"
-        if path.exists():  # finished earlier: resume
+        user_path = folder / "parts" / f"{legit_n}_{impostor_n}_users.csv"
+        if path.exists() and user_path.exists():  # finished earlier: resume
             parts.append(pd.read_csv(path))
+            users.append(pd.read_csv(user_path))
             continue
-        part = sweep_split(legit_n, impostor_n, plan, base)
+        part, user_part = sweep_split(legit_n, impostor_n, plan, base)
         save_cache()
-        part.to_csv(path.with_suffix(".tmp"), index=False)
-        path.with_suffix(".tmp").replace(path)
+        for frame, target in ((part, path), (user_part, user_path)):
+            frame.to_csv(target.with_suffix(".tmp"), index=False)
+            target.with_suffix(".tmp").replace(target)
         parts.append(part)
+        users.append(user_part)
         print(f"[{legit_n} L, {impostor_n} I] done")
     out = folder / "confusion.csv"
     pd.concat(parts).to_csv(out, index=False)
+    pd.concat(users).to_csv(folder / "user_confusion.csv", index=False)
     print(f"{len(plan['splits'])} splits x {plan['max_sessions']} sessions x {len(plan['sensitivities'])} sensitivities "
           f"= {sum(len(p) for p in parts)} confusion matrices\nOutput: {out}")
 
