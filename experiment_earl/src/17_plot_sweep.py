@@ -208,7 +208,7 @@ def plot_simple(table: pd.DataFrame, users: pd.DataFrame, path: Path) -> None:
     ax.axhline(50, color="0.4", lw=1, ls="--")
     ax.text(0.104, 50.5, "50% = guessing", ha="right", va="bottom", fontsize=8, color="0.4")
     ax.set(xlim=(0.005, 0.105), ylim=(45, 75), xlabel="sensitivity (how loosely strokes may match)",
-           ylabel="correct decisions (balanced accuracy, %)")
+           ylabel="correct decisions (%)")
     ax.set_title(f"Best sensitivity: about {low:g}–{high:g}  (★ = peak of each mix, {k} sessions per user)", fontsize=11)
     ax.spines[["top", "right"]].set_visible(False)
     ax.grid(axis="y", alpha=0.25)
