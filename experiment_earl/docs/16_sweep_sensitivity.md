@@ -6,14 +6,14 @@
 
 Tests every sensitivity from 0.01 to 1.00 (step 0.01) at every library size 1 … 40 sessions, for the four
 I × L mixes 1 × 5, 5 × 1, 2 × 3 and 3 × 2, and fills one confusion matrix per (split, sessions, sensitivity).
-Settings are in [`sweep.yaml`](../sweep.yaml) (`seed`, `splits`, `sensitivity` as start/stop/step, `max_sessions`);
-chunking, `dtw_band`, `match_shape_ratio` and `match_session_ratio` come from `config.yaml`.
+Settings are the sweep keys of [`config.yaml`](../config.yaml) (`splits`, `sweep_sensitivity` as start/stop/step,
+`sweep_sessions_max` = m, `sweep_test_sessions` = t; left out of the run hash) and its `seed`; chunking, `dtw_band`, `match_shape_ratio` and `match_session_ratio` come from `config.yaml`.
 
-Outputs, in `runs/<hash>/sweep/` (hash = `config.yaml` with sweep.yaml's seed):
+Outputs, in `runs/<hash>/sweep/` (hash = `config.yaml` without its sweep keys):
 
 - 16: `confusion.csv` (one row per split × sessions × sensitivity: TP, FP, FN, TN, accuracy, FAR, FRR,
   balanced accuracy, the same matrix counted per user, and the users drawn), `parts/<L>_<I>.csv` (one per split;
-  a rerun reuses finished splits, delete `parts/` to recompute) and a copy of `sweep.yaml`.
+  a rerun reuses finished splits, delete `parts/` to recompute after a code change) and a copy of `config.yaml`.
 - 17: `accuracy_vs_sensitivity.png` (balanced accuracy per split, lines at 1, m/4, m/2, m sessions),
   `accuracy_heatmap.png` (sessions × sensitivity per split, colour = balanced accuracy: white = 0.5 chance, blue = better,
   red = worse, as 12) and `far_frr.png` (FAR and FRR at 1, m/4, m/2, m sessions). No best setting is picked: the
@@ -37,8 +37,8 @@ everyone" (5 I × 1 L) and "accept everyone" (1 I × 5 L) at 0.83.
 ```
 draw users and session orders from seed (same draw as 08 / 10)
 for each legitimate user u: library_k(u) = first k of u's sessions, k = 1 … m
-test sessions: legitimate u → last m of u's sessions (never in a library), against u's own library
-               impostor v   → first m of v's sessions, against each legitimate library, one attempt per library
+test sessions: legitimate u → last t of u's sessions (never in a library), against u's own library
+               impostor v   → first t of v's sessions, against each legitimate library, one attempt per library
 for each test session and library session (DTW once, cached in cache/distances.pkl):
     d[chunk] = min over library chunks of the same kind of banded DTW cost / resample_n
 best distance with k sessions = running minimum of d over library sessions 1 … k

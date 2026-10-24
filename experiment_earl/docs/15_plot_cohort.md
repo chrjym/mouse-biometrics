@@ -1,6 +1,6 @@
 # `15_plot_cohort.py`: what cohort scoring looks like
 
-[← index](README.md) · previous: [14](14_seed_check.md)
+[← index](README.md) · previous: [14](14_seed_check.md) · next: [16](16_sweep_sensitivity.md)
 
 ## What it does
 

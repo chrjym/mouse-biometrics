@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sensitivity sweep of sweep.yaml: DTW distances once, then a confusion matrix (positive = impostor) per split x sessions x sensitivity -> runs/<hash>/sweep/."""
+"""Sensitivity sweep of config.yaml's sweep keys: DTW distances once, then a confusion matrix (positive = impostor) per split x sessions x sensitivity -> runs/<hash>/sweep/."""
 
 import argparse
 import pickle
@@ -55,13 +55,18 @@ def best_distance(queries, library, band, cap):
 
 
 def load_plan() -> dict:
-    plan = yaml.safe_load((ROOT / "sweep.yaml").read_text())
-    for legit, impostor in plan["splits"]:
-        if legit + impostor > 10:
-            raise SystemExit(f"Split [{legit}, {impostor}] needs {legit + impostor} users; Balabit has 10")
-    start, stop, step = plan["sensitivity"]
-    plan["sensitivities"] = np.round(np.arange(start, stop + step / 2, step), 4)
-    return plan
+    """The sweep keys of config.yaml (00_config.SWEEP_KEYS, left out of the run hash) plus its seed."""
+    config = cfg_mod.load_config()
+    missing = [key for key in cfg_mod.SWEEP_KEYS if key not in config]
+    if missing:
+        raise SystemExit(f"config.yaml has no {', '.join(missing)}")
+    for legit, impostor in config["splits"]:
+        if legit + impostor > len(cfg_mod.list_users(config)):
+            raise SystemExit(f"Split [{legit}, {impostor}] needs {legit + impostor} users; the data has fewer")
+    start, stop, step = config["sweep_sensitivity"]
+    return {"seed": config["seed"], "splits": config["splits"], "max_sessions": config["sweep_sessions_max"],
+            "test_sessions": config["sweep_test_sessions"],
+            "sensitivities": np.round(np.arange(start, stop + step / 2, step), 4)}
 
 
 def pair_distance(query, library, config: dict, cap: float) -> dict[int, np.ndarray]:
@@ -92,7 +97,8 @@ def sweep_split(legit_n: int, impostor_n: int, plan: dict, base: dict) -> pd.Dat
     """One row per (sessions, sensitivity) with TP/FP/FN/TN over test sessions and over users."""
     config = {**base, "seed": plan["seed"], "n_legitimate": legit_n, "n_impostor": impostor_n}
     legit, impostor, order = plot_mod.draw_users(config, plan["seed"])
-    m, sens, cap = plan["max_sessions"], plan["sensitivities"], float(plan["sensitivities"].max())
+    m, t = plan["max_sessions"], plan["test_sessions"]
+    sens, cap = plan["sensitivities"], float(plan["sensitivities"].max())
     ratio, through = config["match_shape_ratio"], config["match_session_ratio"]
     session = lambda user, item: match_mod.dataset_session(user, item[1], config, item[0])
     libraries = {u: [session(u, s) for s in order[u][:m]] for u in legit}
@@ -106,11 +112,11 @@ def sweep_split(legit_n: int, impostor_n: int, plan: dict, base: dict) -> pd.Dat
                        for p in profiles)
         return np.array(out)
 
-    # Legitimate: own last m sessions (never in a library) against own library; impostor: first m against each library
+    # Legitimate: own last t sessions (never in a library) against own library; impostor: first t against each library
     # as a separate attempt, so an impostor session gets one chance per attempt, like a legitimate session.
-    legit_acc = {u: verdicts(u, order[u][-m:], [u]) for u in legit}
-    impostor_acc = {u: verdicts(u, order[u][:m], legit) for u in impostor}
-    attempts = impostor_n * m * legit_n  # impostor (session, profile) pairs
+    legit_acc = {u: verdicts(u, order[u][-t:], [u]) for u in legit}
+    impostor_acc = {u: verdicts(u, order[u][:t], legit) for u in impostor}
+    attempts = impostor_n * t * legit_n  # impostor (session, profile) pairs
     tn = sum(a.sum(axis=0) for a in legit_acc.values())
     fn = sum(a.sum(axis=0) for a in impostor_acc.values())
     users_tn = sum(a.mean(axis=0) >= through for a in legit_acc.values())
@@ -118,13 +124,13 @@ def sweep_split(legit_n: int, impostor_n: int, plan: dict, base: dict) -> pd.Dat
 
     k, s = np.meshgrid(np.arange(1, m + 1), sens, indexing="ij")
     table = pd.DataFrame({"n_legitimate": legit_n, "n_impostor": impostor_n, "sessions": k.ravel(), "sensitivity": s.ravel(),
-                          "TP": (attempts - fn).ravel(), "FP": (legit_n * m - tn).ravel(),
+                          "TP": (attempts - fn).ravel(), "FP": (legit_n * t - tn).ravel(),
                           "FN": fn.ravel(), "TN": tn.ravel(),
                           "users_TP": (impostor_n - users_fn).ravel(), "users_FP": (legit_n - users_tn).ravel(),
                           "users_FN": users_fn.ravel(), "users_TN": users_tn.ravel()})
-    table["accuracy"] = (table["TP"] + table["TN"]) / (attempts + legit_n * m)
+    table["accuracy"] = (table["TP"] + table["TN"]) / (attempts + legit_n * t)
     table["FAR"] = table["FN"] / attempts            # impostor attempts let in
-    table["FRR"] = table["FP"] / (legit_n * m)      # legitimate sessions rejected
+    table["FRR"] = table["FP"] / (legit_n * t)      # legitimate sessions rejected
     table["balanced_accuracy"] = 1 - (table["FAR"] + table["FRR"]) / 2
     table["users_accuracy"] = (table["users_TP"] + table["users_TN"]) / (legit_n + impostor_n)
     table["legitimate"] = ",".join(legit)
@@ -146,7 +152,7 @@ def save_cache() -> None:
 
 
 def out_folder(plan: dict, base: dict) -> Path:
-    """runs/<hash>/sweep/, the hash of config.yaml with sweep.yaml's seed (same rule as every other run)."""
+    """runs/<hash>/sweep/, the hash of config.yaml without its sweep keys (same rule as every other run)."""
     return cfg_mod.RUNS / cfg_mod.run_folder_name({**base, "seed": plan["seed"]}).split("/")[0] / "sweep"
 
 
@@ -154,11 +160,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.parse_args()
     plan, base = load_plan(), cfg_mod.load_config()
-    if plan["max_sessions"] * 2 > cfg_mod.max_sessions(base):
-        raise SystemExit(f"max_sessions {plan['max_sessions']} x 2 exceeds the smallest pool ({cfg_mod.max_sessions(base)})")
+    if plan["max_sessions"] + plan["test_sessions"] > cfg_mod.max_sessions(base):
+        raise SystemExit(f"sweep_sessions_max + sweep_test_sessions = {plan['max_sessions'] + plan['test_sessions']} "
+                         f"exceeds the smallest pool ({cfg_mod.max_sessions(base)}); lower them in config.yaml")
     folder = out_folder(plan, base)
     (folder / "parts").mkdir(parents=True, exist_ok=True)
-    (folder / "sweep.yaml").write_text((ROOT / "sweep.yaml").read_text())
+    (folder / "config.yaml").write_text(yaml.safe_dump(base, sort_keys=False))
     load_cache()
     parts = []
     for legit_n, impostor_n in plan["splits"]:

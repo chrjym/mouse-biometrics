@@ -202,6 +202,17 @@ After H, this draws one genuine, one typical impostor and the top impostor claim
 
 Outputs, in `runs/<hash>/cohort/plots/`: `claim_<user>_{genuine,impostor_typical,impostor_top}.png` and `scores_per_split.png`.
 
+### K. Sensitivity sweep: one confusion matrix per setting
+
+For the fixed `splits` of `config.yaml` (only the users are drawn from `seed`), every library size 1 … `sweep_sessions_max` and every sensitivity of `sweep_sensitivity`, 16 accepts or rejects each test session (a legitimate user's last `sweep_test_sessions` against their own library, an impostor's first `sweep_test_sessions` against each legitimate library as a separate attempt) and counts TP / FP / FN / TN with positive = impostor. Each setting is counted from scratch; nothing is appended across iterations. 17 draws the result.
+
+```bash
+.venv/bin/python experiment_earl/src/16_sweep_sensitivity.py
+.venv/bin/python experiment_earl/src/17_plot_sweep.py
+```
+
+Outputs, in `runs/<hash>/sweep/`: `confusion.csv` (one row per split, library size and sensitivity, with session- and user-level counts and the users drawn), `parts/` (one CSV per finished split, reused on a rerun; delete it after a code change), `config.yaml`, and from 17 `accuracy_vs_sensitivity.png`, `accuracy_heatmap.png`, `far_frr.png`. No best setting is picked.
+
 ## 4. Where the results are
 
 ```
@@ -247,9 +258,12 @@ experiment_earl/runs/
     │   ├── sessions.csv, cells.csv, best.csv
     │   ├── cohort.png                    EER per split; best user accuracy vs G
     │   └── plots/                        claim_<user>_*.png, scores_per_split.png     (J)
-    └── seed_check/                       chosen settings on new seeds                  (I)
-        ├── results.csv, summary.csv
-        └── seed_check.png
+    ├── seed_check/                       chosen settings on new seeds                  (I)
+    │   ├── results.csv, summary.csv
+    │   └── seed_check.png
+    └── sweep/                            sensitivity × library size per split          (K)
+        ├── confusion.csv, best.csv, splits.csv, config.yaml
+        └── accuracy_vs_sensitivity.png, accuracy_heatmap.png, far_frr.png, confusion_best.png
 ```
 
 **How to read every figure** (axes, colours, what good and bad look like, what we saw): [READING_FIGURES.md](READING_FIGURES.md). The short version:
@@ -279,6 +293,7 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Cohort scoring (H), sessions 2–10 | about 3 minutes the first time, about 30 seconds with a warm cache |
 | New-seed check (I), 3 new seeds | about 10 minutes |
 | Cohort plots (J) | about a minute |
+| Sensitivity sweep (K), 4 splits × 40 × 100 | about 3 minutes the first time, about 12 seconds with a warm cache; figures a few seconds |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.
 

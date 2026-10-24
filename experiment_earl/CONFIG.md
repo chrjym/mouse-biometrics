@@ -40,6 +40,7 @@ runs/1a2b3c/1_9_0.04_10/
 08_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
 09_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
 10_plot_accuracy     every run of one runs/<hash>/ folder: sessions through per legitimate and impostor user
+16_sweep_sensitivity fixed splits × library size × sensitivity: one confusion matrix per setting
 ```
 
 **One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 08 and 09 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 08 and 09 use the same draw and settings (the main configuration).
@@ -78,6 +79,19 @@ Chunks that are not comparable (zero length) still count in the denominator of a
 | `match_session_ratio` | 0.5 | An impostor user counts as **matched** when at least this share of their sessions match any single legitimate profile. This decides `matched_detected`. (Assumption A1 in the plan.) |
 
 The **sensitivity** (called *threshold* before 2026-10-14) is `matched impostor users / total impostor users`. 0 is best: impostors never look like the legitimate users.
+
+## Sensitivity sweep (scripts 16 and 17)
+
+These four keys are read only by 16 and are **left out of the run hash**, so changing them keeps the same `runs/<hash>/` folder; 16 reuses finished splits in `runs/<hash>/sweep/parts/` (delete it after a code change).
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `splits` | `[1, 5]`, `[5, 1]`, `[3, 2]`, `[2, 3]` | The fixed [legitimate, impostor] splits. Each split is its own draw from `seed`, so only *which* users are legitimate or impostors is random, not how many. Each pair must add up to 10 or less. |
+| `sweep_sensitivity` | `[0.01, 1.00, 0.01]` | Start, stop and step of the sensitivities scored (100 values). DTW runs once; each sensitivity is a cut on the same distances. |
+| `sweep_sessions_max` | 40 | Library sizes 1, 2, ... up to this many of a legitimate user's first sessions. |
+| `sweep_test_sessions` | 40 | Tested per user: a legitimate user's last this many sessions (never in their library), an impostor's first this many. `sweep_sessions_max + sweep_test_sessions` must fit the smallest pool (114). |
+
+The stroke rule is `match_shape_ratio`, as everywhere else; `match_session_ratio` sets the user-level counts (`users_*`).
 
 ## When you change a setting
 

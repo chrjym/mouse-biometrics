@@ -27,12 +27,13 @@ def load_config(path: Path | None = None, **overrides) -> dict:
 
 
 RUN_KEYS = ("n_legitimate", "n_impostor", "sensitivity", "sessions_per_user")  # name the run, not the hash
+SWEEP_KEYS = ("splits", "sweep_sensitivity", "sweep_sessions_max", "sweep_test_sessions")  # only 16 reads these
 
 
 def run_folder_name(config: dict) -> str:
     """`<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_user>`: the hash covers every other
-    setting, so runs that differ only in these four sit side by side; any change gives a new folder."""
-    settings = {k: v for k, v in config.items() if k not in RUN_KEYS and k != "run_name"}
+    setting (except the sweep's), so runs that differ only in these four sit side by side; any change gives a new folder."""
+    settings = {k: v for k, v in config.items() if k not in RUN_KEYS + SWEEP_KEYS and k != "run_name"}
     digest = hashlib.sha1(json.dumps(settings, sort_keys=True).encode()).hexdigest()[:6]
     return f"{digest}/" + "_".join(f"{config[k]:.2f}" if k == "sensitivity" else f"{config[k]:g}" for k in RUN_KEYS)
 
