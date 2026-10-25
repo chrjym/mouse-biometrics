@@ -2,6 +2,10 @@
 
 This folder tests whether mouse-movement shapes from legitimate users can be told apart from impostors, using the Balabit dataset. This guide covers setup, the ways to run it, exporting the shapes as images, the find-the-sensitivity and find-the-sessions experiments, batch runs, picking the best setting, cohort scoring, the new-seed check, and where the results go. Every setting is explained in [CONFIG.md](CONFIG.md); how each script works (algorithm, formulas, and why) is in [docs/](docs/README.md); **how to read every figure** is in [READING_FIGURES.md](READING_FIGURES.md).
 
+> **New (adviser, 2026-10-26): run every simulation from [notebooks/earl_simulation.ipynb](notebooks/earl_simulation.ipynb).**
+> Open it with the `.venv` kernel, edit the Settings cell, Run All. It writes the same CSVs as the scripts below (no
+> figures). The scripts and this guide stay until the notebook replaces them.
+
 All commands below are run from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
 ## The data
