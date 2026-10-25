@@ -142,7 +142,7 @@ def user_table(legit_n: int, impostor_n: int, legit: list[str], legit_acc: dict,
                k: np.ndarray, s: np.ndarray) -> pd.DataFrame:
     """One confusion matrix per (legitimate user, half, sessions, sensitivity): the user's own test sessions and every
     impostor attempt against the user's library. Test sessions alternate between halves (even = pick, odd = check),
-    so 18 can choose a setting on one half and score it on sessions it never saw."""
+    so 15 can choose a setting on one half and score it on sessions it never saw."""
     rows = []
     for p, u in enumerate(legit):
         genuine = legit_acc[u]

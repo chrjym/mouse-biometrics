@@ -17,8 +17,8 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    │   06 draw the strokes   07 run the notebook   08 matched pairs (table)   09 genuine check │
    │   10 accuracy per user across the runs of one hash folder                               │
    │   12 best sensitivity and sessions per split (from 10's accuracy.csv)                   │
-   │   16 sensitivity sweep: fixed splits × library size × sensitivity → confusion matrices  │
-   │   17 draw 16's sweep: accuracy vs sensitivity, heatmap, FAR/FRR                        │
+   │   13 sensitivity sweep: fixed splits × library size × sensitivity → confusion matrices  │
+   │   14 draw 13's sweep: accuracy vs sensitivity, heatmap, FAR/FRR                        │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -36,9 +36,9 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 09 | [09_genuine_check.md](09_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
 | 10 | [10_plot_accuracy.md](10_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
 | 12 | [12_pick_best.md](12_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
-| 16 | [16_sweep_sensitivity.md](16_sweep_sensitivity.md) | Per fixed split, nearest-DTW cost once per (test, library) session pair; every library size a running minimum, every sensitivity a cut; TP/FP/FN/TN per setting |
-| 18 | [18_best_setting.md](18_best_setting.md) | Best sensitivity and library size per legitimate user and per split, picked on half the test sessions and checked on the other half |
-| 17 | [17_plot_sweep.md](17_plot_sweep.md) | Balanced accuracy vs sensitivity and as a heatmap, FAR/FRR at 1, m/4, m/2, m sessions; no best setting picked |
+| 13 | [13_sweep_sensitivity.md](13_sweep_sensitivity.md) | Per fixed split, nearest-DTW cost once per (test, library) session pair; every library size a running minimum, every sensitivity a cut; TP/FP/FN/TN per setting |
+| 14 | [14_plot_sweep.md](14_plot_sweep.md) | Balanced accuracy vs sensitivity and as a heatmap, FAR/FRR at 1, m/4, m/2, m sessions; no best setting picked |
+| 15 | [15_best_setting.md](15_best_setting.md) | Best sensitivity and library size per legitimate user and per split, picked on half the test sessions and checked on the other half |
 
 ## Words used on every page
 

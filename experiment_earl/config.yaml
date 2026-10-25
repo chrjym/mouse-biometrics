@@ -10,7 +10,7 @@ n_legitimate: 1            # users whose shapes form the legitimate profiles
 n_impostor: 9              # other users compared against them (n_legitimate + n_impostor <= 10 Balabit users)
 sessions_per_user: 44       # sessions per user; the notebook tests 1, 2, ... up to this (max: printed by every script)
 
-# --- Sensitivity sweep (16, 17): left out of the run hash, so the sweep writes into runs/<hash>/sweep/ ---
+# --- Sensitivity sweep (13, 14): left out of the run hash, so the sweep writes into runs/<hash>/sweep/ ---
 # The splits are fixed; each [legitimate, impostor] pair is its own draw from `seed`, so only the users are random.
 splits:
   - [1, 5]

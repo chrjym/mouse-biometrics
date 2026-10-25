@@ -7,8 +7,8 @@ No single best setting is picked; the whole grid is the result.
 > every dial position and antenna length, then look at the whole map. If the map is flat at 0.5, there is no
 > station to find.
 
-Code: [`src/16_sweep_sensitivity.py`](src/16_sweep_sensitivity.py) (counts) and
-[`src/17_plot_sweep.py`](src/17_plot_sweep.py) (figures). Settings: the sweep keys of [`config.yaml`](config.yaml).
+Code: [`src/13_sweep_sensitivity.py`](src/13_sweep_sensitivity.py) (counts) and
+[`src/14_plot_sweep.py`](src/14_plot_sweep.py) (figures). Settings: the sweep keys of [`config.yaml`](config.yaml).
 
 ---
 
@@ -109,7 +109,7 @@ when ≥ `match_session_ratio` of their attempts pass.
  figures: accuracy vs sensitivity, heatmap, FAR / FRR
 ```
 
-## 7. The figures (17)
+## 7. The figures (14)
 
 | Figure | x | y | Shows |
 |---|---|---|---|
@@ -134,7 +134,7 @@ Outputs: `runs/<hash>/sweep/` (`confusion.csv`, `parts/`, `config.yaml`, the fou
 
 ---
 
-## 10. Best setting per user (18)
+## 10. Best setting per user (15)
 
 To answer "at which sensitivity and with how many sessions should this user be profiled?", the sweep also keeps
 one confusion matrix per legitimate user (the user's own test sessions and every impostor attempt against their
@@ -149,5 +149,5 @@ The check-half score is the one to report: the pick-half score is the highest of
 optimistic. A user is profiled reliably only when the check score stays close to the pick score and clearly
 above 0.5. The same is done per split, with its users' counts added.
 
-In the figures (run 16 → 18 → 17), the split's best is an orange star on the heatmap and on the accuracy line graph, each user's best is a labelled circle on the heatmap, and each panel shows
+In the figures (run 13 → 15 → 14), the split's best is an orange star on the heatmap and on the accuracy line graph, each user's best is a labelled circle on the heatmap, and each panel shows
 the pick → check balanced accuracy.

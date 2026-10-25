@@ -1,4 +1,4 @@
-# `16_sweep_sensitivity.py` and `17_plot_sweep.py`: the sensitivity sweep
+# `13_sweep_sensitivity.py` and `14_plot_sweep.py`: the sensitivity sweep
 
 [← index](README.md)
 
@@ -11,10 +11,10 @@ Settings are the sweep keys of [`config.yaml`](../config.yaml) (`splits`, `sweep
 
 Outputs, in `runs/<hash>/sweep/` (hash = `config.yaml` without its sweep keys):
 
-- 16: `confusion.csv` (one row per split × sessions × sensitivity: TP, FP, FN, TN, accuracy, FAR, FRR,
+- 13: `confusion.csv` (one row per split × sessions × sensitivity: TP, FP, FN, TN, accuracy, FAR, FRR,
   balanced accuracy, the same matrix counted per user, and the users drawn), `parts/<L>_<I>.csv` (one per split;
   a rerun reuses finished splits, delete `parts/` to recompute after a code change) and a copy of `config.yaml`.
-- 17: `accuracy_vs_sensitivity.png` (balanced accuracy per split, lines at 1, m/4, m/2, m sessions),
+- 14: `accuracy_vs_sensitivity.png` (balanced accuracy per split, lines at 1, m/4, m/2, m sessions),
   `accuracy_heatmap.png` (sessions × sensitivity per split, colour = balanced accuracy: white = 0.5 chance, blue = better,
   red = worse, as 12) and `far_frr.png` (FAR and FRR at 1, m/4, m/2, m sessions). No best setting is picked: the
   highest of ~4,000 cells per split, scored on the same data, sits above chance even without any signal.
@@ -28,7 +28,7 @@ Outputs, in `runs/<hash>/sweep/` (hash = `config.yaml` without its sweep keys):
 
 One count per legitimate test session and per impostor (session, library) attempt, so impostors get one chance per
 attempt like legitimate sessions. Accuracy = (TP + TN) / all attempts; FAR = FN / impostor attempts;
-FRR = FP / legitimate sessions. With unequal mixes (1 I × 5 L) accuracy rewards accepting everyone, so 17 plots
+FRR = FP / legitimate sessions. With unequal mixes (1 I × 5 L) accuracy rewards accepting everyone, so 14 plots
 `balanced_accuracy` = 1 − (FAR + FRR) / 2 (0.5 = chance). On seed 927 plain accuracy chose "reject
 everyone" (5 I × 1 L) and "accept everyone" (1 I × 5 L) at 0.83.
 

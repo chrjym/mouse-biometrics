@@ -170,14 +170,14 @@ Outputs, in `runs/<hash>/best/` (rewritten each time): `best.csv` (one row per s
 
 ### K. Sensitivity sweep: one confusion matrix per setting
 
-For the fixed `splits` of `config.yaml` (only the users are drawn from `seed`), every library size 1 … `sweep_sessions_max` and every sensitivity of `sweep_sensitivity`, 16 accepts or rejects each test session (a legitimate user's last `sweep_test_sessions` against their own library, an impostor's first `sweep_test_sessions` against each legitimate library as a separate attempt) and counts TP / FP / FN / TN with positive = impostor. Each setting is counted from scratch; nothing is appended across iterations. 17 draws the result.
+For the fixed `splits` of `config.yaml` (only the users are drawn from `seed`), every library size 1 … `sweep_sessions_max` and every sensitivity of `sweep_sensitivity`, 13 accepts or rejects each test session (a legitimate user's last `sweep_test_sessions` against their own library, an impostor's first `sweep_test_sessions` against each legitimate library as a separate attempt) and counts TP / FP / FN / TN with positive = impostor. Each setting is counted from scratch; nothing is appended across iterations. 14 draws the result.
 
 ```bash
-.venv/bin/python experiment_earl/src/16_sweep_sensitivity.py
-.venv/bin/python experiment_earl/src/17_plot_sweep.py
+.venv/bin/python experiment_earl/src/13_sweep_sensitivity.py
+.venv/bin/python experiment_earl/src/14_plot_sweep.py
 ```
 
-Outputs, in `runs/<hash>/sweep/`: `confusion.csv` (one row per split, library size and sensitivity, with session- and user-level counts and the users drawn), `parts/` (one CSV per finished split, reused on a rerun; delete it after a code change), `config.yaml`, and from 17 `accuracy_vs_sensitivity.png`, `accuracy_heatmap.png`, `far_frr.png`, `confusion_matrices.png`. 16 also writes `user_confusion.csv`; `18_best_setting.py` picks the best sensitivity and library size per legitimate user on half the test sessions and scores it on the other half (`sweep/best/`).
+Outputs, in `runs/<hash>/sweep/`: `confusion.csv` (one row per split, library size and sensitivity, with session- and user-level counts and the users drawn), `parts/` (one CSV per finished split, reused on a rerun; delete it after a code change), `config.yaml`, and from 14 `accuracy_vs_sensitivity.png`, `accuracy_heatmap.png`, `far_frr.png`, `confusion_matrices.png`. 13 also writes `user_confusion.csv`; `15_best_setting.py` picks the best sensitivity and library size per legitimate user on half the test sessions and scores it on the other half (`sweep/best/`).
 
 ## 4. Where the results are
 

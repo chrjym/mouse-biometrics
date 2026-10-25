@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Draw the sweep of 16 (accuracy vs sensitivity per split, sessions x sensitivity heatmaps, FAR/FRR, confusion matrices) -> runs/<hash>/sweep/."""
+"""Draw the sweep of 13 (accuracy vs sensitivity per split, sessions x sensitivity heatmaps, FAR/FRR, confusion matrices) -> runs/<hash>/sweep/."""
 
 import argparse
 from importlib import import_module
@@ -14,7 +14,7 @@ import pandas as pd
 from matplotlib.colors import TwoSlopeNorm
 
 cfg_mod = import_module("00_config")
-sweep_mod = import_module("16_sweep_sensitivity")
+sweep_mod = import_module("13_sweep_sensitivity")
 
 ROOT = Path(__file__).resolve().parents[1]
 COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]  # fixed order, one per split
@@ -34,10 +34,10 @@ def active_xlim(table: pd.DataFrame) -> tuple[float, float]:
 
 
 def load_best(folder: Path) -> tuple[dict | None, pd.DataFrame | None]:
-    """18's choices if it has run: per split {(legit, impostor): row} and the per-user table; else (None, None)."""
+    """15's choices if it has run: per split {(legit, impostor): row} and the per-user table; else (None, None)."""
     best = folder / "best"
     if not (best / "best_splits.csv").exists():
-        print("No best/ yet: run 18_best_setting.py first to mark the best settings")
+        print("No best/ yet: run 15_best_setting.py first to mark the best settings")
         return None, None
     splits = pd.read_csv(best / "best_splits.csv")
     return {(r.n_legitimate, r.n_impostor): r for r in splits.itertuples()}, pd.read_csv(best / "best_users.csv")
@@ -185,7 +185,7 @@ def plot_confusion(table: pd.DataFrame, sessions: int, sensitivities: list[float
 
 def plot_simple(table: pd.DataFrame, users: pd.DataFrame, path: Path) -> None:
     """One plain chart: balanced accuracy (%) against sensitivity, one line per split at one shared library size
-    (the median of 18's per-user best sizes), the too-strict / just-right / too-loose zones, a star at each peak."""
+    (the median of 15's per-user best sizes), the too-strict / just-right / too-loose zones, a star at each peak."""
     k = int(users["sessions"].median())
     fig, ax = plt.subplots(figsize=(8, 4.6), layout="constrained")
     peaks = []

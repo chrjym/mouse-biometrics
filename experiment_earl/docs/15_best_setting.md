@@ -1,17 +1,17 @@
-# `18_best_setting.py`: best sensitivity and library size per user
+# `15_best_setting.py`: best sensitivity and library size per user
 
-[← index](README.md) · previous: [17](17_plot_sweep.md)
+[← index](README.md) · previous: [14](14_plot_sweep.md)
 
 ## What it does
 
 Answers "at which sensitivity and with how many sessions should a given user be profiled?" from
-`runs/<hash>/sweep/user_confusion.csv` (written by [16](16_sweep_sensitivity.md)), without scoring the choice on the
+`runs/<hash>/sweep/user_confusion.csv` (written by [13](13_sweep_sensitivity.md)), without scoring the choice on the
 sessions it was chosen on.
 
-- 16 counts one confusion matrix per (legitimate user, sessions, sensitivity): the user's own 40 test sessions and
+- 13 counts one confusion matrix per (legitimate user, sessions, sensitivity): the user's own 40 test sessions and
   every impostor attempt against that user's library. Test sessions alternate between two halves: even = **pick**,
   odd = **check**.
-- 18 picks, per user and per split, the setting with the highest balanced accuracy on the pick half (ties: fewer
+- 15 picks, per user and per split, the setting with the highest balanced accuracy on the pick half (ties: fewer
   sessions, then lower sensitivity), and reports the same setting's scores on the check half unchanged.
 
 Outputs in `runs/<hash>/sweep/best/`: `best_users.csv`, `best_splits.csv` (pick- and check-half TP/FP/FN/TN, FAR,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Best sensitivity and library size per legitimate user and per split, chosen on the pick half of 16's test sessions and scored on the check half -> runs/<hash>/sweep/best/."""
+"""Best sensitivity and library size per legitimate user and per split, chosen on the pick half of 13's test sessions and scored on the check half -> runs/<hash>/sweep/best/."""
 
 import argparse
 from importlib import import_module
@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 cfg_mod = import_module("00_config")
-sweep_mod = import_module("16_sweep_sensitivity")
+sweep_mod = import_module("13_sweep_sensitivity")
 
 ROOT = Path(__file__).resolve().parents[1]
 SPLIT = ["n_legitimate", "n_impostor"]
@@ -72,7 +72,7 @@ def main() -> None:
     folder = sweep_mod.out_folder(plan, base)
     path = folder / "user_confusion.csv"
     if not path.exists():
-        raise SystemExit(f"{path} is missing; run 16_sweep_sensitivity.py (delete sweep/parts/ if it ran before 18 existed)")
+        raise SystemExit(f"{path} is missing; run 13_sweep_sensitivity.py (delete sweep/parts/ if it ran before 15 existed)")
     table = pd.read_csv(path)
     users = pick(table, SPLIT + ["user"])
     splits = pick(scores(table.groupby(SPLIT + ["half"] + SETTING, as_index=False)[COUNTS].sum()), SPLIT)

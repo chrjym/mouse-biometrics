@@ -167,8 +167,8 @@ $$\text{FRR} = \frac{|\{g\in G: g \text{ rejected}\}|}{|G|},\qquad \text{FAR} = 
 
 Configurations are compared in four studies, each holding all other settings fixed:
 
-1. **Sensitivity study (user × user × sensitivity).** Sweep $\tau$ from 0.01 to 1.00 in 0.01 steps (`16_sweep_sensitivity.py`). Plot accuracy and FAR/FRR against $\tau$ to find where users begin to separate.
-2. **Enrollment-size study (user × session × sensitivity).** Vary library size $s$ from 1 to 40 sessions at each $\tau$; heatmaps of accuracy over ($\tau$, $s$) (`17_plot_sweep.py`, `10_plot_accuracy.py`).
+1. **Sensitivity study (user × user × sensitivity).** Sweep $\tau$ from 0.01 to 1.00 in 0.01 steps (`13_sweep_sensitivity.py`). Plot accuracy and FAR/FRR against $\tau$ to find where users begin to separate.
+2. **Enrollment-size study (user × session × sensitivity).** Vary library size $s$ from 1 to 40 sessions at each $\tau$; heatmaps of accuracy over ($\tau$, $s$) (`14_plot_sweep.py`, `10_plot_accuracy.py`).
 3. **Legitimate/impostor mix study.** Repeat 1–2 for the splits $[N_L, N_I] \in \{[5,1], [1,5], [3,2], [2,3]\}$ to see whether results depend on how many profiles an impostor can try.
 4. **Generalization (seed) check.** The best ($\tau$, $s$) per split is chosen on one seed (`12_pick_best.py`) and applied unchanged to new seeds (`14_seed_check.py`). The drop from the tuning seed to new seeds measures over-fitting to the draw.
 

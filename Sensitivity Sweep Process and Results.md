@@ -179,8 +179,8 @@ What the sweep still settles:
 Run from the repo root. The run takes about 1.5 minutes with a warm DTW cache.
 
 ```
-.venv/bin/python experiment_earl/src/16_sweep_sensitivity.py
-.venv/bin/python experiment_earl/src/17_plot_sweep.py
+.venv/bin/python experiment_earl/src/13_sweep_sensitivity.py
+.venv/bin/python experiment_earl/src/14_plot_sweep.py
 ```
 
 Outputs land in `experiment_earl/runs/526e7a/sweep/`: `confusion.csv` (16,000 rows), `best.csv`, `accuracy_vs_sensitivity.png`, `accuracy_heatmap.png`, `far_frr.png`, `confusion_best.png`. The output folder does not depend on the sensitivity grid, so move or delete an old `sweep/` folder before running a new grid.

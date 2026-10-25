@@ -39,7 +39,7 @@ runs/1a2b3c/1_9_0.04_10/
 08_plot_matches      lists the impostor strokes that matched each legitimate user in the notebook (matches.csv)
 09_genuine_check     the legitimate users' own unused sessions against their own profile (CSV only)
 10_plot_accuracy     every run of one runs/<hash>/ folder: sessions through per legitimate and impostor user (accuracy.csv)
-16_sweep_sensitivity fixed splits × library size × sensitivity: one confusion matrix per setting
+13_sweep_sensitivity fixed splits × library size × sensitivity: one confusion matrix per setting
 ```
 
 **One draw, fixed for the whole run** (user decision, 2026-10-12): scripts 01–05, the **notebook**, 08 and 09 make one RNG draw from `seed` that picks the `n_legitimate` legitimate users, the `n_impostor` impostors and each user's session order. Nothing is redrawn afterwards, so every step, figure and table of a run uses the same users and sessions. The notebook tests 1, 2, ... up to `sessions_per_user` sessions per user on that draw. Scripts 08 and 09 use the same draw and settings (the main configuration).
@@ -79,9 +79,9 @@ Chunks that are not comparable (zero length) still count in the denominator of a
 
 The **sensitivity** (called *threshold* before 2026-10-14) is `matched impostor users / total impostor users`. 0 is best: impostors never look like the legitimate users.
 
-## Sensitivity sweep (scripts 16 and 17)
+## Sensitivity sweep (scripts 13 and 14)
 
-These four keys are read only by 16 and are **left out of the run hash**, so changing them keeps the same `runs/<hash>/` folder; 16 reuses finished splits in `runs/<hash>/sweep/parts/` (delete it after a code change).
+These four keys are read only by 13 and are **left out of the run hash**, so changing them keeps the same `runs/<hash>/` folder; 13 reuses finished splits in `runs/<hash>/sweep/parts/` (delete it after a code change).
 
 | Setting | Default | Meaning |
 |---|---|---|

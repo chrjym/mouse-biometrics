@@ -27,7 +27,7 @@ def load_config(path: Path | None = None, **overrides) -> dict:
 
 
 RUN_KEYS = ("n_legitimate", "n_impostor", "sensitivity", "sessions_per_user")  # name the run, not the hash
-SWEEP_KEYS = ("splits", "sweep_sensitivity", "sweep_sessions_max", "sweep_test_sessions")  # only 16 reads these
+SWEEP_KEYS = ("splits", "sweep_sensitivity", "sweep_sessions_max", "sweep_test_sessions")  # only 13 reads these
 
 
 def run_folder_name(config: dict) -> str:
