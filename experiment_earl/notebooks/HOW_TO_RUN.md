@@ -143,12 +143,16 @@ that JupyterLab has built in. It then keeps running on the server after you clos
    ```
 
    `nohup ... &` keeps it running after the tab closes; the messages go to `notebook_run.log`.
-4. **Follow the progress.** In this mode the cells' printed output is not shown. The batch writes one line per
-   finished run to its log, so watch that:
+4. **Watch it live.** The terminal itself shows nothing while the notebook runs, but everything the notebook prints
+   (each batch run, each sweep split, every `Output:` line, the best settings) is also written to a progress file.
+   Follow it with:
 
    ```bash
-   tail -f experiment_earl/runs/batch_log.csv    # Ctrl+C stops watching; the run goes on
+   tail -f experiment_earl/runs/notebook_progress.log    # Ctrl+C stops watching; the run goes on
    ```
+
+   Each start adds a `=== <date time> notebook started ===` line, so earlier runs stay above it. For a one-line-per-run
+   table of the batch, `experiment_earl/runs/batch_log.csv` is still written too.
 
 5. **Is it still running?**
 
@@ -211,7 +215,7 @@ with more CPU cores runs the matching faster.
 | `FileNotFoundError: No datasets/balabit found` | The notebook was opened from outside the repository. Open it from `experiment_earl/notebooks/`. |
 | `ValueError: Settings do not fit the data` | The message lists what to change in the Settings cell (section 3, limits). |
 | `No finished runs ...: run section 3 first` | Switch `"batch"` on, or check that `SETTINGS` is the same as when the runs were made. |
-| Started from the terminal and nothing appears | Normal: printed output is not shown in that mode. Watch `runs/batch_log.csv` and check `pgrep -af jupyter-execute` (section 4). |
+| Started from the terminal and nothing appears | Normal: the terminal shows nothing in that mode. Watch `tail -f experiment_earl/runs/notebook_progress.log`, and check `pgrep -af jupyter-execute` (section 4). |
 | Terminal: `No such file or directory: .venv/bin/jupyter` | The terminal is not in the repository root. `cd` into the repository folder and start again. |
 | A batch run shows `failed` | The error is printed and saved in `runs/batch_log.csv`; the batch continues with the next run. |
 | The server or kernel stopped in the middle of a batch | Open the notebook again and press Run All. With `SKIP_FINISHED_RUNS = True`, finished runs are skipped and only the rest is simulated. It does **not** restart by itself. |
