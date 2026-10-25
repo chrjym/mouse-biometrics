@@ -20,6 +20,28 @@ Suggested format per entry:
 
 ---
 
+## [2026-10-24] — Sweep concept: best setting per user (18) and confusion-matrix figure
+
+**Context:** Additions to `experiment_earl/SWEEP_CONCEPT.md` (commits `16aa0f77b`, `9b39140cb`, `4127e22b1`), to bring to the adviser. Not adviser feedback yet.
+
+**Feedback:** None yet; to be presented at the next consultation.
+
+**Decisions (as the code stands):**
+- **New figure (17):** `confusion_matrices.png`, 2 × 2 matrices per split at sensitivity 0.01, 0.02, 0.05, 0.10 (40 sessions), with counts and the share of each column. The sweep now outputs four figures.
+- **Best setting per user (18):** the sweep (16) also keeps one confusion matrix per legitimate user (the user's own test sessions plus every impostor attempt against their library). Each user's 40 test sessions alternate between two halves:
+  - **Pick** (even, 20 sessions): choose the setting with the highest balanced accuracy; ties → fewer sessions, then lower sensitivity.
+  - **Check** (odd, 20 sessions): score that same setting on sessions it never saw.
+- The check-half score is the one to report: the pick score is the best of 4,000 settings and always optimistic. A user is profiled reliably only when the check score stays close to the pick score and clearly above 0.5. The same is done per split by adding its users' counts.
+- Reading: library size = sessions needed at registration; sensitivity = verification tolerance.
+- **Figures** (run order 16 → 18 → 17): the split's best is an orange star on the heatmap and the accuracy line graph; each user's best is a labelled circle on the heatmap; each panel shows the pick → check balanced accuracy.
+
+**Open questions:**
+- Section 8 ("Why no best setting is picked") still contradicts section 10; which framing should the thesis use?
+- Is a pick/check split of one seed's sessions enough, or should the frozen best setting also be tested on held-out seeds (e.g. 946–955)?
+- The figures table in the concept lacks the best-setting star on the accuracy line graph.
+
+---
+
 ## [2026-10-24] — Sweep: seed (RNG) dependence and how the confusion matrix is counted
 
 **Context:** Group clarification of the sensitivity sweep (`experiment_earl/src/16_sweep_sensitivity.py`, `sweep.yaml`, run `19399f`), to bring to the adviser. Not adviser feedback yet.
