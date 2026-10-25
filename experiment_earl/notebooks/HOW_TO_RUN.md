@@ -140,9 +140,12 @@ that JupyterLab has built in. It then keeps running on the server after you clos
    ```bash
    mkdir -p experiment_earl/runs
    nohup .venv/bin/jupyter execute experiment_earl/notebooks/earl_simulation.ipynb > experiment_earl/runs/notebook_run.log 2>&1 &
+   echo $! > experiment_earl/runs/notebook_run.pid
    ```
 
-   `nohup ... &` keeps it running after the tab closes; the messages go to `notebook_run.log`.
+   `nohup ... &` keeps it running after the tab closes; the messages go to `notebook_run.log`. The terminal prints
+   the run's process ID (PID), e.g. `[1] 90133`, and the second line saves it to `notebook_run.pid`, so you can
+   find it again from a new terminal tab.
 4. **Watch it live.** The terminal itself shows nothing while the notebook runs, but everything the notebook prints
    (each batch run, each sweep split, every `Output:` line, the best settings) is also written to a progress file.
    Follow it with:
@@ -154,16 +157,22 @@ that JupyterLab has built in. It then keeps running on the server after you clos
    Each start adds a `=== <date time> notebook started ===` line, so earlier runs stay above it. For a one-line-per-run
    table of the batch, `experiment_earl/runs/batch_log.csv` is still written too.
 
-5. **Is it still running?**
+5. **See the process (PID) and whether it is still running.** A run is two processes: the runner, whose PID was
+   saved above, and the kernel that does the computing (a child of the runner).
 
    ```bash
-   pgrep -af jupyter-execute
+   PID=$(cat experiment_earl/runs/notebook_run.pid)
+   ps -o pid,etime,%cpu,%mem,cmd -p $PID           # the runner: PID, time running, CPU, memory
+   ps -o pid,etime,%cpu,%mem -p $(pgrep -P $PID)  # the kernel doing the work
+   top -p $(pgrep -P $PID)                         # live CPU and memory of the kernel; q to quit
+   pgrep -af jupyter-execute                       # every notebook run on this machine
    ```
 
-   No line means it has finished. If a cell failed, the run stopped there and the error is at the end of the log:
-   `tail -20 experiment_earl/runs/notebook_run.log`. The results are where section 5 says.
-6. **Stop it early:** `kill <number>`, with the number at the start of the `pgrep` line. Its kernel shuts down with
-   it, and finished runs are kept.
+   If `ps -p $PID` prints only the header line, the run has finished. If a cell failed, the run stopped there and the
+   error is at the end of the log: `tail -20 experiment_earl/runs/notebook_run.log`. The results are where section 5
+   says.
+6. **Stop it early:** `kill $(cat experiment_earl/runs/notebook_run.pid)`. Its kernel shuts down with it, and
+   finished runs are kept.
 
 Do not start a second run of the notebook (terminal or browser) while one is going: both would write the same
 files. A run started this way does not restart by itself if the server is restarted.
