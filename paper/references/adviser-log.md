@@ -20,6 +20,23 @@ Suggested format per entry:
 
 ---
 
+## [2026-10-26] — Replace the Python scripts with a Jupyter notebook
+
+**Context:** The EARL experiment runs as numbered scripts in `experiment_earl/src/` from the terminal (batch, accuracy, best setting, sweep). Cleanup the same day removed the executed-notebook copies, the PNG output of 08–10 and the cohort / seed-check scripts (old 13–15), and renumbered the sweep to 13–15.
+
+**Feedback:** All Python scripts should be replaced by a Jupyter notebook (`.ipynb`), and every simulation should run in the notebook, not from the terminal.
+
+**Decisions:**
+- One new notebook replaces the scripts; `notebooks/session_progression.ipynb` is no longer used.
+- All settings are set inside the notebook; it writes CSV outputs only for now (the group writes the figure code later).
+- It must run locally, on another machine or on a remote Jupyter server.
+
+**Open questions:**
+- Which script stages carry over into the notebook (e.g. the file-based single trial 01–05, the per-chunk PNGs of 06, matched pairs 08, genuine check 09)?
+- Whether `config.yaml`, `batch.yaml` and the per-script docs are retired with the scripts.
+
+---
+
 ## [2026-10-24] — Sweep concept: best setting per user (18) and confusion-matrix figure
 
 **Context:** Additions to `experiment_earl/SWEEP_CONCEPT.md` (commits `16aa0f77b`, `9b39140cb`, `4127e22b1`), to bring to the adviser. Not adviser feedback yet.
