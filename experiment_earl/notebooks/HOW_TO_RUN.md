@@ -126,6 +126,44 @@ Press **Run All** (VS Code: *Run All* at the top; Jupyter: *Run → Run All Cell
 Each section prints what it wrote (`Output: ...`). To run only some sections, switch the others off in `SECTIONS`
 and press Run All again.
 
+### Long runs: start it from the Jupyter terminal (recommended by the adviser)
+
+Run All in the browser is fine for short runs. For a batch that takes hours, start the notebook from the terminal
+that JupyterLab has built in. It then keeps running on the server after you close the terminal tab or the browser.
+
+1. Edit the Settings cell and **save the notebook** (`Ctrl+S`). The terminal run reads the saved file, not what is
+   on your screen.
+2. Open a terminal inside Jupyter: **File → New → Terminal** (or the *Terminal* tile in the Launcher). It is a shell
+   on the server, in the folder Jupyter was started from. If that is not the repository root, `cd` into it first.
+3. Start the run in the background:
+
+   ```bash
+   mkdir -p experiment_earl/runs
+   nohup .venv/bin/jupyter execute experiment_earl/notebooks/earl_simulation.ipynb > experiment_earl/runs/notebook_run.log 2>&1 &
+   ```
+
+   `nohup ... &` keeps it running after the tab closes; the messages go to `notebook_run.log`.
+4. **Follow the progress.** In this mode the cells' printed output is not shown. The batch writes one line per
+   finished run to its log, so watch that:
+
+   ```bash
+   tail -f experiment_earl/runs/batch_log.csv    # Ctrl+C stops watching; the run goes on
+   ```
+
+5. **Is it still running?**
+
+   ```bash
+   pgrep -af jupyter-execute
+   ```
+
+   No line means it has finished. If a cell failed, the run stopped there and the error is at the end of the log:
+   `tail -20 experiment_earl/runs/notebook_run.log`. The results are where section 5 says.
+6. **Stop it early:** `kill <number>`, with the number at the start of the `pgrep` line. Its kernel shuts down with
+   it, and finished runs are kept.
+
+Do not start a second run of the notebook (terminal or browser) while one is going: both would write the same
+files. A run started this way does not restart by itself if the server is restarted.
+
 ## 5. Where the results are
 
 Everything goes to `experiment_earl/runs/<hash>/`. The 6-character `<hash>` is made from `SETTINGS`: the same
@@ -173,6 +211,8 @@ with more CPU cores runs the matching faster.
 | `FileNotFoundError: No datasets/balabit found` | The notebook was opened from outside the repository. Open it from `experiment_earl/notebooks/`. |
 | `ValueError: Settings do not fit the data` | The message lists what to change in the Settings cell (section 3, limits). |
 | `No finished runs ...: run section 3 first` | Switch `"batch"` on, or check that `SETTINGS` is the same as when the runs were made. |
+| Started from the terminal and nothing appears | Normal: printed output is not shown in that mode. Watch `runs/batch_log.csv` and check `pgrep -af jupyter-execute` (section 4). |
+| Terminal: `No such file or directory: .venv/bin/jupyter` | The terminal is not in the repository root. `cd` into the repository folder and start again. |
 | A batch run shows `failed` | The error is printed and saved in `runs/batch_log.csv`; the batch continues with the next run. |
 | The server or kernel stopped in the middle of a batch | Open the notebook again and press Run All. With `SKIP_FINISHED_RUNS = True`, finished runs are skipped and only the rest is simulated. It does **not** restart by itself. |
 | Results land in a new `runs/<hash>/` folder | A value in `SETTINGS` differs from before. Put it back to reuse the old folder. |

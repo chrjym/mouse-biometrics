@@ -20,6 +20,21 @@ Suggested format per entry:
 
 ---
 
+## [2026-10-26] — Run the simulation notebook from the Jupyter terminal
+
+**Context:** The simulation notebook (`experiment_earl/notebooks/earl_simulation.ipynb`) was built the same day to replace the scripts.
+
+**Feedback:** In a demonstration, the adviser ran the simulation from a terminal inside the Jupyter server, and suggested running it that way.
+
+**Decisions:**
+- Long runs are started from JupyterLab's own terminal (File → New → Terminal) with `nohup .venv/bin/jupyter execute experiment_earl/notebooks/earl_simulation.ipynb > experiment_earl/runs/notebook_run.log 2>&1 &`, so they keep running after the browser tab is closed. Run All in the browser stays for short runs.
+- Progress is followed in `runs/batch_log.csv` (one line per finished run), because `jupyter execute` does not show the cells' printed output; steps written to `experiment_earl/notebooks/HOW_TO_RUN.md`.
+
+**Open questions:**
+- Whether this is exactly the command the adviser used (the group did not see it); confirm at the next consultation.
+
+---
+
 ## [2026-10-26] — Replace the Python scripts with a Jupyter notebook
 
 **Context:** The EARL experiment runs as numbered scripts in `experiment_earl/src/` from the terminal (batch, accuracy, best setting, sweep). Cleanup the same day removed the executed-notebook copies, the PNG output of 08–10 and the cohort / seed-check scripts (old 13–15), and renumbered the sweep to 13–15.
