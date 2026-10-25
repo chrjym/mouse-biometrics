@@ -12,7 +12,7 @@ each legitimate user and each step $k$:
   `sessions_per_user` sessions and are therefore **never** in the profile;
 - **impostor:** the impostors' first $k$ sessions (exactly what the notebook tests).
 
-Outputs: `runs/<run>/results/genuine_check.csv`, `results/genuine_check_summary.csv`, `figures/genuine_check.png`.
+Outputs: `runs/<run>/results/genuine_check.csv`, `results/genuine_check_summary.csv`. No figure is drawn (removed 2026-10-26).
 
 ## Algorithm
 

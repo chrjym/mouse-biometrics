@@ -44,7 +44,7 @@ Tests `n_legitimate` legitimate users against `n_impostor` impostor users, with 
 .venv/bin/python experiment_earl/src/07_run_notebook.py
 ```
 
-This executes `notebooks/session_progression.ipynb` and saves the executed copy, with all tables and plots, in the run folder. You can also open the notebook in VS Code or Jupyter, pick the `.venv` kernel and run all cells; its CSVs and figures go to the same run folder, but the executed copy stays in `notebooks/` (clear its outputs before committing).
+This executes `notebooks/session_progression.ipynb`; its tables and plots go to the run folder. No executed `.ipynb` copy is saved. You can also open the notebook in VS Code or Jupyter, pick the `.venv` kernel and run all cells, with the same result.
 
 ### B. Single trial, step by step (file-based)
 
@@ -100,15 +100,14 @@ Each image shows the real screen path: green dot = start, red dot = end, blue = 
 
 ### D. Matched shapes behind the per-user bar graphs
 
-Shows which impostor strokes matched which strokes of each legitimate user in the notebook (A): the same draw, users and sessions, one figure per legitimate user and session step. Each panel is one matched pair after normalization (what DTW compares): the impostor stroke (red dashed) on the user's stroke it matched (blue), with both session ids, chunk numbers and the DTW cost per point. The figure title repeats the bar graph's verdict per impostor (strokes matched, sessions at or above `match_shape_ratio`, matched or not). Run the notebook first so the run folder exists.
+Lists which impostor strokes matched which strokes of each legitimate user in the notebook (A): the same draw, users and sessions, per legitimate user and session step. Each matched pair is one stroke (what DTW compares): the impostor stroke and the user's stroke it matched, with both session ids, chunk numbers and the DTW cost per point. The console prints, per impostor, the strokes matched and whether the sessions pass the notebook's rules (matched or not). Run the notebook first so the run folder exists.
 
 ```bash
 .venv/bin/python experiment_earl/src/08_plot_matches.py --run oct12_test2_d4015c                  # all users and steps, ~2 minutes
 .venv/bin/python experiment_earl/src/08_plot_matches.py --run oct12_test2_d4015c --user user9 --sessions 2
-.venv/bin/python experiment_earl/src/08_plot_matches.py --max 60                                   # more pairs per figure
 ```
 
-Outputs, inside the run folder: `figures/matches/<user>_sessions<k>.png` (at most `--max` pairs, random sample) and `results/matches.csv` (every matched stroke of the drawn users and steps).
+Output, inside the run folder: `results/matches.csv` (every matched stroke of the drawn users and steps). No figures are drawn.
 
 ### E. Genuine check: own unused sessions against their own profile
 
@@ -119,7 +118,7 @@ The notebook (A) only asks whether impostors get through. This asks the opposite
 .venv/bin/python experiment_earl/src/09_genuine_check.py --held-out 5                    # more own sessions per user
 ```
 
-Outputs, inside the run folder: `results/genuine_check.csv` (every tested session: share of strokes matched, passed or not), `results/genuine_check_summary.csv` and `figures/genuine_check.png` (one panel per legitimate user: own sessions blue, impostors red, label = sessions passed / tested).
+Outputs, inside the run folder: `results/genuine_check.csv` (every tested session: share of strokes matched, passed or not) and `results/genuine_check_summary.csv` (per profile, step and kind: mean share, sessions passed / tested). No figure is drawn.
 
 ### Working with an older run
 
@@ -138,25 +137,25 @@ Run folders are `<hash>/<n_legitimate>_<n_impostor>_<sensitivity>_<sessions_per_
 
 ```bash
 .venv/bin/python experiment_earl/src/11_batch.py --dry-run     # list the runs and which are done, run nothing
-.venv/bin/python experiment_earl/src/11_batch.py               # run them all, then plot (F)
+.venv/bin/python experiment_earl/src/11_batch.py               # run them all, then score (F)
 .venv/bin/python experiment_earl/src/11_batch.py --only 0.03   # one sensitivity only (quick test)
-.venv/bin/python experiment_earl/src/11_batch.py --no-plot     # skip F at the end
+.venv/bin/python experiment_earl/src/11_batch.py --no-accuracy # skip F at the end
 ```
 
 - **Resumable:** a run whose folder already has `results/session_progression.csv` is skipped, so rerunning the same command continues where it stopped and retries failed runs.
 - **If it is killed**, `config.yaml.batch-backup` stays behind and the next start refuses to run. Check `config.yaml`, copy the backup over it if needed, delete the backup, then start again.
-- **Outputs:** the run folders, `runs/batch_log.csv` (status and seconds per run), and in the hash folder F's files plus `summary/summary.csv` and `summary/README.md` (a table of every run with links to its plots).
+- **Outputs:** the run folders, `runs/batch_log.csv` (status and seconds per run), and in the hash folder F's `accuracy.csv` plus `summary/summary.csv` and `summary/README.md` (a table of every run with links to its run folder).
 
 ### F. Sessions through per user across the runs of one hash folder
 
-Runs that differ only in `n_legitimate`, `n_impostor`, `sensitivity` and `sessions_per_user` share one `runs/<hash>/` folder. This script scores every run in it and, per sensitivity, draws one figure with two line graphs: **legitimate users** (own last `sessions_per_user` sessions, never in a profile, against their own profile) and **impostor users** (their first `sessions_per_user` sessions, as in the notebook, against the legitimate profile that passes most of them). y = sessions that go through (≥ `match_shape_ratio` of strokes match), the notebook's fixed counts; one line per `sessions_per_user`; filled marker = the user goes through (≥ `match_session_ratio` of sessions).
+Runs that differ only in `n_legitimate`, `n_impostor`, `sensitivity` and `sessions_per_user` share one `runs/<hash>/` folder. This script scores every run in it: for **legitimate users** (own last `sessions_per_user` sessions, never in a profile, against their own profile) and **impostor users** (their first `sessions_per_user` sessions, as in the notebook, against the legitimate profile that passes most of them) it counts sessions that go through (≥ `match_shape_ratio` of strokes match), the notebook's fixed counts. A user is through at ≥ `match_session_ratio` of sessions.
 
 ```bash
 .venv/bin/python experiment_earl/src/10_plot_accuracy.py            # the hash folder config.yaml selects
 .venv/bin/python experiment_earl/src/10_plot_accuracy.py efdc92     # a specific hash folder
 ```
 
-Outputs, in the hash folder: `runs/<hash>/accuracy.csv` (one row per run and user: sessions passed / tested, matched strokes, strokes, through, best profile) and `runs/<hash>/accuracy_<L>_<I>_sensitivity_<value>.png` (one per split and sensitivity). It is resumable: each finished sensitivity is saved in `runs/<hash>/accuracy_parts/` and reused on a rerun, so a killed run loses at most the sensitivity in progress. Delete `accuracy_parts/` to rescore everything (for example after changing the scoring code).
+Output, in the hash folder: `runs/<hash>/accuracy.csv` (one row per run and user: sessions passed / tested, matched strokes, strokes, through, best profile). No figures are drawn. It is resumable: each finished sensitivity is saved in `runs/<hash>/accuracy_parts/` and reused on a rerun, so a killed run loses at most the sensitivity in progress. Delete `accuracy_parts/` to rescore everything (for example after changing the scoring code).
 
 ### G. The best sensitivity and sessions per split
 
@@ -167,40 +166,7 @@ After F, this reads `runs/<hash>/accuracy.csv` and scores every (split, sensitiv
 .venv/bin/python experiment_earl/src/12_pick_best.py 251ea4     # a specific hash folder
 ```
 
-Outputs, in `runs/<hash>/best/` (rewritten each time): `best.csv` (one row per split, both accuracies, `beats_chance` = user accuracy above 0.5), `scores.csv` (every cell), `best_rows.csv` (the `accuracy.csv` rows of the chosen cells), `best_heatmaps.png` (sensitivity × sessions per split, colour = user accuracy, chosen cell boxed) and a copy of F's figure for each chosen split and sensitivity.
-
-### H. Cohort scoring: does a session look more like its user than like other people?
-
-Instead of 10's yes/no stroke match, this scores every session continuously: **raw** = how close its strokes are to the claimed user's library, **cohort** = for each stroke, the share of other people whose library is farther away than the claimed user's (0.5 = no evidence). Every library holds the same number of strokes (sessions × 40), because bigger libraries are closer to everything. It reports the EER and the best user accuracy per split next to G's best.
-
-```bash
-.venv/bin/python experiment_earl/src/13_cohort_score.py 251ea4                     # sessions 2–10 (minutes)
-.venv/bin/python experiment_earl/src/13_cohort_score.py 251ea4 --max-sessions 30   # the whole batch range (much slower)
-```
-
-Outputs, in `runs/<hash>/cohort/`: `sessions.csv` (every claim with both scores), `cells.csv` (per split, sessions and method: EER, best threshold, users through, user and session accuracy), `best.csv` (best per split next to G's) and `cohort.png`.
-
-### I. New-seed check: do the chosen settings hold?
-
-G and H pick their best setting on the same runs they score. This takes each method's choice on the hash folder's seed (G: sensitivity + sessions; H: sessions + threshold, raw and cohort) and applies it unchanged to new seeds (new user order and sessions). Run F and G first.
-
-```bash
-.venv/bin/python experiment_earl/src/14_seed_check.py 251ea4                          # test seeds = seed + 1 ... + 3
-.venv/bin/python experiment_earl/src/14_seed_check.py 251ea4 --test-seeds 11 22 33 44
-```
-
-Outputs, in `runs/<hash>/seed_check/`: `results.csv` (per split, method and seed: setting, users through, accuracies, EER), `summary.csv` (training value vs test mean / min / max) and `seed_check.png`.
-
-### J. Draw what cohort scoring does
-
-After H, this draws one genuine, one typical impostor and the top impostor claim for a user: each stroke next to its nearest stroke in the claimed user's library and in every other person's (red = closer than the claimed user's, against the claim; grey = farther, for it), plus every claim's score per split with the chosen threshold.
-
-```bash
-.venv/bin/python experiment_earl/src/15_plot_cohort.py 251ea4
-.venv/bin/python experiment_earl/src/15_plot_cohort.py 251ea4 --user user9 --sessions 2 --strokes 8
-```
-
-Outputs, in `runs/<hash>/cohort/plots/`: `claim_<user>_{genuine,impostor_typical,impostor_top}.png` and `scores_per_split.png`.
+Outputs, in `runs/<hash>/best/` (rewritten each time): `best.csv` (one row per split, both accuracies, `beats_chance` = user accuracy above 0.5), `scores.csv` (every cell), `best_rows.csv` (the `accuracy.csv` rows of the chosen cells), `best_heatmaps.png` (sensitivity × sessions per split, colour = user accuracy, chosen cell boxed).
 
 ### K. Sensitivity sweep: one confusion matrix per setting
 
@@ -219,13 +185,10 @@ Outputs, in `runs/<hash>/sweep/`: `confusion.csv` (one row per split, library si
 experiment_earl/runs/<hash>/<L>_<I>_<sensitivity>_<sessions>/
 ├── config.yaml          the exact settings this run used
 ├── run.json             when the folder was created and the git commit
-├── notebooks/           executed notebook with all tables and plots                (A)
 ├── figures/
 │   ├── session_progression.png          bar graph: impostors matched per session step   (A)
 │   ├── session_progression_users.png    one bar graph per legitimate user               (A)
-│   ├── session_progression_heatmap.png  heatmap: sessions × legitimate users            (A)
-│   ├── matches/<user>_sessions<k>.png   matched impostor strokes on the user's strokes  (D)
-│   └── genuine_check.png                own unused sessions vs impostors, per profile   (E)
+│   └── session_progression_heatmap.png  heatmap: sessions × legitimate users            (A)
 ├── results/
 │   ├── session_progression.csv          one row per session step                        (A)
 │   ├── session_progression_steps.csv    every step, every impostor                      (A)
@@ -233,8 +196,8 @@ experiment_earl/runs/<hash>/<L>_<I>_<sensitivity>_<sessions>/
 │   ├── session_progression_users.csv    impostors matched per legitimate user and step  (A)
 │   ├── trial_0.json                     per-impostor and held-out match ratios          (B)
 │   ├── summary.csv                      sensitivity of the single trial                 (B)
-├── results/matches.csv    every matched stroke behind the per-user bar graphs      (D)
-├── results/genuine_check{,_summary}.csv  own unused sessions vs impostors     (E)
+│   ├── matches.csv                      every matched stroke behind the per-user counts (D)
+│   └── genuine_check{,_summary}.csv     own unused sessions vs impostors               (E)
 ├── shapes/              chunks (.npz) and chunk PNGs                                (B, C)
 └── temp/                drawn sessions and manifest.json                           (B)
 ```
@@ -249,18 +212,9 @@ experiment_earl/runs/
     ├── summary/{summary.csv,README.md}   one row per run, with links to the plots     (batch)
     ├── accuracy.csv                      every run and user: sessions passed / tested  (F)
     ├── accuracy_parts/                   one finished sensitivity per file (resume)    (F)
-    ├── accuracy_<L>_<I>_sensitivity_<v>.png  sessions through per user                (F)
     ├── best/                             best sensitivity + sessions per split         (G)
     │   ├── best.csv, scores.csv, best_rows.csv
-    │   ├── best_heatmaps.png             sensitivity × sessions per split, best boxed
-    │   └── accuracy_<L>_<I>_sensitivity_<v>.png   copies of F's chosen figures
-    ├── cohort/                           cohort scoring                                (H)
-    │   ├── sessions.csv, cells.csv, best.csv
-    │   ├── cohort.png                    EER per split; best user accuracy vs G
-    │   └── plots/                        claim_<user>_*.png, scores_per_split.png     (J)
-    ├── seed_check/                       chosen settings on new seeds                  (I)
-    │   ├── results.csv, summary.csv
-    │   └── seed_check.png
+    │   └── best_heatmaps.png             sensitivity × sessions per split, best boxed
     └── sweep/                            sensitivity × library size per split          (K)
         ├── confusion.csv, best.csv, splits.csv, config.yaml
         └── accuracy_vs_sensitivity.png, accuracy_heatmap.png, far_frr.png, confusion_best.png
@@ -270,10 +224,8 @@ experiment_earl/runs/
 
 - **Impostors matched**: how many impostor users looked like a legitimate user. Lower is better.
 - **Sensitivity** (called *threshold* before 2026-10-14) = impostors matched / impostor users, from 0 to 1. 0 is best: no impostor passed.
-- **User accuracy** (G, H, I): (legitimate users accepted / legitimate users + impostors kept out / impostors) / 2. 1 = perfect, **0.5 = chance**.
-- **EER** (H, I): the error rate where genuine sessions rejected equal impostor sessions accepted. 0 = perfect, **0.5 = chance**.
-- **Cohort score** (H, J): per stroke, the share of other people whose library is farther from it than the claimed user's; a session's score is the mean. **0.5 = no evidence**.
-- G and H choose their best setting on the same sessions they score, so their values are optimistic; I tests the choices on new seeds.
+- **User accuracy** (G): (legitimate users accepted / legitimate users + impostors kept out / impostors) / 2. 1 = perfect, **0.5 = chance**.
+- G chooses its best setting on the same sessions it scores, so its values are optimistic.
 
 The whole `runs/` folder is git-ignored: results stay on your computer. Copy a run folder to share it.
 
@@ -288,11 +240,8 @@ For the scripts (01–07), the first run of a new chunking or matching setting i
 | Single trial 01–05 | a few minutes (step 04 also scores the held-out sessions) |
 | Shape PNGs (C) for 10 users × 5 sessions | about 25 minutes (about 44,000 images) |
 | Batch, one notebook run | 6 s (2 sessions) to 44 s (30 sessions); `251ea4` (6,750 runs) took about 40 hours |
-| Sessions through (F), first time on `251ea4` | about 2 hours; a rerun with every part saved takes seconds, plus about 4 minutes to draw 450 figures |
+| Sessions through (F), first time on `251ea4` | about 2 hours; a rerun with every part saved takes seconds |
 | Best setting (G) | seconds |
-| Cohort scoring (H), sessions 2–10 | about 3 minutes the first time, about 30 seconds with a warm cache |
-| New-seed check (I), 3 new seeds | about 10 minutes |
-| Cohort plots (J) | about a minute |
 | Sensitivity sweep (K), 4 splits × 40 × 100 | about 3 minutes the first time, about 12 seconds with a warm cache; figures a few seconds |
 
 More sessions per user means more shapes to compare, so runs beyond 5 sessions take noticeably longer.
@@ -312,6 +261,3 @@ More sessions per user means more shapes to compare, so runs beyond 5 sessions t
 | `config.yaml.batch-backup exists: an earlier batch did not finish cleanly` | A batch was killed. Check `config.yaml`, copy the backup over it if needed, delete the backup, then rerun. |
 | `Killed` while running F on a large hash folder | Out of memory (fixed 2026-10-19: F now keeps one sensitivity at a time). Rerun; finished sensitivities in `accuracy_parts/` are reused. |
 | `No .../accuracy.csv: run 10_plot_accuracy.py <hash> first` | Run F before G. |
-| `No .../cohort/sessions.csv: run 13_cohort_score.py <hash> first` | Run H before J. |
-| `Needs run folders and .../best/best.csv: run 10 and 12 on <hash> first` | Run F and G before I. |
-| `Pools too small for N sessions` | Lower `--max-sessions` (H, I); every user needs about 3 × that many sessions. |

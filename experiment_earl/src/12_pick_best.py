@@ -111,10 +111,6 @@ def main() -> None:
     best.to_csv(out / "best.csv", index=False)
     keys = best[CELL].merge(table, on=CELL)
     keys.to_csv(out / "best_rows.csv", index=False)
-    for row in best.itertuples():
-        figure = group / f"accuracy_{row.n_legitimate}_{row.n_impostor}_sensitivity_{row.sensitivity:g}.png"
-        if figure.exists():
-            shutil.copy2(figure, out / figure.name)
     plot(cells, best, out / "best_heatmaps.png",
          f"runs/{group.name}: user accuracy = (legitimate users through + impostor users rejected) / 2\n"
          f"box = best per split (ties: session accuracy, then fewer sessions, then lower sensitivity)")
@@ -123,7 +119,7 @@ def main() -> None:
                        "impostor_users", "user_accuracy", "session_accuracy", "beats_chance"]
     print(best[columns].round(3).to_string(index=False))
     print(f"Cells: {len(cells)}  Splits: {len(best)}  Better than chance: {int(best.beats_chance.sum())}")
-    print(f"Output: {out}/ (best.csv, scores.csv, best_rows.csv, best_heatmaps.png, best accuracy figures)")
+    print(f"Output: {out}/ (best.csv, scores.csv, best_rows.csv, best_heatmaps.png)")
 
 
 if __name__ == "__main__":

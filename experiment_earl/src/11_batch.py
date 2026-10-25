@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run every notebook run of batch.yaml (skip finished runs, log), then plot them. config.yaml is never changed:
+"""Run every notebook run of batch.yaml (skip finished runs, log), then score them and summarize them. config.yaml is never changed:
 each run gets its own snapshot (config.yaml with the batch.yaml values) in its run folder."""
 
 import argparse
@@ -79,7 +79,7 @@ def main() -> None:
     parser.add_argument("--only", type=float, help="run a single sensitivity, e.g. 0.2 (quick test)")
     parser.add_argument("--dry-run", action="store_true", help="list the runs and whether each is done, run nothing")
     parser.add_argument("--timeout", type=int, default=3600, help="seconds allowed per notebook run")
-    parser.add_argument("--no-plot", action="store_true", help="skip the accuracy plots (10_plot_accuracy.py) at the end")
+    parser.add_argument("--no-accuracy", action="store_true", help="skip the accuracy table (10_plot_accuracy.py) and summary at the end")
     args = parser.parse_args()
 
     runs = plan_runs(yaml.safe_load(args.plan.read_text()), args.only)
@@ -126,17 +126,17 @@ def main() -> None:
     if new_folders:
         print("\nTo share the new runs (runs/ is git-ignored, so -f is needed):")
         print("  git add -f " + " ".join(f"experiment_earl/runs/{name}" for name in new_folders))
-    if not args.no_plot and counts["ok"] + counts["skipped"]:
-        plot_groups(sorted(groups))
+    if not args.no_accuracy and counts["ok"] + counts["skipped"]:
+        score_groups(sorted(groups))
 
 
-def plot_groups(groups: list[str]) -> None:
+def score_groups(groups: list[str]) -> None:
     """Run 10_plot_accuracy.py on each hash folder the plan used."""
     for group in groups:
-        print(f"\nPlotting runs/{group} (10_plot_accuracy.py) ...", flush=True)
+        print(f"\nScoring runs/{group} (10_plot_accuracy.py) ...", flush=True)
         result = subprocess.run([sys.executable, str(ROOT / "src" / "10_plot_accuracy.py"), group], cwd=ROOT.parent)
         if result.returncode != 0:
-            print(f"Plotting runs/{group} failed (exit code {result.returncode}); rerun: "
+            print(f"Scoring runs/{group} failed (exit code {result.returncode}); rerun: "
                   f".venv/bin/python experiment_earl/src/10_plot_accuracy.py {group}")
         else:
             summarize_group(cfg_mod.RUNS / group)
@@ -171,15 +171,10 @@ def summarize_group(group: Path) -> None:
     lines += [f"| {r.split} | {r.sensitivity:.2f} | {r.sessions} | {r.legit_passed}/{r.legit_tested} | {r.legit_accepted} | "
               f"{r.impostor_passed}/{r.impostor_tested} | {r.impostors_through} | [{r.run}](../{r.run}/) |"
               for r in summary.itertuples()]
-    lines += ["", "## Plots (one per split and sensitivity)", ""]
-    for split, part in summary.groupby("split", sort=False):
-        lines.append(f"- {split}: " + ", ".join(f"[{s:.2f}](../accuracy_{split}_sensitivity_{s:.2f}.png)"
-                                                 for s in sorted(part.sensitivity.unique())))
     lines += ["", "## Files", "",
               "- `summary/summary.csv`: the table above",
               "- `accuracy.csv`: every run and user (from `10_plot_accuracy.py`)",
-              "- `accuracy_<legit>_<impostor>_sensitivity_<value>.png`: the plots",
-              "- `<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>/`: one folder per run (results/, figures/, notebooks/)",
+              "- `<n_legitimate>_<n_impostor>_<sensitivity>_<sessions>/`: one folder per run (results/, figures/)",
               "- `../batch_log.csv`: which runs finished or failed, and how long each took", ""]
     (out / "README.md").write_text("\n".join(lines))
     print(f"Summary: {out / 'summary.csv'}, {out / 'README.md'}")

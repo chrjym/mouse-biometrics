@@ -8,7 +8,8 @@ The notebook ([07](07_run_notebook.md)) only *counts* impostors that match each 
 shows **which strokes** matched, by drawing each matched impostor stroke on top of the user's stroke it matched.
 It answers the question "what shapes make two different people look the same?"
 
-Outputs: `runs/<run>/figures/matches/<user>_sessions<k>.png`, `results/matches.csv` (every matched pair).
+Output: `runs/<run>/results/matches.csv` (every matched pair). No figures are drawn (removed 2026-10-26); the console
+prints each impostor's verdict.
 
 ## Algorithm
 
@@ -45,13 +46,13 @@ and its order are identical, a stroke counts as matched here exactly when it cou
 
 `_dtw_within` stops early and only answers yes/no. To print the actual cost in each panel (compiled with numba [[3]](#ref-3)), `dtw_cost` fills the
 whole banded DTW table (the recurrence in [04](04_match_shapes.md#the-dtw-recurrence)) and returns $D(n,n)$. The
-plot shows
+matches.csv column shows
 
 $$\text{cost per point} = D(n, n) / n \;\le\; \texttt{dtw\_tolerance}$$
 
 ### 3. Verdicts (`session_verdicts`)
 
-The figure title repeats the bar graph's decision for each impostor, with the rules of 04:
+The console line repeats the bar graph's decision for each impostor, with the rules of 04:
 
 $$r_s = \frac{\text{matched strokes of } s}{\text{strokes of } s}, \qquad
 \text{MATCHED} \iff \frac{|\{s : r_s \ge \sigma\}|}{k} \ge \rho$$
@@ -59,15 +60,11 @@ $$r_s = \frac{\text{matched strokes of } s}{\text{strokes of } s}, \qquad
 On runs `oct12_test2_d4015c` and `oct12_test2_e36855`, all 30 verdicts agree with
 `session_progression_users.csv`, which confirms that the script and the notebook compute the same thing.
 
-### 4. Plot (`plot_step`)
-
-At most `--max` (36) pairs, a seeded random sample, are drawn per figure. Each panel shows the user's stroke in
-blue, the impostor's stroke as a red dashed line, and the start in green, with the y axis inverted like the screen.
-
 ## Why
 
-Counts alone cannot explain **why** impostors pass. Seeing the strokes can. It also checks the matcher: if the
-overlaid strokes did not look alike, the tolerance or the normalization would be wrong.
+Counts alone cannot explain **why** impostors pass. The matched pairs in `matches.csv` can, when drawn with another
+tool. They also check the matcher: if the matched strokes did not look alike, the tolerance or the normalization
+would be wrong.
 
 ## What we learned
 

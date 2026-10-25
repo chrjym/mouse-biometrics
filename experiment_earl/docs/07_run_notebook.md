@@ -4,8 +4,8 @@
 
 ## What it does
 
-Runs `notebooks/session_progression.ipynb` from top to bottom without opening Jupyter [[1]](#ref-1), and saves the executed
-copy (with all outputs and plots) as `runs/<run>/notebooks/session_progression.ipynb`.
+Runs `notebooks/session_progression.ipynb` from top to bottom without opening Jupyter [[1]](#ref-1). The notebook writes
+its CSVs and figures into the run folder (`results/`, `figures/`). No executed `.ipynb` copy is saved (removed 2026-10-26).
 
 ## Algorithm
 
@@ -14,15 +14,14 @@ config, run ← open_run(--run)                  # same run-folder rule as every
 set EARL_RUN = run name                        # the notebook reads this, so it uses the same folder
 notebook ← read the template notebook
 run every cell with nbconvert's ExecutePreprocessor (python3 kernel, working dir = notebooks/, --timeout s)
-write the executed notebook into the run folder
+the executed notebook is discarded; its results and figures are already in the run folder
 ```
 
 ## Why
 
 - **The template stays clean.** The notebook in `notebooks/` is never overwritten with outputs, so git diffs show
   only code changes.
-- **Results stay with their settings.** The executed copy is saved next to the run's `config.yaml`, like every
-  other result.
+- **No `.ipynb` files accumulate.** The executed copies were about 2.8 GB across `runs/` and nothing read them.
 
 ## What the notebook computes
 

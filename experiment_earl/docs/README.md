@@ -14,12 +14,9 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
    ┌──────────────────────────┼─────────────────────────────────────────────────────────────┐
    │ A. Shape matching (does an impostor's stroke look like one of the user's strokes?)       │
    │   01 draw users → 02 draw sessions → 03 cut into strokes → 04 DTW match → 05 sensitivity │
-   │   06 draw the strokes   07 run the notebook   08 draw matched pairs   09 genuine check   │
+   │   06 draw the strokes   07 run the notebook   08 matched pairs (table)   09 genuine check │
    │   10 accuracy per user across the runs of one hash folder                               │
    │   12 best sensitivity and sessions per split (from 10's accuracy.csv)                   │
-   │   13 cohort scoring: closer to the claimed user than to other people? (EER vs 12)       │
-   │   14 new-seed check: 12's and 13's chosen settings, unchanged, on new seeds             │
-   │   15 draw 13's scoring: strokes vs nearest strokes per library; scores per split        │
    │   16 sensitivity sweep: fixed splits × library size × sensitivity → confusion matrices  │
    │   17 draw 16's sweep: accuracy vs sensitivity, heatmap, FAR/FRR                        │
    └──────────────────────────────────────────────────────────────────────────────────────────┘
@@ -39,9 +36,6 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 09 | [09_genuine_check.md](09_genuine_check.md) | Score the user's own unused sessions against their own profile, next to the impostors |
 | 10 | [10_plot_accuracy.md](10_plot_accuracy.md) | Sessions through (notebook counts) per legitimate and impostor user, one line per run of a hash folder |
 | 12 | [12_pick_best.md](12_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
-| 13 | [13_cohort_score.md](13_cohort_score.md) | Nearest-DTW scores against equal-size libraries; cohort score = share of other people a stroke is farther from; EER per split |
-| 14 | [14_seed_check.md](14_seed_check.md) | Settings chosen on the training seed by 12 and 13, applied unchanged to new seeds; train vs test user accuracy |
-| 15 | [15_plot_cohort.md](15_plot_cohort.md) | Per claim, each stroke next to its nearest stroke in every library (closer / farther); genuine vs impostor scores per split |
 | 16 | [16_sweep_sensitivity.md](16_sweep_sensitivity.md) | Per fixed split, nearest-DTW cost once per (test, library) session pair; every library size a running minimum, every sensitivity a cut; TP/FP/FN/TN per setting |
 | 18 | [18_best_setting.md](18_best_setting.md) | Best sensitivity and library size per legitimate user and per split, picked on half the test sessions and checked on the other half |
 | 17 | [17_plot_sweep.md](17_plot_sweep.md) | Balanced accuracy vs sensitivity and as a heatmap, FAR/FRR at 1, m/4, m/2, m sessions; no best setting picked |

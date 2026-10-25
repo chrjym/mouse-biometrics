@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
-"""Sessions that go through (fixed counts, as in the notebook), per user, for every run under runs/<hash>/: one figure per split and sensitivity with legitimate and impostor line graphs."""
+"""Sessions that go through (fixed counts, as in the notebook), per user, for every run under runs/<hash>/: writes accuracy.csv with one row per run and user."""
 
 import argparse
 from importlib import import_module
 from pathlib import Path
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib.ticker import MaxNLocator
 
 cfg_mod = import_module("00_config")
 match_mod = import_module("04_match_shapes")
@@ -89,34 +84,6 @@ def save_part(part: pd.DataFrame, path: Path) -> pd.DataFrame:
     return part
 
 
-def plot(table: pd.DataFrame, path: Path, title: str) -> None:
-    fig, axes = plt.subplots(1, 2, figsize=(13, 4.8), sharey=True,
-                             gridspec_kw={"width_ratios": [max(table[table.kind == k].user.nunique(), 2)
-                                                           for k in ("legitimate", "impostor")]})
-    sessions = sorted(table["sessions"].unique())
-    colours = plt.cm.viridis([0.85 * i / max(len(sessions) - 1, 1) for i in range(len(sessions))])
-    for ax, kind in zip(axes, ("legitimate", "impostor")):
-        part = table[table["kind"] == kind]
-        users = sorted(part["user"].unique(), key=lambda u: int(u[4:]))
-        for k, g in part.groupby("sessions"):
-            g = g.set_index("user").reindex(users)
-            colour = colours[sessions.index(k)]
-            ax.plot(users, g["passed"], color=colour, label=f"{k} sessions")
-            ax.scatter(users, g["passed"], s=36, zorder=3, edgecolors=colour,
-                       facecolors=[colour if t else "white" for t in g["through"].fillna(False)])
-        ax.set_title(f"{kind.capitalize()} users", fontsize=10)
-        ax.set_xlabel(f"{kind} user")
-        ax.set_ylim(-0.3, max(sessions) + 0.3)
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.grid(alpha=0.3)
-    axes[0].set_ylabel("sessions that go through")
-    axes[1].legend(fontsize=7, loc="center left", bbox_to_anchor=(1.01, 0.5))
-    fig.suptitle(title, fontsize=9)
-    fig.tight_layout()
-    fig.savefig(path, dpi=130, bbox_inches="tight")
-    plt.close(fig)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("hash", nargs="?", help="folder under runs/ holding the runs to compare "
@@ -151,22 +118,11 @@ def main() -> None:
     table.to_csv(group / "accuracy.csv", index=False)
     match_mod.save_cache()
 
-    config = cfg_mod.load_config(folders[0] / "config.yaml")
-    figures = []
-    for (n_legit, n_impostor, sens), part in table.groupby(["n_legitimate", "n_impostor", "sensitivity"]):
-        path = group / f"accuracy_{n_legit}_{n_impostor}_sensitivity_{sens:.2f}.png"
-        plot(part, path,
-             f"runs/{group.name}, {n_legit} legitimate vs {n_impostor} impostors, sensitivity {sens:.2f}: sessions that go through (≥ {config['match_shape_ratio']:.0%} of strokes "
-             f"match), seed {config['seed']}\nlegitimate = own last <sessions> sessions (never in a profile) vs own profile; "
-             f"impostor = first <sessions> sessions vs the best legitimate profile; line = sessions per user; "
-             f"filled = user goes through (≥ {config['match_session_ratio']:.0%} of sessions)")
-        figures.append(path.name)
-
     summary = table.groupby(["n_legitimate", "n_impostor", "kind", "sensitivity", "sessions"]).agg(passed=("passed", "sum"), tested=("tested", "sum"),
                                                                      through=("through", "sum"), users=("user", "size"))
     print(summary.to_string())
     print(f"Runs: {len(folders)}  Rows: {len(table)}")
-    print(f"Output: {group / 'accuracy.csv'}, {', '.join(figures)}")
+    print(f"Output: {group / 'accuracy.csv'}")
 
 
 if __name__ == "__main__":

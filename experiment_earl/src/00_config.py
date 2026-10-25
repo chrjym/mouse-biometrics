@@ -12,7 +12,7 @@ import pandas as pd
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-RUNS = ROOT / "runs"        # one folder per config: config.yaml, results/, figures/, shapes/, temp/, notebooks/
+RUNS = ROOT / "runs"        # one folder per config: config.yaml, results/, figures/, shapes/, temp/
 CACHE_DIR = ROOT / "cache"  # DTW pair cache shared by all runs (its keys hold the settings that change a score)
 INVALID_COORDINATE = 65535  # Balabit logging glitch, not a position
 

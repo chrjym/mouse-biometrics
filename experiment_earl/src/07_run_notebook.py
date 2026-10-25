@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute notebooks/session_progression.ipynb for a run and save the executed copy in runs/<run>/notebooks/."""
+"""Execute notebooks/session_progression.ipynb for a run, so its results CSVs and figures are written to runs/<run>/. No .ipynb copy is saved."""
 
 import argparse
 import os
@@ -24,10 +24,7 @@ def main() -> None:
     notebook = nbformat.read(TEMPLATE, 4)
     ExecutePreprocessor(timeout=args.timeout, kernel_name="python3").preprocess(
         notebook, {"metadata": {"path": str(TEMPLATE.parent)}})
-    out = run / "notebooks" / TEMPLATE.name
-    out.parent.mkdir(exist_ok=True)
-    nbformat.write(notebook, out)
-    print(f"Output: {out}")
+    print(f"Output: {run / 'results'}, {run / 'figures'}")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # How to run the automation (`11_batch.py`)
 
-`src/11_batch.py` runs every simulation listed in `batch.yaml` with one command, then plots and summarizes the results. You only edit `batch.yaml`: the script never changes `config.yaml`. Each run gets its own `config.yaml` snapshot in its run folder.
+`src/11_batch.py` runs every simulation listed in `batch.yaml` with one command, then scores and summarizes the results. You only edit `batch.yaml`: the script never changes `config.yaml`. Each run gets its own `config.yaml` snapshot in its run folder.
 
 Run every command from the **repository root** (`thesis-mouse-biometrics/`). On Windows, replace `.venv/bin/python` with `.venv\Scripts\python`.
 
@@ -10,7 +10,7 @@ Run every command from the **repository root** (`thesis-mouse-biometrics/`). On 
 |---|---|
 | **Input** | `experiment_earl/batch.yaml` (what to run) + `experiment_earl/config.yaml` (every other setting) |
 | **Command** | `.venv/bin/python experiment_earl/src/11_batch.py` |
-| **Output** | `experiment_earl/runs/<hash>/`: one folder per run, accuracy plots, `summary/` overview; `runs/batch_log.csv` |
+| **Output** | `experiment_earl/runs/<hash>/`: one folder per run, `accuracy.csv`, `summary/` overview; `runs/batch_log.csv` |
 
 ---
 
@@ -82,7 +82,7 @@ What happens, in order:
    5. **Log** one line to `runs/batch_log.csv`.
    6. If the run **fails**, note it and continue with the next.
 2. **Summary:** runs ok, skipped and failed, and a `git add` command for the new run folders.
-3. **Plot:** run `10_plot_accuracy.py` on the hash folder.
+3. **Score:** run `10_plot_accuracy.py` on the hash folder (writes `accuracy.csv`).
 4. **Summarize:** write `summary/summary.csv` and `summary/README.md`.
 
 Options:
@@ -91,7 +91,7 @@ Options:
 |---|---|
 | `--dry-run` | list the runs only (step 3) |
 | `--only 0.4` | run a single sensitivity (quick test) |
-| `--no-plot` | skip the plotting and summary (steps 3–4) |
+| `--no-accuracy` | skip the scoring and summary (steps 3–4) |
 | `--plan <file>` | use another plan file instead of `batch.yaml` |
 | `--timeout 3600` | seconds allowed per run (default 3600) |
 
@@ -109,15 +109,11 @@ runs/
     │   ├── README.md                   results table + links to every plot and run folder
     │   └── summary.csv                 one row per run
     ├── accuracy.csv                    every run x every user
-    ├── accuracy_1_9_sensitivity_0.20.png  one plot per split and sensitivity
-    ├── accuracy_1_9_sensitivity_0.40.png
-    ├── ...
     └── 1_9_0.20_2/                     one folder per run
         ├── config.yaml                 exact settings of this run
         ├── run.json                    when it was created, git commit
         ├── results/                    session_progression*.csv
-        ├── figures/                    bar graphs and heatmap
-        └── notebooks/                  the executed notebook
+        └── figures/                    bar graphs and heatmap
 ```
 
 ### `summary/summary.csv` columns
@@ -132,14 +128,6 @@ runs/
 | `impostor_passed` / `impostor_tested` | impostor sessions that pass the profile (**lower is better**) |
 | `impostors_through` | impostors who get through |
 
-### The plots (`accuracy_<legit>_<impostor>_sensitivity_<value>.png`)
-
-One figure per split and sensitivity, so splits are never mixed.
-
-- **Left panel, legitimate:** x = each legitimate user, y = their sessions that pass.
-- **Right panel, impostor:** x = each impostor, y = their sessions that pass.
-- **One line per session count**; a filled marker means the user as a whole goes through.
-
 ### `batch_log.csv` columns
 
 `time`, `run`, `status` (`ok` / `failed`), `seconds`, `error` (last line of the error message).
@@ -148,7 +136,7 @@ One figure per split and sensitivity, so splits are never mixed.
 
 ## Step 6: Share the results (optional)
 
-`runs/` is git-ignored, so adding it needs `-f`. Agree first on who commits; `accuracy.csv`, the plots and `summary/` are rewritten by every batch.
+`runs/` is git-ignored, so adding it needs `-f`. Agree first on who commits; `accuracy.csv` and `summary/` are rewritten by every batch.
 
 ```bash
 git add -f experiment_earl/runs/<hash>/1_9_0.20_2 ...   # the command printed at the end of the batch
@@ -162,5 +150,5 @@ git pull --rebase && git push
 |---|---|
 | `config.yaml has no line '<key>: ...'` | A key in `config.yaml` was renamed or removed. Put it back as `<key>: <value>` at the start of a line. |
 | A run shows `failed` | Read its `error` in `batch_log.csv`, fix the cause, run the batch again (only missing runs run). |
-| `Plotting runs/<hash> failed` | The runs are kept. Rerun: `.venv/bin/python experiment_earl/src/10_plot_accuracy.py <hash>` |
+| `Scoring runs/<hash> failed` | The runs are kept. Rerun: `.venv/bin/python experiment_earl/src/10_plot_accuracy.py <hash>` |
 | Runs land in a new hash folder | A setting other than the five in `batch.yaml` differs from before. Check `config.yaml` with `git diff`. |

@@ -15,9 +15,8 @@ runs/1a2b3c/1_9_0.04_10/
 ├── config.yaml     snapshot of the settings used (with comments)
 ├── run.json        when the folder was created and the git commit
 ├── results/        trial_0.json, summary.csv, session_progression*.csv
-├── figures/        session_progression*.png
-├── notebooks/      executed copy of session_progression.ipynb (07_run_notebook.py)
-├── shapes/         chunks as .npz and, after 07, the PNGs   (regenerable)
+├── figures/        session_progression*.png (notebook)
+├── shapes/         chunks as .npz and, after 06, the PNGs   (regenerable)
 └── temp/           manifest.json and the copied sessions    (regenerable)
 ```
 
@@ -36,10 +35,10 @@ runs/1a2b3c/1_9_0.04_10/
 04_match_shapes      compares impostor chunks with the legitimate library (DTW)
 05_sensitivity       sensitivity = impostors matched / total impostors (formerly "threshold")
 06_plot_shapes       draws every chunk as a PNG
-07_run_notebook      executes the notebook and saves the copy in the run folder
-08_plot_matches      draws the impostor strokes that matched each legitimate user in the notebook
-09_genuine_check     the legitimate users' own unused sessions against their own profile, next to the impostors
-10_plot_accuracy     every run of one runs/<hash>/ folder: sessions through per legitimate and impostor user
+07_run_notebook      executes the notebook; its results and figures go to the run folder (no .ipynb copy)
+08_plot_matches      lists the impostor strokes that matched each legitimate user in the notebook (matches.csv)
+09_genuine_check     the legitimate users' own unused sessions against their own profile (CSV only)
+10_plot_accuracy     every run of one runs/<hash>/ folder: sessions through per legitimate and impostor user (accuracy.csv)
 16_sweep_sensitivity fixed splits × library size × sensitivity: one confusion matrix per setting
 ```
 
@@ -104,5 +103,5 @@ Any change to a value makes the next script run create a new folder under `runs/
 ## Limits to remember
 
 - Balabit has only 10 users, so the total of legitimate and impostor users can never go above 10.
-- The notebook `notebooks/session_progression.ipynb` reads this file and sets nothing itself. It stops with a message if the user counts or `sessions_per_user` do not fit Balabit. Its outputs go to the current run folder.
+- The notebook `notebooks/session_progression.ipynb` reads this file and sets nothing itself. It stops with a message if the user counts or `sessions_per_user` do not fit Balabit. Its outputs go to the current run folder; no executed `.ipynb` copy is saved.
 - The tolerance of 0.02 is a baseline, not a validated value: in earlier tuning, a user's own held-out sessions never matched more than impostors did.

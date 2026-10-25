@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-"""Draw the impostor strokes that matched each legitimate user's strokes in the session progression notebook, one figure per user and session step."""
+"""List the impostor strokes that matched each legitimate user's strokes in the session progression notebook, per user and session step (matches.csv and the console verdicts)."""
 
 import argparse
 import random
 from importlib import import_module
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from numba import njit, prange
@@ -105,39 +101,10 @@ def session_verdicts(rows: list[dict], impostor: list[str], order: dict, k: int,
     return lines
 
 
-def plot_step(rows: list[dict], verdicts: list[str], profile: str, k: int, limit: int, path) -> int:
-    shown = sorted(random.Random(f"{profile}-{k}").sample(rows, min(limit, len(rows))),
-                   key=lambda r: (r["impostor"], r["impostor_session"], r["kind"], r["chunk"]))
-    cols = min(6, len(shown))
-    n_rows = -(-len(shown) // cols)
-    header = 0.2 * (len(verdicts) + 2)  # inches for the title lines
-    fig, axes = plt.subplots(n_rows, cols, figsize=(cols * 1.9, n_rows * 2.1 + header), squeeze=False)
-    for ax, r in zip(axes.flat, shown):
-        ax.plot(r["match"][:, 0], r["match"][:, 1], color="tab:blue", linewidth=1.6, label=profile)
-        ax.plot(r["query"][:, 0], r["query"][:, 1], color="tab:red", linewidth=1.0, linestyle="--", label="impostor")
-        ax.plot(0, 0, "o", color="tab:green", markersize=3)
-        ax.set_aspect("equal", adjustable="datalim")
-        ax.invert_yaxis()
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_title(f"{r['impostor']} {r['impostor_session'][-6:]} {r['kind']} #{r['chunk']}\n"
-                     f"→ {r['profile_session'][-6:]} #{r['profile_chunk']}, cost {r['cost_per_point']:.3f}",
-                     fontsize=6.5)
-    for ax in axes.flat[len(shown):]:
-        ax.axis("off")
-    fig.suptitle(f"{profile}, {k} sessions per user: {len(shown)} of {len(rows):,} matched impostor strokes "
-                 f"(red dashed) on {profile}'s stroke (blue), green = start\n" + "\n".join(verdicts), fontsize=8)
-    fig.tight_layout(rect=(0, 0, 1, 1 - header / fig.get_figheight()))
-    fig.savefig(path, dpi=120)
-    plt.close(fig)
-    return len(shown)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--user", action="append", help="legitimate users to draw (repeatable; default all)")
     parser.add_argument("--sessions", type=int, action="append", help="session steps to draw (repeatable; default all)")
-    parser.add_argument("--max", type=int, default=36, help="matched pairs per figure (random sample)")
     cfg_mod.add_run_argument(parser)
     args = parser.parse_args()
     config, run = cfg_mod.open_run(args.run)
@@ -149,22 +116,18 @@ def main() -> None:
     print(f"Seed {config['seed']}: legitimate {', '.join(legit)}; "
           f"impostors {', '.join(impostor)}; session steps {steps}")
 
-    out = run / "figures" / "matches"
-    out.mkdir(parents=True, exist_ok=True)
     pairs, table = {}, []
     for profile in profiles:
         for k in steps:
             rows = step_matches(profile, impostor, order, k, config, pairs)
             verdicts = session_verdicts(rows, impostor, order, k, config)
             table += [{c: v for c, v in r.items() if c not in ("query", "match")} for r in rows]
-            shown = plot_step(rows, verdicts, profile, k, args.max, out / f"{profile}_sessions{k}.png") if rows else 0
-            print(f"{profile} {k} sessions: {len(rows):,} matched strokes, {shown} drawn | " + " | ".join(verdicts),
-                  flush=True)
+            print(f"{profile} {k} sessions: {len(rows):,} matched strokes | " + " | ".join(verdicts), flush=True)
 
     results = run / "results"
     results.mkdir(exist_ok=True)
     pd.DataFrame(table).round(4).to_csv(results / "matches.csv", index=False)
-    print(f"Output: {out}, {results / 'matches.csv'}")
+    print(f"Output: {results / 'matches.csv'}")
 
 
 if __name__ == "__main__":

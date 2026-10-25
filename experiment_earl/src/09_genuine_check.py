@@ -4,11 +4,6 @@
 import argparse
 from importlib import import_module
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 cfg_mod = import_module("00_config")
@@ -61,35 +56,6 @@ def main() -> None:
                .agg(mean_ratio=("ratio", "mean"), passed=("matched", "sum"), tested=("matched", "size")).reset_index())
     summary.round(4).to_csv(results / "genuine_check_summary.csv", index=False)
 
-    n_cols = min(3, len(legit))
-    n_rows = -(-len(legit) // n_cols)
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4.3 * n_cols, 3.4 * n_rows), sharey=True, squeeze=False)
-    x = np.arange(len(steps))
-    for ax, profile in zip(axes.flat, legit):
-        g = summary[summary["profile"] == profile]
-        for offset, kind, colour in ((-0.2, "genuine", "tab:blue"), (0.2, "impostor", "tab:red")):
-            part = g[g["kind"] == kind].set_index("sessions").reindex(steps)
-            bars = ax.bar(x + offset, part["mean_ratio"], 0.4, color=colour, label=kind)
-            ax.bar_label(bars, labels=[f"{p:.0f}/{t:.0f}" for p, t in zip(part["passed"], part["tested"])],
-                         padding=2, fontsize=7)
-        ax.axhline(config["match_shape_ratio"], color="k", linestyle=":", linewidth=1)
-        ax.set_title(f"{profile} (genuine: {len(held_out[profile])} unused sessions)", fontsize=9)
-        ax.set_xticks(x, [str(k) for k in steps])
-        ax.set_xlabel("sessions in the profile")
-    for ax in axes[:, 0]:
-        ax.set_ylabel("share of strokes matched")
-    for ax in axes.flat[len(legit):]:
-        ax.set_visible(False)
-    axes[0, 0].legend(fontsize=8, loc="upper left")
-    fig.suptitle(f"Own unused sessions (blue) vs impostors {', '.join(impostor)} (red) against each legitimate profile, "
-                 f"seed {config['seed']}\nbar = mean share of strokes matched; label = sessions passed "
-                 f"(≥ {config['match_shape_ratio']:.0%}, dotted line) / sessions tested", fontsize=9)
-    fig.tight_layout()
-    figures = run / "figures"
-    figures.mkdir(exist_ok=True)
-    fig.savefig(figures / "genuine_check.png", dpi=130)
-    plt.close(fig)
-
     for profile in legit:
         g = summary[summary["profile"] == profile]
         line = " | ".join(f"{k}: own {r_g.passed:.0f}/{r_g.tested:.0f} ({r_g.mean_ratio:.0%}), "
@@ -98,7 +64,7 @@ def main() -> None:
                           for r_g in [g[(g["sessions"] == k) & (g["kind"] == "genuine")].iloc[0]]
                           for r_i in [g[(g["sessions"] == k) & (g["kind"] == "impostor")].iloc[0]])
         print(f"{profile}: {line}")
-    print(f"Output: {results / 'genuine_check.csv'}, {results / 'genuine_check_summary.csv'}, {figures / 'genuine_check.png'}")
+    print(f"Output: {results / 'genuine_check.csv'}, {results / 'genuine_check_summary.csv'}")
 
 
 if __name__ == "__main__":
