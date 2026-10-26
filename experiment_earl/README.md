@@ -183,6 +183,14 @@ For the fixed `splits` of `config.yaml` (only the users are drawn from `seed`), 
 
 Outputs, in `runs/<hash>/sweep/`: `confusion.csv` (one row per split, library size and sensitivity, with session- and user-level counts and the users drawn), `parts/` (one CSV per finished split, reused on a rerun; delete it after a code change), `config.yaml`, and from 14 `accuracy_vs_sensitivity.png`, `accuracy_heatmap.png`, `far_frr.png`, `confusion_matrices.png`. 13 also writes `user_confusion.csv`; `15_best_setting.py` picks the best sensitivity and library size per legitimate user on half the test sessions and scores it on the other half (`sweep/best/`).
 
+Initial results (experiments 1 and 2) for the four `splits`, from `runs/<hash>/accuracy.csv` (run 10 first):
+
+```bash
+.venv/bin/python experiment_earl/src/16_initial_results.py [hash]
+```
+
+Outputs, in `runs/<hash>/initial_results/`: `exp1_user_user_sensitivity.png` (accuracy against sensitivity at 1 session), `exp2_user_session_sensitivity.png` (accuracy against sessions per sensitivity), and their CSVs (see [docs/16_initial_results.md](docs/16_initial_results.md)).
+
 ## 4. Where the results are
 
 ```

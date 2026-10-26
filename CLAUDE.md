@@ -30,6 +30,7 @@ pip install -r requirements.txt     # pandas, pyarrow, shapely, matplotlib, jupy
 .venv/bin/python experiment_earl/src/13_sweep_sensitivity.py # fixed splits x library size x sensitivity, confusion matrix per setting -> runs/<hash>/sweep/
 .venv/bin/python experiment_earl/src/14_plot_sweep.py       # draw 13's sweep (accuracy, heatmap, FAR/FRR, confusion matrices)
 .venv/bin/python experiment_earl/src/15_best_setting.py     # best sensitivity + sessions per user, picked on half the tests, checked on the other -> runs/<hash>/sweep/best/
+.venv/bin/python experiment_earl/src/16_initial_results.py   # experiments 1 and 2 (accuracy vs sensitivity at 1 session; vs sessions per sensitivity) -> runs/<hash>/initial_results/
 cd experiment_earl/notebooks && ../../.venv/bin/jupyter nbconvert --to notebook --execute --inplace session_progression.ipynb
 
 # Paper tools
