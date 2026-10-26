@@ -154,8 +154,31 @@ that JupyterLab has built in. It then keeps running on the server after you clos
    tail -f experiment_earl/runs/notebook_progress.log    # Ctrl+C stops watching; the run goes on
    ```
 
-   Each start adds a `=== <date time> notebook started ===` line, so earlier runs stay above it. For a one-line-per-run
-   table of the batch, `experiment_earl/runs/batch_log.csv` is still written too.
+   Each start adds a `=== <date time> notebook started ===` line, so earlier runs stay above it. Every line has a
+   time, and long sections say what they are doing right now, for example:
+
+   ```
+   10:32:11  ==== 3. Batch ====
+   10:32:11  [1/60] 540c32/1_9_0.02_10: started (1 legitimate + 9 impostors, sensitivity 0.02, 10 sessions per user)
+   10:32:11    legitimate: user16 | impostors: user15, user23, ...
+   10:32:12    session progression: 4/10 sessions per user
+   10:32:40    accuracy: impostor user23 (2/9) against 1 library
+   10:33:05  [1/60] 540c32/1_9_0.02_10 ... ok (0m 54s), about 53m 06s left
+   10:45:00  ==== 6. Sensitivity sweep ====
+   10:45:00  [1 L, 5 I] started
+   10:45:30      impostor user15: 20/40 sessions tested against 1 library
+   ```
+
+   For a one-line-per-run table of the batch, `experiment_earl/runs/batch_log.csv` is still written too.
+
+   **Everything at once:** `status.sh` shows whether the run is still going (PID, time running, CPU and memory of
+   the runner and its kernel), the error if it stopped on one, how many batch runs are logged, and the latest
+   progress lines:
+
+   ```bash
+   bash experiment_earl/notebooks/status.sh          # last 20 progress lines; add a number for more, e.g. 50
+   watch -n 5 bash experiment_earl/notebooks/status.sh   # refresh every 5 s; Ctrl+C stops watching
+   ```
 
 5. **See the process (PID) and whether it is still running.** A run is two processes: the runner, whose PID was
    saved above, and the kernel that does the computing (a child of the runner).
