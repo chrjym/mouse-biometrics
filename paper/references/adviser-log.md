@@ -20,6 +20,28 @@ Suggested format per entry:
 
 ---
 
+## [2026-10-26] — Thesis Consultation v6: experiments 1 and 2 with confusion matrices
+
+**Context:** Consultation sheet `Queries-2.pdf` (whiteboard photo + notes). Earlier scripts for this (`15_best_setting.py`, `16_initial_results.py`) and `Sensitivity Sweep Process and Results.md` were deleted by the group as false.
+
+**Feedback:**
+- Experiment 1, User x User x Sensitivity: 1 session, every sensitivity 0.01 … 1.00 in 0.01 steps; two graphs (legitimate user, impostor user), x = sensitivity, y = accuracy (0 bad, 1 good), one line per split. Pick the best-accuracy sensitivity from the CSV and use it in experiment 2.
+- Experiment 2, User x Sensitivity x Session: the best sensitivity of experiment 1, sessions 5, 10, … 40; the same two graphs with x = sessions; pick the best from the CSV.
+- Splits 1 x 5, 5 x 1, 3 x 2, 2 x 3 (I x L).
+- Confusion matrix, positive = impostor: TP = impostor caught, FP = user wrongly blocked, FN = impostor let in, TN = real user accepted. Accuracy = (TP + TN) / (TP + TN + FP + FN). One confusion matrix per graph.
+
+**Decisions (group, same day):**
+- Counts are sessions (each tested session is one decision); an impostor's sessions are tested against the legitimate library that passes most of them (the batch rule).
+- The counts of every iteration are added to the ones before it until the last iteration; the graphs plot these running totals, and the confusion matrix is the total at the last iteration with all splits added (one per experiment figure).
+- The best sensitivity / session count is picked on each point's own counts, all splits added.
+- Implemented as section 9 of `experiment_earl/notebooks/earl_simulation.ipynb` (CSV + PNG in `runs/<hash>/experiments/`); section 7 (logic of the deleted 15) removed.
+
+**Open questions:**
+- Whether "one confusion matrix per graph" means one per experiment figure (as built) or a separate one for the legitimate and the impostor graph.
+- Whether the running total should also drive the best pick (it now uses each point's own counts).
+
+---
+
 ## [2026-10-26] — Run the simulation notebook from the Jupyter terminal
 
 **Context:** The simulation notebook (`experiment_earl/notebooks/earl_simulation.ipynb`) was built the same day to replace the scripts.

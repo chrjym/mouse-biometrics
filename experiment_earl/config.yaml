@@ -20,9 +20,6 @@ splits:
 sweep_sensitivity: [0.01, 1.00, 0.01]  # start, stop, step of the sensitivities scored (each is a cut on the same DTW distances)
 sweep_sessions_max: 40      # library sizes 1, 2, ... up to this many of a legitimate user's first sessions
 sweep_test_sessions: 40     # tested per user: a legitimate user's last this many sessions, an impostor's first this many
-# Initial results (16): experiment 1 = every sensitivity at 1 session; experiment 2 = these session counts x sensitivities
-initial_sessions: [5, 50, 5]  # start, stop, step of the library sizes drawn in experiment 2
-initial_sensitivities: [0.01, 0.02, 0.03, 0.04, 0.05, 0.10, 0.20]  # one line each in experiment 2
 
 # --- Data: all of Balabit, raw (adviser, 2026-10-08) ---
 # training_files and test_files are merged into one folder per user (adviser, 2026-10-14).

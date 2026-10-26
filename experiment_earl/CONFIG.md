@@ -89,8 +89,6 @@ These four keys are read only by 13 and are **left out of the run hash**, so cha
 | `sweep_sensitivity` | `[0.01, 1.00, 0.01]` | Start, stop and step of the sensitivities scored (100 values). DTW runs once; each sensitivity is a cut on the same distances. |
 | `sweep_sessions_max` | 40 | Library sizes 1, 2, ... up to this many of a legitimate user's first sessions. |
 | `sweep_test_sessions` | 40 | Tested per user: a legitimate user's last this many sessions (never in their library), an impostor's first this many. `sweep_sessions_max + sweep_test_sessions` must fit the smallest pool (114). |
-| `initial_sessions` | [5, 50, 5] | Start, stop, step of the library sizes drawn in experiment 2 of `16_initial_results.py` (runs with these `sessions_per_user` must exist). Not in the run hash. |
-| `initial_sensitivities` | [0.01 … 0.20] | Sensitivities drawn as lines in experiment 2 of 16. Experiment 1 uses every sensitivity run at 1 session. Not in the run hash. |
 
 The stroke rule is `match_shape_ratio`, as everywhere else; `match_session_ratio` sets the user-level counts (`users_*`).
 
