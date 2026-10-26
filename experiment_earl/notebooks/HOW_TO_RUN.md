@@ -1,8 +1,8 @@
 # How to run the EARL simulation notebook
 
 `earl_simulation.ipynb` (in this folder) runs every simulation of the EARL shape-matching experiment: the batch of
-runs, accuracy, the best setting per split, the sensitivity sweep and the best setting per user. You set everything
-in one cell and press **Run All**. It writes **CSV files only**; there are no figures yet.
+runs, accuracy, the best setting per split, the sensitivity sweep and the adviser's experiments 1 and 2. You set
+everything in one cell and press **Run All**. It writes **CSV files**, plus the two figures of experiments 1 and 2.
 
 It replaces the Python scripts in `experiment_earl/src/` (adviser, 2026-10-26) and gives the same results: on a
 small test every CSV was identical to the scripts' output.
@@ -90,6 +90,7 @@ Everything you can change is in the **Settings** cell, near the top. Do not edit
 | `SKIP_FINISHED_RUNS` | `True` = runs that already have results are not simulated again. |
 | `SWEEP` | The sensitivity sweep: its fixed splits, the sensitivities scored (start, stop, step), the library sizes and the sessions tested per user. |
 | `SINGLE_RUN`, `GENUINE_HELD_OUT` | The one run used by the two optional checks (matched pairs, genuine check). |
+| `EXPERIMENTS` | Experiments 1 and 2 (adviser, Thesis Consultation v6): the four splits as `[legitimate, impostor]` (1 x 5, 5 x 1, 3 x 2, 2 x 3 as I x L), experiment 1's sensitivities (start, stop, step) and session count, experiment 2's session counts (start, stop, step). |
 | `SECTIONS` | Switch each section on (`True`) or off (`False`). |
 
 Limits (the notebook checks these and stops with a message if one is broken):
@@ -119,9 +120,9 @@ Press **Run All** (VS Code: *Run All* at the top; Jupyter: *Run → Run All Cell
 | 4. Accuracy | Collects every finished run into one table and a summary | 3 |
 | 5. Best per split | Best sensitivity and sessions per split | 4 |
 | 6. Sensitivity sweep | One confusion matrix per split, library size and sensitivity | – |
-| 7. Best setting per user | Best setting per legitimate user, checked on unseen sessions | 6 |
-| 8. Matched pairs (off by default) | Which impostor strokes matched which user strokes | – |
-| 9. Genuine check (off by default) | A user's own unused sessions against their own profile | – |
+| 7. Matched pairs (off by default) | Which impostor strokes matched which user strokes | – |
+| 8. Genuine check (off by default) | A user's own unused sessions against their own profile | – |
+| 9. Experiments 1 and 2 | Experiment 1: accuracy against sensitivity at 1 session; experiment 2: accuracy against sessions at experiment 1's best sensitivity. Legitimate and impostor graph, one confusion matrix each (positive = impostor, session counts added up to the last iteration), the best point marked with a "best" arrow. Missing runs are simulated. | – |
 
 Each section prints what it wrote (`Output: ...`). To run only some sections, switch the others off in `SECTIONS`
 and press Run All again.
@@ -218,11 +219,12 @@ experiment_earl/runs/
     ├── accuracy.csv                      every run and user together                  (4)
     ├── summary/summary.csv               one row per run                              (4)
     ├── best/                             scores.csv, best.csv, best_rows.csv          (5)
-    └── sweep/
-        ├── confusion.csv                 per split, library size and sensitivity      (6)
-        ├── user_confusion.csv            the same per legitimate user                 (6)
-        ├── parts/, config.yaml           finished splits and the sweep's settings     (6)
-        └── best/                         best_users.csv, best_splits.csv              (7)
+    ├── sweep/
+    │   ├── confusion.csv                 per split, library size and sensitivity      (6)
+    │   ├── user_confusion.csv            the same per legitimate user                 (6)
+    │   └── parts/, config.yaml           finished splits and the sweep's settings     (6)
+    └── experiments/                      exp1/exp2: _points.csv (per split and point: counts, running totals),
+                                          _overall.csv (all splits per point, best = True), _confusion.csv, .png  (9)
 ```
 
 The two optional checks write `results/matches.csv` and `results/genuine_check{,_summary}.csv` into the

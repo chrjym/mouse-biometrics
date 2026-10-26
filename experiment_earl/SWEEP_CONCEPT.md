@@ -131,23 +131,3 @@ above 0.5, so a "best" would overstate the method. The grid is read as a whole i
 - **Below 0.5** (red, e.g. 1-session libraries): real users are blocked more often than impostors.
 
 Outputs: `runs/<hash>/sweep/` (`confusion.csv`, `parts/`, `config.yaml`, the four figures).
-
----
-
-## 10. Best setting per user (15)
-
-To answer "at which sensitivity and with how many sessions should this user be profiled?", the sweep also keeps
-one confusion matrix per legitimate user (the user's own test sessions and every impostor attempt against their
-library). Each user's 40 test sessions alternate between two halves:
-
-| Half | Sessions | Used for |
-|---|---|---|
-| **Pick** | even (20) | Choose the setting with the highest balanced accuracy; ties → fewer sessions, then lower sensitivity |
-| **Check** | odd (20) | Score that same setting on sessions it never saw |
-
-The check-half score is the one to report: the pick-half score is the highest of 4,000 settings and is always
-optimistic. A user is profiled reliably only when the check score stays close to the pick score and clearly
-above 0.5. The same is done per split, with its users' counts added.
-
-In the figures (run 13 → 15 → 14), the split's best is an orange star on the heatmap and on the accuracy line graph, each user's best is a labelled circle on the heatmap, and each panel shows
-the pick → check balanced accuracy.
