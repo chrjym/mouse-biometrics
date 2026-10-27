@@ -37,7 +37,7 @@ experiment/
 ├── datasets/balabit/         the Balabit data (step 2)
 └── experiment_earl/
     ├── runs/                 every result and log (made by the notebook)
-    └── cache/                saved DTW results, reused by later runs (made by the notebook)
+    └── cache/costs.pkl       saved DTW costs, reused by every sensitivity and after a restart (made by the notebook)
 ```
 
 **Every command in this guide runs inside `experiment/`** unless it says "on your own computer". If a command
@@ -267,7 +267,9 @@ rsync -a <user>@<server>:experiment/experiment_earl/runs/ experiment_earl/runs/
 - **Small test** (section 5): under a minute.
 - **Sensitivity sweep**: a few minutes the first time; seconds afterwards, because the DTW distances are saved in
   `experiment_earl/cache/`.
-- **Full batch** (thousands of runs): many hours. Runs with more sessions per user take longer. The matching uses
+- **Full batch** (thousands of runs): many hours. Each pair of sessions is compared with DTW only once; every
+  sensitivity reuses that cost (kept in RAM and saved to `experiment_earl/cache/costs.pkl` at least every 10 minutes and
+  after each sensitivity), so later sensitivities and a restarted run go much faster than the first sensitivity. Runs with more sessions per user take longer. The matching uses
   every CPU core of the server.
 
 ## 10. Common problems
