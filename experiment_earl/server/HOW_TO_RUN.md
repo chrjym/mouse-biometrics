@@ -34,8 +34,8 @@ experiment/
 ├── requirements.txt          the Python packages
 ├── status.sh                 shows whether a run is going and its latest progress
 ├── .venv/                    Python environment (step 3)
+├── datasets/balabit/         the Balabit data (step 2)
 └── experiment_earl/
-    ├── datasets/balabit/     the Balabit data (step 2)
     ├── runs/                 every result and log (made by the notebook)
     └── cache/                saved DTW results, reused by later runs (made by the notebook)
 ```
@@ -53,9 +53,13 @@ login, e.g. `earl@10.0.0.5`.
 scp experiment_earl/server/{simulation.ipynb,requirements.txt,HOW_TO_RUN.md,status.sh} <user>@<server>:experiment/
 
 # the Balabit data (~200 MB; only needed once)
-ssh <user>@<server> "mkdir -p experiment/experiment_earl"
-rsync -a experiment_earl/datasets <user>@<server>:experiment/experiment_earl/
+rsync -a experiment_earl/datasets <user>@<server>:experiment/
 ```
+
+The notebook looks for the data in `experiment/datasets/balabit/` first, then in
+`experiment/experiment_earl/datasets/balabit/`; either place works. If you uploaded `datasets.zip` instead, unzip it on
+the server so that `experiment/datasets/balabit/users/` exists (`cd experiment && unzip ../datasets.zip`, then check
+with `ls datasets/balabit/users`). The notebook prints the folder it uses as `data folder: ...`.
 
 Optional: if you already ran simulations on your computer with the same settings, copy the DTW cache too, so the
 server does not compute those distances again:
@@ -269,7 +273,7 @@ rsync -a <user>@<server>:experiment/experiment_earl/runs/ experiment_earl/runs/
 
 | Message or situation | What to do |
 |---|---|
-| `No Balabit data in .../experiment_earl/datasets/balabit` | The data is missing: step 2, the `rsync` line. If the data is there, the notebook was opened from another folder: start Jupyter in `experiment/`, or set `EARL_HOME=/path/to/experiment`. |
+| `No Balabit data in .../datasets/balabit` | The data is missing or one folder too deep/shallow: `experiment/datasets/balabit/users/user12/...` must exist (step 2). If it does, the notebook was opened from another folder: start Jupyter in `experiment/`, or set `EARL_HOME=/path/to/experiment`. |
 | `pip could not install ...` | The kernel is the system Python, where Ubuntu blocks pip. Choose the **.venv (EARL)** kernel (section 4). |
 | `No module named numba` or numba fails to install | Run step 3 again; on Python 3.14 numba must be 0.63 or newer. |
 | `No such file or directory: .venv/bin/jupyter` | The terminal is not in `experiment/`: `cd ~/experiment` first. |
