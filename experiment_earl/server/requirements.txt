@@ -1,0 +1,9 @@
+# Packages for simulation.ipynb (the notebook also installs any that are missing into its kernel)
+numpy
+pandas
+pyyaml
+matplotlib
+numba          # needs numba >= 0.63 on Python 3.14
+jupyterlab     # Jupyter in the browser and its terminal
+nbclient       # jupyter execute, for long runs started from the terminal
+ipykernel
