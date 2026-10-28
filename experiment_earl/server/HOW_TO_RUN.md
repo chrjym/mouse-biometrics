@@ -197,6 +197,7 @@ The terminal prints nothing more while the notebook runs; that is normal. Sectio
 | 7. Matched pairs (off by default) | Which impostor strokes matched which user strokes | – |
 | 8. Genuine check (off by default) | A user's own unused sessions against their own profile | – |
 | 9. Experiments 1 and 2 | Accuracy against sensitivity (exp 1) and against sessions at exp 1's best sensitivity (exp 2), with confusion matrices and two figures. Missing runs are simulated. | – |
+| 10. Stroke export | Every stroke of the `STROKES` users, one CSV per session (plus every x, y, t if `points` is on), `all_strokes.csv` and `sessions.csv`. The `strokes/` folder is rewritten each time. | – |
 
 ## 7. Watch a long run
 
