@@ -133,6 +133,7 @@ Everything you can change is in the **Settings** cell near the top. Do not edit 
 | `EXPERIMENTS` | Experiments 1 and 2 (section 9): the four splits, experiment 1's sensitivities (start, stop, step) and session count, experiment 2's session counts (start, stop, step). |
 | `SINGLE_RUN`, `GENUINE_HELD_OUT` | The one run used by the two optional checks (sections 7 and 8). |
 | `CORES` | CPU cores the matching may use. `None` (default) = every core available to the notebook: the cores the process may run on, capped by the container's CPU quota if it has one (a container often shows every core of the host, and more threads than the quota only slow it down). A number, e.g. `2`, caps it. The data check prints `numba uses N CPU cores`. Not part of the results folder name. |
+| `STROKES` | Stroke export (section 10): `users` = the users whose strokes are written, one CSV per session with one row per stroke (kind, points, timing, start/end position, size, path length, straightness, speed). `None` = all 10 users, or a list such as `["user7", "user29"]`. |
 | `SECTIONS` | Switch each section on (`True`) or off (`False`). |
 
 Limits (the notebook checks them and stops with a message that says what to change):
@@ -253,7 +254,8 @@ experiment_earl/runs/
     ├── summary/summary.csv               one row per run                                    (4)
     ├── best/                             scores.csv, best.csv, best_rows.csv                (5)
     ├── sweep/                            confusion.csv, user_confusion.csv, parts/          (6)
-    └── experiments/                      exp1/exp2 _points.csv, _overall.csv, _confusion.csv, .png  (9)
+    ├── experiments/                      exp1/exp2 _points.csv, _overall.csv, _confusion.csv, .png  (9)
+    └── strokes/                          <user>/<session>.csv (one row per stroke), all_strokes.csv, sessions.csv  (10)
 ```
 
 Copy the results back to your own computer (on your own computer, from the repository root):

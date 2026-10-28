@@ -91,6 +91,7 @@ Everything you can change is in the **Settings** cell, near the top. Do not edit
 | `SWEEP` | The sensitivity sweep: its fixed splits, the sensitivities scored (start, stop, step), the library sizes and the sessions tested per user. |
 | `SINGLE_RUN`, `GENUINE_HELD_OUT` | The one run used by the two optional checks (matched pairs, genuine check). |
 | `EXPERIMENTS` | Experiments 1 and 2 (adviser, Thesis Consultation v6): the four splits as `[legitimate, impostor]` (1 x 5, 5 x 1, 3 x 2, 2 x 3 as I x L), experiment 1's sensitivities (start, stop, step) and session count, experiment 2's session counts (start, stop, step). |
+| `STROKES` | Stroke export (section 10): `users` = the users whose strokes are written, one CSV per session with one row per stroke (kind, points, timing, start/end position, size, path length, straightness, speed). `None` = all 10 users, or a list such as `["user7", "user29"]`. |
 | `SECTIONS` | Switch each section on (`True`) or off (`False`). |
 
 Limits (the notebook checks these and stops with a message if one is broken):
@@ -224,8 +225,10 @@ experiment_earl/runs/
     │   ├── confusion.csv                 per split, library size and sensitivity      (6)
     │   ├── user_confusion.csv            the same per legitimate user                 (6)
     │   └── parts/, config.yaml           finished splits and the sweep's settings     (6)
-    └── experiments/                      exp1/exp2: _points.csv (per split and point: counts, running totals),
-                                          _overall.csv (all splits per point, best = True), _confusion.csv, .png  (9)
+    ├── experiments/                      exp1/exp2: _points.csv (per split and point: counts, running totals),
+    │                                     _overall.csv (all splits per point, best = True), _confusion.csv, .png  (9)
+    └── strokes/                          <user>/<session>.csv (one row per stroke), all_strokes.csv,
+                                          sessions.csv (one row per session)                                  (10)
 ```
 
 The two optional checks write `results/matches.csv` and `results/genuine_check{,_summary}.csv` into the
