@@ -132,7 +132,7 @@ Everything you can change is in the **Settings** cell near the top. Do not edit 
 | `SWEEP` | The sensitivity sweep (section 6): its fixed splits, the sensitivities scored (start, stop, step), the library sizes and the sessions tested per user. |
 | `EXPERIMENTS` | Experiments 1 and 2 (section 9): the four splits, experiment 1's sensitivities (start, stop, step) and session count, experiment 2's session counts (start, stop, step). |
 | `SINGLE_RUN`, `GENUINE_HELD_OUT` | The one run used by the two optional checks (sections 7 and 8). |
-| `CORES` | CPU cores the matching may use: `2`, the cores the adviser gave us. A container often shows every core of the host, and using more threads than our share only slows it down. The data check prints `numba uses 2 CPU cores`. Not part of the results folder name. |
+| `CORES` | CPU cores the matching may use. `None` (default) = every core available to the notebook: the cores the process may run on, capped by the container's CPU quota if it has one (a container often shows every core of the host, and more threads than the quota only slow it down). A number, e.g. `2`, caps it. The data check prints `numba uses N CPU cores`. Not part of the results folder name. |
 | `SECTIONS` | Switch each section on (`True`) or off (`False`). |
 
 Limits (the notebook checks them and stops with a message that says what to change):
