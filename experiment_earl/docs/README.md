@@ -38,7 +38,6 @@ Each page ends with its own **References** (IEEE style, with DOI or link); all o
 | 12 | [12_pick_best.md](12_pick_best.md) | User accuracy (session accuracy breaks ties) per (split, sensitivity, sessions); keeps the best cell of each split in `runs/<hash>/best/` |
 | 13 | [13_sweep_sensitivity.md](13_sweep_sensitivity.md) | Per fixed split, nearest-DTW cost once per (test, library) session pair; every library size a running minimum, every sensitivity a cut; TP/FP/FN/TN per setting |
 | 14 | [14_plot_sweep.md](14_plot_sweep.md) | Balanced accuracy vs sensitivity and as a heatmap, FAR/FRR at 1, m/4, m/2, m sessions; no best setting picked |
-| 17 | [17_passed_strokes.md](17_passed_strokes.md) | Session IDs and pass verdicts at each best setting; passed sessions' strokes trimmed to 0.5 s, plotted from (0,0) |
 
 ## Words used on every page
 
