@@ -92,6 +92,7 @@ Everything you can change is in the **Settings** cell, near the top. Do not edit
 | `SINGLE_RUN`, `GENUINE_HELD_OUT` | The one run used by the two optional checks (matched pairs, genuine check). |
 | `EXPERIMENTS` | Experiments 1 and 2 (adviser, Thesis Consultation v6): the four splits as `[legitimate, impostor]` (1 x 5, 5 x 1, 3 x 2, 2 x 3 as I x L), experiment 1's sensitivities (start, stop, step) and session count, experiment 2's session counts (start, stop, step). |
 | `STROKES` | Stroke export (section 10): `users` = the users whose strokes are written, one CSV per session with one row per stroke (kind, points, timing, start/end position, size, path length, straightness, speed). `None` = all 10 users, or a list such as `["user7", "user29"]`. `points: True` also writes every recorded x, y, t of every stroke (`<session>_points.csv`; all 10 users ≈ 94 MB with the stroke files). Every file has `position`, the session's place in the seed's session order that every run uses: with k sessions per user, `position < k` are the profile sessions, `position >= pool_size - k` the legitimate user's tested sessions. |
+| `MORE_SEEDS` | Seeds run after `SETTINGS["seed"]` (section 11): once every section has finished for the first seed, they all run again for each of these in turn, e.g. `[947, 948, 949]`. Each seed writes to its own `runs/<hash>/` (the seed is part of the hash); DTW costs are shared, so later seeds are faster. `[]` = only `SETTINGS["seed"]`. |
 | `SECTIONS` | Switch each section on (`True`) or off (`False`). |
 
 Limits (the notebook checks these and stops with a message if one is broken):
@@ -125,6 +126,7 @@ Press **Run All** (VS Code: *Run All* at the top; Jupyter: *Run → Run All Cell
 | 7. Matched pairs (off by default) | Which impostor strokes matched which user strokes | – |
 | 8. Genuine check (off by default) | A user's own unused sessions against their own profile | – |
 | 9. Experiments 1 and 2 | Experiment 1: accuracy against sensitivity at 1 session; experiment 2: accuracy against sessions at experiment 1's best sensitivity. Legitimate and impostor graph, one confusion matrix each (positive = impostor, session counts added up to the last iteration), the best point marked with a "best" arrow. Missing runs are simulated. | – |
+| 11. More seeds | Sections 3–10 (those switched on) again for every seed of `MORE_SEEDS`, one after another, each into its own `runs/<hash>/`. Finished runs of every seed are skipped after a restart. | – |
 
 Each section prints what it wrote (`Output: ...`). To run only some sections, switch the others off in `SECTIONS`
 and press Run All again.
