@@ -1,4 +1,4 @@
-# Stroke shapes of one user: from chained strokes to convex hulls
+# Stroke shapes of one user: from normalized strokes to convex hulls
 
 Exploration of 2026-10-18. Goal: form a shape for one specific user from that user's strokes, using the best sensitivity and session count found so far, and close it into a shape that can be described geometrically. Sections 1–5 describe how the shapes were built; section 6 compares two users; section 7 explains why the convex hull is used; section 8 tests 0.5 s pieces with the hull as the decision step.
 
@@ -35,28 +35,19 @@ Note: 0.5 s is the pause that *ends* a stroke, not the stroke length. Median str
 ### 3.1 Normalization
 `normalize()` in `03_chunk_shapes.py`: shift the first point to **(0, 0)**, scale by the bounding-box diagonal (diagonal = 1), resample to 64 points evenly spaced along the path. Time and screen position are dropped.
 
-### 3.2 Nearest-neighbour chain
-- Pairwise distance between strokes: banded DTW (band = 0.1 × 64 points), mean distance per point, the same measure the experiment uses.
-- Chain: start at the medoid (smallest summed distance), repeatedly step to the most similar unused stroke.
-- Joining: each stroke is translated so it starts where the previous one ended.
-- Result (`chain_user29.png`): the joined path curls into a loop because the order sorts strokes by **direction**. Only 28% of strokes have a neighbour within 0.04; 129 of 155 links are wider than 0.04.
-
-### 3.3 Direction-free alignment
+### 3.2 Direction-free alignment
 - Each stroke rotated so start → end lies on the +x axis, scaled so the start-to-end distance = 1, and mirrored so the bend points up. Every aligned stroke runs **(0, 0) → (1, 0)**.
 - Strokes whose start-to-end distance is under 0.5 × their bounding-box diagonal end near their start (**loops**, 16 for user29) and are kept apart.
-- Views (`shape_ways_user29.png`): mean stroke ± 1 sd; bend map (bulge = max height / chord, against where the bend peaks); families (the chain of aligned strokes cut at links > 0.04, runs of ≥ 3 strokes; 7 families covering 80 strokes); a straight-to-curved "alphabet".
+- Views (`shape_ways_user29.png`): mean stroke ± 1 sd; bend map (bulge = max height / chord, against where the bend peaks); a straight-to-curved "alphabet".
 - user29: median bulge 0.17, bend peaks ~2/3 along the stroke, 9% nearly straight.
-- Chaining aligned strokes end to start gives only a straight line, since they all point the same way.
 
-### 3.4 Closing the shape (aligned frame)
+### 3.3 Closing the shape (aligned frame)
 `closed_shapes_user29.png`:
 
 | shape | how it is closed | area | perimeter |
 |---|---|---|---|
-| closed chain | chain end joined to its start by one straight line | 928.8 (stroke units) | 173.5 |
 | convex hull | around all aligned points | 2.92 | 6.63 |
 | concave hull | shapely `concave_hull`, ratio 0.15 | 1.73 | 8.47 |
-| envelope | per x-slice, 10th–90th percentile of heights, lower edge + upper edge | 0.28 | 2.74 |
 
 ## 4. Pixel-space views (strokes shifted to (0, 0))
 
@@ -186,7 +177,7 @@ Script: `runs/efdc92/compare_fair/compare_fair.py` (outputs `pairs.csv`, `summar
 5. **Hulls per session:** the 90% convex hull (strokes up to the 90th percentile of reach) and the concave hull (r = 0.15), built from the resampled points.
 
 ### 6.2 Measures per pair of sessions
-- **Stroke Fréchet:** strokes aligned as in 3.3 and resampled to 32 points. For every stroke, the discrete Fréchet distance to the nearest stroke of the other session; the mean over both directions:
+- **Stroke Fréchet:** strokes aligned as in 3.2 and resampled to 32 points. For every stroke, the discrete Fréchet distance to the nearest stroke of the other session; the mean over both directions:
   d(A, B) = ½ [ mean_{a∈A} min_{b∈B} d_F(a, b) + mean_{b∈B} min_{a∈A} d_F(a, b) ]
   with c(i,j) = max(‖pᵢ − qⱼ‖, min(c(i−1,j), c(i−1,j−1), c(i,j−1))), d_F = c(n,m).
 - **Hull IoU:** A(A ∩ B) / A(A ∪ B), for both hull types.
@@ -302,9 +293,8 @@ Figures and data: `runs/efdc92/short_strokes/` (`short_strokes_regions.png`, `sh
 Scripts (copied from the session scratchpad) are in `scripts/`; run from the repo root with the venv:
 
 ```bash
-.venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/chain_shape.py     # 3.2 chain
-.venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/shape_ways.py      # 3.3 aligned views
-.venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/closed_shapes.py   # 3.4 closed shapes
+.venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/shape_ways.py      # 3.2 aligned views
+.venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/closed_shapes.py   # 3.3 closed shapes
 .venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/export_strokes.py  # user29 strokes, CSVs
 .venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/user_hulls.py user20  # section 4 for any user (add 0.5 for 0.5 s pieces)
 .venv/bin/python experiment_earl/runs/efdc92/shapes_explore/scripts/session_shapes.py   # one panel per session, user29 and user20
@@ -314,4 +304,4 @@ Scripts (copied from the session scratchpad) are in `scripts/`; run from the rep
 .venv/bin/python experiment_earl/runs/efdc92/short_strokes/pieces_origin.py          # section 8 pieces at (0,0) + duration check
 ```
 
-Section 4 for user29 was drawn inline; `user_hulls.py user29 0.5` writes the 0.5 s version into `runs/efdc92/shapes_explore/`; do not run `user_hulls.py user29` without 0.5 there, it would overwrite `strokes.csv`, which also holds the chain columns from `export_strokes.py`. The `runs/` folder is git-ignored, so these files are not committed.
+Section 4 for user29 was drawn inline; `user_hulls.py user29 0.5` writes the 0.5 s version into `runs/efdc92/shapes_explore/`; do not run `user_hulls.py user29` without 0.5 there, it would overwrite `strokes.csv` from `export_strokes.py`. The `runs/` folder is git-ignored, so these files are not committed.

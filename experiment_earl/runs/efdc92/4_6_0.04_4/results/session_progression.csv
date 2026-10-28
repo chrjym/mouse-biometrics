@@ -1,5 +1,0 @@
-sessions,matched_detected,sensitivity,n_legit,n_impostor,seed
-1,2,0.333,4,6,945
-2,5,0.833,4,6,945
-3,4,0.667,4,6,945
-4,4,0.667,4,6,945

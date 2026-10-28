@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np, pandas as pd, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 sys.path.insert(0, str(Path(__file__).parent))
-from chain_shape import pairwise, nn_chain, cfg_mod, plot_mod, K
-from shape_ways import align, families
+from chain_shape import pairwise, cfg_mod, plot_mod, K
+from shape_ways import align
 ch = import_module("03_chunk_shapes")
 OUT = Path("/home/tin/thesis-mouse-biometrics/experiment_earl/runs/efdc92/shapes_explore/strokes")
 
@@ -24,10 +24,8 @@ def main():
                 p = ch.normalize(c, config["resample_n"])
                 if p is not None: raw.append((n, j, c, p))
     lib = np.array([r[3] for r in raw])
-    D = pairwise(lib, lib, band); np.fill_diagonal(D, np.inf); chain_pos = {i: k for k, i in enumerate(nn_chain(D))}
-    al = [align(p) for p in lib]; ok = [i for i, a in enumerate(al) if a is not None]
-    A = np.array([al[i] for i in ok]); Da = pairwise(A, A, band); np.fill_diagonal(Da, np.inf)
-    fam = {ok[i]: f + 1 for f, run in enumerate(families(Da, nn_chain(Da))) for i in run}
+    D = pairwise(lib, lib, band); np.fill_diagonal(D, np.inf)
+    al = [align(p) for p in lib]
     rows, pts = [], []
     for i, (sess, j, c, p) in enumerate(raw):
         a = al[i]; sid = f"s{i + 1:03d}"
@@ -35,7 +33,7 @@ def main():
         rows.append({"stroke": sid, "session": sess, "chunk_in_session": j, "points": len(c),
                      "duration_s": round(c[-1, 2] - c[0, 2], 3), "length_px": round(ch.path_length(c), 1),
                      "start_x": c[0, 0], "start_y": c[0, 1], "end_x": c[-1, 0], "end_y": c[-1, 1],
-                     "loop": a is None, "bulge": round(bulge, 3), "family": fam.get(i, ""), "chain_position": chain_pos[i] + 1,
+                     "loop": a is None, "bulge": round(bulge, 3), 
                      "nearest_dtw": round(D[i].min(), 4), "file": f"{sid}.png"})
         pts += [{"stroke": sid, "t": t, "x": x, "y": y} for x, y, t in c]
         fig, ax = plt.subplots(1, 3, figsize=(11, 3.6))
@@ -47,7 +45,7 @@ def main():
             ax[2].set_title(f"aligned (0,0)->(1,0), bulge {bulge:.2f}")
         else:
             ax[2].text(.5, .5, "loop: ends near its start\n(not aligned, left out of shapes 2-4)", ha="center", va="center"); ax[2].axis("off")
-        fig.suptitle(f"{sid}  {user} {sess} chunk {j}  family {fam.get(i, '-')}  chain #{chain_pos[i] + 1}")
+        fig.suptitle(f"{sid}  {user} {sess} chunk {j}")
         fig.tight_layout(); fig.savefig(OUT / f"{sid}.png", dpi=80); plt.close(fig)
     pd.DataFrame(rows).to_csv(OUT.parent / "strokes.csv", index=False)
     pd.DataFrame(pts).to_csv(OUT.parent / "stroke_points.csv", index=False)
