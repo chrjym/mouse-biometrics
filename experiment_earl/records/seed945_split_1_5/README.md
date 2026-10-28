@@ -9,7 +9,7 @@ Record of the 1_5 runs on seed 945, copied from the git-ignored `runs/19399f/1_5
 - `labels_file: datasets/balabit/public_labels.csv` is set, so sessions marked `is_illegal=1` were left out
   (`src/00_config.py`). The current main config uses no label file.
 
-`summary.csv` has one row per run; `runs/<run>/` holds its `config.yaml`, `run.json` and `accuracy.csv`.
+`summary.csv` has one row per run. The per-run files stay in `runs/19399f/1_5_*/`.
 
 ## Results
 
