@@ -100,7 +100,8 @@ Limits (the notebook checks these and stops with a message if one is broken):
   **43** (a user's tested sessions must not overlap their profile), and `SWEEP` `sessions_max + test_sessions` up
   to **87**.
 
-**Try it small first.** The default batch is 6,750 runs and takes many hours. For a first run, use for example:
+**Try it small first.** The default batch is 4 splits × 100 sensitivities × 8 session counts = 3,200 runs (about
+10 minutes on 2 cores). For a first run, use for example:
 
 ```python
 "splits": [[1, 9], [5, 5]],
@@ -233,10 +234,11 @@ The two optional checks write `results/matches.csv` and `results/genuine_check{,
 ## 6. How long it takes
 
 - **Small test** (2 splits, 2 sensitivities, 2 session counts, small sweep): about 15 seconds.
-- **Sensitivity sweep** with the default settings: a few minutes the first time; seconds afterwards, because the
-  DTW distances are saved in `experiment_earl/cache/distances.pkl`.
-- **Full default batch** (6,750 runs): many hours. The old script version took about 40 hours; the notebook reuses
-  DTW results between runs of the same sensitivity, so it should be faster, but this has not been measured yet.
+- **Full default batch** (3,200 runs, 2 cores, measured 2026-10-28): about 9 minutes the first time, of which about
+  4 are the DTW costs of the 28,800 session pairs. Each pair is compared once; every run and sensitivity reuses its
+  cost (`experiment_earl/cache/costs.pkl`), and the session progression is computed once per sensitivity and split.
+- **Sensitivity sweep and experiments 1 and 2:** seconds, because they reuse the batch's DTW costs (a few minutes
+  if they run without the batch first).
 
 More sessions per user means more strokes to compare, so runs with many sessions take noticeably longer. A machine
 with more CPU cores runs the matching faster.

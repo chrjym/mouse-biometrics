@@ -141,8 +141,8 @@ Limits (the notebook checks them and stops with a message that says what to chan
 - Every user has at least **87 sessions** after the attack sessions are dropped. So `BATCH` sessions can go up to
   **43**, and `SWEEP` `sessions_max + test_sessions` up to **87**.
 
-**Try it small first.** The current batch is 4 splits × 100 sensitivities × 8 session counts = 3,200 runs, which
-takes many hours. For a first test, set for example:
+**Try it small first.** The current batch is 4 splits × 100 sensitivities × 8 session counts = 3,200 runs, about
+10 minutes on 2 cores (section 9). For a first test, set for example:
 
 ```python
 "splits": [[1, 2]],
@@ -265,12 +265,12 @@ rsync -a <user>@<server>:experiment/experiment_earl/runs/ experiment_earl/runs/
 ## 9. How long it takes
 
 - **Small test** (section 5): under a minute.
-- **Sensitivity sweep**: a few minutes the first time; seconds afterwards, because the DTW distances are saved in
-  `experiment_earl/cache/`.
-- **Full batch** (thousands of runs): many hours. Each pair of sessions is compared with DTW only once; every
-  sensitivity reuses that cost (kept in RAM and saved to `experiment_earl/cache/costs.pkl` at least every 10 minutes and
-  after each sensitivity), so later sensitivities and a restarted run go much faster than the first sensitivity. Runs with more sessions per user take longer. The matching uses
-  every CPU core of the server.
+- **Full batch** (3,200 runs): about 9 minutes on 2 cores of a desktop PC (measured 2026-10-28); the server may be
+  slower. About 4 minutes are the DTW costs of the 28,800 session pairs: each pair is compared once, and every run and
+  sensitivity reuses its cost (kept in RAM and saved to `experiment_earl/cache/costs.pkl` at least every 10 minutes and
+  after each sensitivity), so a restarted run skips them. The session progression is computed once per sensitivity
+  and split, for the largest session count, and the shorter runs take their steps from it.
+- **Sensitivity sweep and experiments 1 and 2:** seconds after the batch, because they reuse the same DTW costs.
 
 ## 10. Common problems
 
