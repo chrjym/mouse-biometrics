@@ -37,7 +37,7 @@ experiment/
 ├── datasets/balabit/         the Balabit data (step 2)
 └── experiment_earl/
     ├── runs/                 every result and log (made by the notebook)
-    └── cache/costs.pkl       saved DTW costs, reused by every sensitivity and after a restart (made by the notebook)
+    └── cache/costs_<seed>.pkl  saved DTW costs of one seed, reused by every sensitivity and after a restart (made by the notebook)
 ```
 
 **Every command in this guide runs inside `experiment/`** unless it says "on your own computer". If a command
@@ -134,7 +134,7 @@ Everything you can change is in the **Settings** cell near the top. Do not edit 
 | `SINGLE_RUN`, `GENUINE_HELD_OUT` | The one run used by the two optional checks (sections 7 and 8). |
 | `CORES` | CPU cores the matching may use. `None` (default) = every core available to the notebook: the cores the process may run on, capped by the container's CPU quota if it has one (a container often shows every core of the host, and more threads than the quota only slow it down). A number, e.g. `2`, caps it. The data check prints `numba uses N CPU cores`. Not part of the results folder name. |
 | `STROKES` | Stroke export (section 10): `users` = the users whose strokes are written, one CSV per session with one row per stroke (kind, points, timing, start/end position, size, path length, straightness, speed). `None` = all 10 users, or a list such as `["user7", "user29"]`. `points: True` also writes every recorded x, y, t of every stroke (`<session>_points.csv`; all 10 users ≈ 94 MB with the stroke files). Every file has `position`, the session's place in the seed's session order that every run uses: with k sessions per user, `position < k` are the profile sessions, `position >= pool_size - k` the legitimate user's tested sessions. |
-| `MORE_SEEDS` | Seeds run after `SETTINGS["seed"]` (section 11): once every section has finished for the first seed, they all run again for each of these in turn, e.g. `[947, 948, 949]`. Each seed writes to its own `runs/<hash>/` (the seed is part of the hash). Before each of these seeds the kernel's memory is emptied (DTW costs saved to `cache/costs.pkl`, then the in-memory DTW costs, sessions and tables cleared and the garbage collector run; the log prints `Memory freed: X MB -> Y MB`), so memory does not keep growing from seed to seed. `[]` = only `SETTINGS["seed"]`. |
+| `MORE_SEEDS` | Seeds run after `SETTINGS["seed"]` (section 11): once every section has finished for the first seed, they all run again for each of these in turn, e.g. `[947, 948, 949]`. Each seed writes to its own `runs/<hash>/` (the seed is part of the hash). Every seed has its own DTW cache file, `cache/costs_<seed>.pkl`. Before each of these seeds the kernel's memory is emptied (DTW costs saved to the seed's file, then the in-memory DTW costs, sessions and tables cleared and the garbage collector run; the log prints `Memory freed: X MB -> Y MB`) and only the next seed's file is loaded, so memory stays at one seed's worth however many seeds run, also after a restart. `cache/costs.pkl` from older versions is no longer used and can be deleted. `[]` = only `SETTINGS["seed"]`. |
 | `SECTIONS` | Switch each section on (`True`) or off (`False`). |
 
 Limits (the notebook checks them and stops with a message that says what to change):
@@ -273,7 +273,7 @@ rsync -a <user>@<server>:experiment/experiment_earl/runs/ experiment_earl/runs/
 - **Small test** (section 5): under a minute.
 - **Full batch** (3,200 runs): about 9 minutes on 2 cores of a desktop PC (measured 2026-10-28); the server may be
   slower. About 4 minutes are the DTW costs of the 28,800 session pairs: each pair is compared once, and every run and
-  sensitivity reuses its cost (kept in RAM and saved to `experiment_earl/cache/costs.pkl` at least every 10 minutes and
+  sensitivity reuses its cost (kept in RAM and saved to `experiment_earl/cache/costs_<seed>.pkl` at least every 10 minutes and
   after each sensitivity), so a restarted run skips them. The session progression is computed once per sensitivity
   and split, for the largest session count, and the shorter runs take their steps from it.
 - **Sensitivity sweep and experiments 1 and 2:** seconds after the batch, because they reuse the same DTW costs.
