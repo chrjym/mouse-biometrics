@@ -12,6 +12,18 @@ This study uses a quantitative, experimental design that converts each user's 0.
 4. Measure the dissimilarity between the data points of a user's hull and those of enrolled user profiles using the Euclidean distance; and
 5. Evaluate the matching performance using accuracy, FAR, FRR and EER, and determine how well the geometric profiles distinguish users toward continuous authentication.
 
+## Process overview
+
+The method moves from raw pointer records to a single decision in seven stages. Each stage produces the input of the next.
+
+1. **Data selection.** Sessions come from the Balabit dataset, and those marked illegal are excluded. The result is a set of sessions for each user.
+2. **Stroke extraction.** One stroke of exactly 0.5 s is taken from each session, which keeps every session's contribution equal in duration.
+3. **Grouping.** A user's strokes are split into two sets. The passed sessions form the profile, and all tested sessions form the mixed hull.
+4. **Alignment and pooling.** Every stroke is moved to start at (0,0), and the strokes in a set are pooled into one point cloud. Position on the screen no longer matters, so the cloud reflects only how far and in which directions the user moved from the start of each stroke.
+5. **Shape construction.** The convex hull gives the outer boundary of the cloud. Because it spans empty regions that no stroke visits, it is refined into a concave hull that follows the cloud more closely. For user29, this refinement keeps 38.1% of the convex area.
+6. **Conversion to numbers.** Two outlines may have different numbers of corners, so they cannot be compared corner by corner. Each outline therefore gets the same starting corner and direction, and is resampled to 64 evenly spaced points. With an x and a y value for each point, every outline becomes a vector of 128 numbers.
+7. **Comparison and decision.** Matching points on two outlines are compared, and the gaps are summarized as one distance. For identification, the nearest profile is the identified user. For verification, a claim is accepted when the distance is at or below the threshold T, and the resulting decisions give FAR, FRR, EER and accuracy.
+
 ## Data and stroke segmentation
 
 The study uses the public [Balabit Mouse Dynamics Challenge](https://github.com/balabit/Mouse-Dynamics-Challenge) dataset [1], which records mouse pointer timing and position for 10 users. Sessions marked as illegal in its public labels were excluded.
@@ -54,6 +66,8 @@ Smaller values mean more similar hulls. For user23 and user29, the distance is 3
 
 Each mixed hull is compared with every profile, and the nearest profile is the identified user.
 
+The division by 8 comes from the square root of the 64 points. It turns the total distance into a typical gap per point, which is easier to read in pixels and stays comparable when the number of points changes.
+
 ## Evaluation metrics and baseline
 
 The method reached an EER of 20% at about 418 px, using one global threshold T. A claim is accepted when the distance is at or below T. FAR and FRR follow the error-rate concepts in ISO/IEC 19795-1:2021 [4], and EER is the point where they are equal.
@@ -62,7 +76,7 @@ $$FAR = \frac{\text{impostor attempts accepted}}{\text{all impostor attempts}}, 
 
 $$Accuracy = \frac{\text{correct decisions}}{\text{all decisions}}$$
 
-The evaluation used 40 comparisons at 64 points: 5 genuine and 35 impostor. The profile of user16 was removed because it was built from wrongly accepted impostor sessions.
+A low threshold rejects more impostors but also more genuine users, and a high threshold does the reverse. The table below shows this trade-off, with FAR rising from 0% to 34.3% as the threshold grows while FRR falls from 20% to 0%. The evaluation used 40 comparisons at 64 points: 5 genuine and 35 impostor. The profile of user16 was removed because it was built from wrongly accepted impostor sessions.
 
 | Threshold (px) | FAR | FRR | Accuracy |
 |---|---|---|---|
