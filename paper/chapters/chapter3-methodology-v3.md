@@ -42,7 +42,25 @@ Each set of strokes becomes one closed outline and then one fixed-length vector 
 $$\Delta x_t = x_t - x_0, \qquad \Delta y_t = y_t - y_0$$
 
 2. **Convex hull.** The Graham scan [2] finds the smallest convex polygon around the pooled stroke points. For user29 this area is 782,606 px².
+
+   Each candidate point B is tested against the last two kept points O and A using the cross product. A point is kept only when the path turns the same way as the hull direction.
+
+   $$\mathrm{cross}(O,A,B) = (x_A - x_O)(y_B - y_O) - (y_A - y_O)(x_B - x_O)$$
+
+   The area of a hull with corners k = 1, ..., n, where corner n + 1 is corner 1, follows the shoelace formula.
+
+   $$Area = \frac{1}{2}\left|\sum_{k=1}^{n}(x_k y_{k+1} - x_{k+1} y_k)\right|$$
+
 3. **Concave hull.** Delaunay erosion, as described by Davis [3], triangulates the points and removes outer triangles with long edges (ratio 0.15). For user29 the limit is 149.6 px, leaving 53 corners and 298,036 px², or 38.1% of the convex area.
+
+   The edge limit L is set from the shortest and longest edges of the triangulation and the ratio r = 0.15. An outer triangle is removed when its outer edge is longer than L.
+
+   $$L = l_{min} + r(l_{max} - l_{min})$$
+
+   The share of the convex area that remains is then computed.
+
+   $$\frac{Area_{concave}}{Area_{convex}} = \frac{298{,}036}{782{,}606} = 38.1\%$$
+
 4. **Fixed start.** Corners are ordered counter-clockwise from the lowest corner, then the leftmost if tied.
 5. **Data points.** The outline is resampled to 64 evenly spaced points. For user29, the 4,863 px perimeter gives a step of about 76 px.
 
