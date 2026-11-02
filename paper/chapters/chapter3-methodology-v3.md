@@ -35,6 +35,18 @@ Sessions were taken from the best settings of the earlier simulation. One stroke
 
 ## Geometric representation
 
+The user × best sensitivity × best session setting was determined first: sensitivity 0.02 and 25 sessions.
+
+| User | Sessions passed | Sessions registered |
+|---|---|---|
+| user9 | 23 | 25 |
+| user15 | 9 | 25 |
+| user20 | 23 | 25 |
+| user23 | 11 | 25 |
+| user29 | 18 | 25 |
+
+Only the first chunk of each session was registered and then plotted at (0,0).
+
 Each set of strokes becomes one closed outline and then one fixed-length vector of 128 numbers. The steps use user29's profile as the example.
 
 1. **Alignment.** Each stroke is shifted so that it starts at (0,0), which removes screen position.
