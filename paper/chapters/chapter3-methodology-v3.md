@@ -35,7 +35,9 @@ Sessions were taken from the best settings of the earlier simulation. One stroke
 
 ## Geometric representation
 
-The user × best sensitivity × best session setting was determined first: sensitivity 0.02 and 25 sessions.
+### Feature extraction
+
+Upon the segmentation of the dataset into strokes, the researchers determined each user's performance at the best sensitivity and best number of sessions. For the split of five legitimate users and one impostor, the best setting was a sensitivity of 0.02 with 25 sessions. At this setting, the researchers identified, for each user, the sessions registered and the sessions passed, as shown in Table X. Of the 25 sessions registered for each user, user9 and user20 each passed 23, user29 passed 18, user23 passed 11, and user15 passed 9.
 
 | User | Sessions passed | Sessions registered |
 |---|---|---|
@@ -45,7 +47,7 @@ The user × best sensitivity × best session setting was determined first: sensi
 | user23 | 11 | 25 |
 | user29 | 18 | 25 |
 
-Only the first chunk of each session was registered and then plotted at (0,0).
+From these sessions, the researchers registered only the first chunk of each session, limited to 0.5 s, and plotted each chunk from the origin (0,0). This placed all of a user's chunks at one common starting point, which removed the effect of screen position. The aligned chunks were then pooled, and the researchers extracted the geometric features of the user by constructing a convex hull around the points and refining it into a concave hull. Each outline was then resampled to 64 evenly spaced points, which produced a feature vector of 128 values for every user.
 
 Each set of strokes becomes one closed outline and then one fixed-length vector of 128 numbers. The steps use user29's profile as the example.
 
