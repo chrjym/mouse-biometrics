@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot ranks a-b (e.g. 1-10, 11-20) of 17_best_balanced.py's ranking for one experiment and split: legitimate and impostor sessions through and accuracy per setting, from one hash folder or the summary over all seeds."""
+"""Plot ranks a-b (e.g. 1-10, 11-20) of 17_best_balanced.py's ranking over all seeds (or one --seed) for one experiment and split into runs/best_balanced/plots/: legitimate and impostor sessions through and accuracy per setting."""
 
 import argparse
 from importlib import import_module
@@ -27,27 +27,31 @@ def parse_rows(text: str) -> tuple[int, int]:
     return first, last
 
 
-def hash_rows(group: Path, exp: str, split: str) -> pd.DataFrame:
-    """One hash folder's ranking (rank column of 17's <exp>_scores.csv) for one split."""
-    path = group / "best_balanced" / f"{exp}_scores.csv"
+OUT = cfg_mod.RUNS / "best_balanced"
+
+
+def read(name: str) -> pd.DataFrame:
+    path = OUT / name
     if not path.exists():
-        raise SystemExit(f"No {path}: run 17_best_balanced.py {group.name} first")
-    table = pd.read_csv(path)
-    table = table[table["split"] == split].sort_values("rank")
+        raise SystemExit(f"No {path}: run 17_best_balanced.py first")
+    return pd.read_csv(path)
+
+
+def seed_rows(seed: int, exp: str, split: str) -> pd.DataFrame:
+    """One seed's ranking (rank column of 17's scores.csv) for one split."""
+    table = read("scores.csv")
+    table = table[(table["seed"] == seed) & (table["experiment"] == exp) & (table["split"] == split)]
+    table = table.sort_values("rank")
     table["note"] = [f"legit {tn}/{tn + fp}, impostor {fn}/{fn + tp}"
                      for tp, fp, fn, tn in table[["TP", "FP", "FN", "TN"]].itertuples(index=False)]
     return table
 
 
 def summary_rows(exp: str, split: str) -> pd.DataFrame:
-    """The summary's order over seeds (17 sorts by times_best, seeds_qualifying, accuracy, x) for one split."""
-    path = cfg_mod.RUNS / "best_balanced_summary.csv"
-    if not path.exists():
-        raise SystemExit(f"No {path}: run 17_best_balanced.py --all (or with several hashes) first")
-    table = pd.read_csv(path)
-    table = table[(table["experiment"] == exp) & (table["split"] == split)].reset_index(drop=True)
-    table["rank"] = table.index + 1
-    table["qualifies"] = table["seeds_qualifying"] > 0
+    """The ranking over all seeds (17's summary.csv: times_best, seeds_qualifying, accuracy, x) for one split;
+    qualifies = qualifies in at least one seed."""
+    table = read("summary.csv")
+    table = table[(table["experiment"] == exp) & (table["split"] == split)].sort_values("rank")
     table["note"] = [f"best in {b}/{s} seeds, qualifies in {q}"
                      for b, s, q in table[["times_best", "seeds", "seeds_qualifying"]].itertuples(index=False)]
     return table
@@ -103,9 +107,7 @@ def plot(rows: pd.DataFrame, exp: str, title: str, path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("hash", nargs="?", help="folder under runs/ (default: the one config.yaml selects)")
-    parser.add_argument("--summary", action="store_true",
-                        help="plot runs/best_balanced_summary.csv (all seeds) instead of one hash folder")
+    parser.add_argument("--seed", type=int, help="plot one seed's ranking instead of the ranking over all seeds")
     parser.add_argument("--rows", type=parse_rows, default=(1, 10),
                         help="ranks to plot: N = top N, A-B = ranks A to B, e.g. 10, 11-20 (default 1-10)")
     parser.add_argument("--experiment", choices=list(X), default="exp1", help="exp1 (sensitivity) or exp2 (sessions)")
@@ -115,16 +117,14 @@ def main() -> None:
     args = parser.parse_args()
     first, last = args.rows
 
-    if args.summary:
+    if args.seed is None:
         table = summary_rows(args.experiment, args.split)
-        out_dir = cfg_mod.RUNS / "best_balanced_plots"
-        source = f"{int(table['seeds'].max()) if len(table) else 0} seeds (runs/best_balanced_summary.csv)"
+        source = f"over {int(table['seeds'].max()) if len(table) else 0} seeds"
     else:
-        group = cfg_mod.RUNS / (args.hash or cfg_mod.run_folder_name(cfg_mod.load_config()).split("/")[0])
-        table = hash_rows(group, args.experiment, args.split)
-        out_dir = group / "best_balanced_plots"
-        seed = table["seed"].iloc[0] if len(table) and pd.notna(table["seed"].iloc[0]) else "?"
-        source = f"runs/{group.name}, seed {seed:g}" if seed != "?" else f"runs/{group.name}"
+        table = seed_rows(args.seed, args.experiment, args.split)
+        source = f"seed {args.seed}" + (f", runs/{table['hash'].iloc[0]}" if len(table) else "")
+    out_dir = OUT / "plots"
+    name = "all_seeds" if args.seed is None else f"seed_{args.seed}"
     if args.qualifying_only:
         table = table[table["qualifies"]].assign(rank=lambda t: range(1, len(t) + 1))
     if table.empty:
@@ -136,12 +136,15 @@ def main() -> None:
 
     out_dir.mkdir(parents=True, exist_ok=True)
     suffix = "_qualifying" if args.qualifying_only else ""
-    path = out_dir / f"{args.experiment}_{args.split.replace(' ', '')}{suffix}_rank_{first}-{rows['rank'].max()}.png"
+    path = out_dir / f"{name}_{args.experiment}_{args.split.replace(' ', '')}{suffix}_rank_{first}-{rows['rank'].max()}.png"
     title = (f"{'Experiment 1: sensitivity' if args.experiment == 'exp1' else 'Experiment 2: sessions'}, "
              f"split {args.split}, ranks {first}-{rows['rank'].max()} of {len(table)}"
              f"{' qualifying' if args.qualifying_only else ''} ({source})\n"
-             f"rank: qualifying first (more legitimate than impostor sessions through, legitimate >= min), "
-             f"then accuracy; hatched = not qualifying")
+             + ("rank: seeds where it is the best qualifying setting, then seeds where it qualifies, then mean accuracy; "
+                "bars and dot = means over seeds; hatched = qualifies in no seed"
+                if args.seed is None else
+                "rank: qualifying first (more legitimate than impostor sessions through, legitimate >= min), "
+                "then accuracy; hatched = not qualifying"))
     plot(rows, args.experiment, title, path)
     print(f"Plotted ranks {first}-{rows['rank'].max()} of {len(table)} -> {path}")
 

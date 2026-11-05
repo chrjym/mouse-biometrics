@@ -20,17 +20,22 @@ Per-split points hold only 5–6 sessions (one per user), so single-seed per-spl
 summary over seeds.
 
 ```bash
-.venv/bin/python experiment_earl/src/17_best_balanced.py            # the hash config.yaml selects
-.venv/bin/python experiment_earl/src/17_best_balanced.py a6e6f7 19399f
-.venv/bin/python experiment_earl/src/17_best_balanced.py --all      # every runs/<hash>/ with experiments/ (e.g. 500 seeds)
+.venv/bin/python experiment_earl/src/17_best_balanced.py                 # every runs/<hash>/ with experiments/ (every seed)
+.venv/bin/python experiment_earl/src/17_best_balanced.py a6e6f7 19399f   # only these hash folders
 ```
 
-Per hash: `best_balanced/best.csv` (rank 1 of each split, both experiments), `exp1_scores.csv`, `exp2_scores.csv`
-(folder rewritten each call). With more than one hash: `runs/best_balanced_seeds.csv` (every seed's rank-1 rows, with
-`hash` and `seed` from the `config.yaml` snapshots) and `runs/best_balanced_summary.csv` (per experiment, split and
-point: `seeds`, mean `accuracy`/rates, `times_best` = seeds where it is rank 1 **and** qualifies, `seeds_qualifying`,
-`times_notebook_best`). Experiment 2 is grouped by sessions only, since its sensitivity is each seed's own
-experiment-1 best. Pass hashes that differ only in seed.
+Everything goes to **`runs/best_balanced/`** (user request 2026-11-05: one result for many seeds, nothing written into
+the hash folders; the file is rewritten on each call):
+
+- `summary.csv`: per experiment, split and point over seeds, ranked (`rank` 1 = best): `times_best` = seeds where it is
+  rank 1 **and** qualifies, then `seeds_qualifying`, then mean `accuracy`, then the higher x; also `seeds`, mean
+  `legit_through` / `impostor_through` / `balanced_accuracy`, `accuracy_std`, `times_notebook_best`, `qualifies` =
+  qualifies in at least one seed. Experiment 2 is grouped by sessions only, since its sensitivity is each seed's own
+  experiment-1 best.
+- `seeds.csv`: every seed's rank-1 row per experiment and split (with `seed`, `hash` from the `config.yaml` snapshots).
+- `scores.csv`: every ranked point of every seed (what `18_plot_best_balanced.py --seed` reads).
+
+Pass hash folders that differ only in seed.
 
 Checked 2026-11-05: on `a6e6f7` (seed 946) the `all` row gives 0.06 (TN 6 / FP 5, FN 1 / TP 10, accuracy 0.727), the
 same as `exp1_overall.csv` and `exp1.png`; experiment 2 at 0.06 has no qualifying session count (every impostor session

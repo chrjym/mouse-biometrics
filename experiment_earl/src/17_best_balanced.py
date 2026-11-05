@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-"""Best sensitivity (experiment 1) and sessions (experiment 2) from each runs/<hash>/experiments/ (one hash per seed): more legitimate than impostor sessions must go through, then highest accuracy, ties to higher sensitivity / more sessions; plus a summary over all seeds."""
+"""Best sensitivity (experiment 1) and sessions (experiment 2) over every seed's runs/<hash>/experiments/ into runs/best_balanced/: more legitimate than impostor sessions must go through, then highest accuracy, ties to higher sensitivity / more sessions."""
 
 import argparse
-import shutil
 from importlib import import_module
 from pathlib import Path
 
@@ -14,8 +13,6 @@ cfg_mod = import_module("00_config")
 ROOT = Path(__file__).resolve().parents[1]
 COUNTS = ["TP", "FP", "FN", "TN"]   # positive = impostor: TP rejected, FN let in, TN legitimate accepted, FP blocked
 X = {"exp1": "sensitivity", "exp2": "sessions"}
-SHOWN = ["split", "sensitivity", "sessions", "TP", "FP", "FN", "TN", "legit_through", "impostor_through", "accuracy",
-         "qualifies", "notebook_best"]
 
 
 def score(points: pd.DataFrame, x: str) -> pd.DataFrame:
@@ -57,34 +54,16 @@ def seed_of(group: Path) -> int | None:
     return None
 
 
-def process(group: Path, min_legit: float, quiet: bool) -> pd.DataFrame | None:
-    """Writes runs/<hash>/best_balanced/; returns every ranked point of both experiments, tagged."""
+def process(group: Path, min_legit: float) -> pd.DataFrame | None:
+    """Every ranked point of both experiments of one hash folder (one seed), tagged with hash and seed."""
     source = group / "experiments"
     if not (source / "exp1_points.csv").exists():
         print(f"skip {group.name}: no experiments/exp1_points.csv")
         return None
     tag = {"hash": group.name, "seed": seed_of(group)}
-    out = group / "best_balanced"
-    if out.exists():
-        shutil.rmtree(out)
-    out.mkdir()
-    ranked = []
-    for exp, x in X.items():
-        path = source / f"{exp}_points.csv"
-        if not path.exists():
-            continue
-        cells = rank(score(pd.read_csv(path), x), x, min_legit).assign(experiment=exp, **tag)
-        cells.to_csv(out / f"{exp}_scores.csv", index=False)
-        ranked.append(cells)
-    table = pd.concat(ranked, ignore_index=True)
-    best = table[table["rank"] == 1]
-    best.to_csv(out / "best.csv", index=False)
-    if not quiet:
-        print(f"== {group.name} (seed {tag['seed']})")
-        for exp, rows in best.groupby("experiment"):
-            print(f"{exp} (best {X[exp]}):")
-            print(rows[SHOWN].round(3).to_string(index=False))
-    return table
+    ranked = [rank(score(pd.read_csv(source / f"{exp}_points.csv"), x), x, min_legit).assign(experiment=exp, **tag)
+              for exp, x in X.items() if (source / f"{exp}_points.csv").exists()]
+    return pd.concat(ranked, ignore_index=True)
 
 
 def summarize(table: pd.DataFrame) -> pd.DataFrame:
@@ -105,40 +84,46 @@ def summarize(table: pd.DataFrame) -> pd.DataFrame:
                  .reset_index())
         stats = stats.sort_values(["split", "times_best", "seeds_qualifying", "accuracy", x],
                                   ascending=[True, False, False, False, False])
+        stats["rank"] = stats.groupby("split").cumcount() + 1
+        stats["qualifies"] = stats["seeds_qualifying"] > 0
         parts.append(stats.assign(experiment=exp))
-    return pd.concat(parts, ignore_index=True)
+    summary = pd.concat(parts, ignore_index=True)
+    first = ["experiment", "split", "rank", "sensitivity", "sessions"]
+    return summary[[c for c in first if c in summary] + [c for c in summary.columns if c not in first]]
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("hashes", nargs="*", help="folders under runs/ holding experiments/ "
-                                                  "(default: the one config.yaml selects)")
-    parser.add_argument("--all", action="store_true", help="every runs/<hash>/ that has experiments/ (e.g. 500 seeds)")
+    parser.add_argument("hashes", nargs="*", help="only these folders under runs/ (default: every runs/<hash>/ that "
+                                                  "has experiments/, i.e. every seed)")
     parser.add_argument("--min-legit", type=float, default=0.5,
                         help="share of legitimate sessions that must go through to qualify (default 0.5)")
     args = parser.parse_args()
-    if args.all:
-        groups = sorted(p.parent.parent for p in cfg_mod.RUNS.glob("*/experiments/exp1_points.csv"))
+    if args.hashes:
+        groups = [cfg_mod.RUNS / n for n in args.hashes]
     else:
-        names = args.hashes or [cfg_mod.run_folder_name(cfg_mod.load_config()).split("/")[0]]
-        groups = [cfg_mod.RUNS / n for n in names]
+        groups = sorted(p.parent.parent for p in cfg_mod.RUNS.glob("*/experiments/exp1_points.csv"))
 
-    quiet = len(groups) > 5
-    tables = [t for t in (process(g, args.min_legit, quiet) for g in groups) if t is not None]
+    tables = [t for t in (process(g, args.min_legit) for g in groups) if t is not None]
     if not tables:
         raise SystemExit("No experiments/ found: run section 9 of the notebook first")
-    print(f"Per hash ({len(tables)}): best_balanced/ (best.csv, exp1_scores.csv, exp2_scores.csv)")
-    if len(tables) > 1:
-        table = pd.concat(tables, ignore_index=True)
-        table[table["rank"] == 1].to_csv(cfg_mod.RUNS / "best_balanced_seeds.csv", index=False)
-        summary = summarize(table)
-        summary.to_csv(cfg_mod.RUNS / "best_balanced_summary.csv", index=False)
-        print(f"\nMost often best over {table['seed'].nunique()} seeds:")
-        top = summary.groupby(["experiment", "split"], sort=False).head(1)
-        print(top[["experiment", "split", "sensitivity", "sessions", "seeds", "times_best", "seeds_qualifying",
-                   "accuracy", "legit_through", "impostor_through"]].round(3).to_string(index=False))
-        print(f"Output: {cfg_mod.RUNS / 'best_balanced_seeds.csv'} (each seed's best), "
-              f"{cfg_mod.RUNS / 'best_balanced_summary.csv'} (every point over seeds)")
+    table = pd.concat(tables, ignore_index=True)
+    out = cfg_mod.RUNS / "best_balanced"
+    out.mkdir(exist_ok=True)
+    first = ["experiment", "seed", "hash"]
+    table = table[first + [c for c in table.columns if c not in first]]
+    table.to_csv(out / "scores.csv", index=False)
+    best = table[table["rank"] == 1]
+    best.to_csv(out / "seeds.csv", index=False)
+    summary = summarize(table)
+    summary.to_csv(out / "summary.csv", index=False)
+
+    print(f"{table['seed'].nunique()} seeds ({len(tables)} hash folders), min legitimate through {args.min_legit:g}")
+    top = summary[summary["rank"] == 1]
+    print(top[["experiment", "split", "sensitivity", "sessions", "seeds", "times_best", "seeds_qualifying",
+               "accuracy", "legit_through", "impostor_through"]].round(3).to_string(index=False))
+    print(f"Output: {out}/ (summary.csv = every point over seeds, ranked; seeds.csv = each seed's best; "
+          f"scores.csv = every point of every seed)")
 
 
 if __name__ == "__main__":
