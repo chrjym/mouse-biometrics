@@ -268,6 +268,21 @@ Copy the results back to your own computer (on your own computer, from the repos
 rsync -a <user>@<server>:experiment/experiment_earl/runs/ experiment_earl/runs/
 ```
 
+With many seeds (`MORE_SEEDS`), copy only the folders you need with `pull_runs.py` (runs on your computer, needs
+`ssh` and `rsync`). It copies the chosen paths of every `runs/<hash>/` (one per seed), checks each copy's file count and
+size, and logs it in `experiment_earl/runs/pull_log.csv`; a later call skips every path whose file count, size and
+newest file are unchanged on the server, so only new seeds and still-growing folders are copied again.
+
+```bash
+python3 experiment_earl/server/pull_runs.py --remote <user>@<server> --dry-run          # what would be copied
+python3 experiment_earl/server/pull_runs.py --remote <user>@<server>                    # default: experiments sweep best summary accuracy.csv
+python3 experiment_earl/server/pull_runs.py --remote <user>@<server> --folders experiments 'strokes/sessions.csv' --seeds 946-1000
+```
+
+`--folders` takes paths inside `runs/<hash>/` (globs allowed, e.g. `'1_5_*'`), `--seeds` single seeds or ranges
+(the seed is read from the hash folder's `config.yaml` snapshots), `--source` another server folder than
+`experiment/experiment_earl/runs`. A failed path is not logged, so the next call tries it again.
+
 ## 9. How long it takes
 
 - **Small test** (section 5): under a minute.
