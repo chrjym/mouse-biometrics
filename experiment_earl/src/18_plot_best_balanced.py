@@ -48,10 +48,10 @@ def seed_rows(seed: int, exp: str, split: str) -> pd.DataFrame:
 
 
 def summary_rows(exp: str, split: str) -> pd.DataFrame:
-    """The ranking over all seeds (17's summary.csv: times_best, seeds_qualifying, accuracy, x) for one split;
+    """The ranking over all seeds (17's <exp>_ranking.csv, or by_split/ for one split), rank 1 first;
     qualifies = qualifies in at least one seed."""
-    table = read("summary.csv")
-    table = table[(table["experiment"] == exp) & (table["split"] == split)].sort_values("rank")
+    name = f"{exp}_ranking.csv" if split == "all" else f"by_split/{exp}_{split.replace(' ', '')}_ranking.csv"
+    table = read(name).sort_values("rank")
     table["note"] = [f"best in {b}/{s} seeds, qualifies in {q}"
                      for b, s, q in table[["times_best", "seeds", "seeds_qualifying"]].itertuples(index=False)]
     return table

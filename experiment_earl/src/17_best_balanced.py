@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Best sensitivity (experiment 1) and sessions (experiment 2) over every seed's runs/<hash>/experiments/ into runs/best_balanced/: more legitimate than impostor sessions must go through, then highest accuracy, ties to higher sensitivity / more sessions."""
+"""Rank every sensitivity (experiment 1) and session count (experiment 2) from best to worst over every seed's runs/<hash>/experiments/ into runs/best_balanced/<exp>_ranking.csv: more legitimate than impostor sessions must go through, then highest accuracy, ties to higher sensitivity / more sessions."""
 
 import argparse
 from importlib import import_module
@@ -109,22 +109,28 @@ def main() -> None:
         raise SystemExit("No experiments/ found: run section 9 of the notebook first")
     table = pd.concat(tables, ignore_index=True)
     out = cfg_mod.RUNS / "best_balanced"
-    out.mkdir(exist_ok=True)
-    first = ["experiment", "seed", "hash"]
+    if out.exists():
+        for old in [*out.glob("*.csv"), *out.glob("by_split/*.csv")]:
+            old.unlink()
+    (out / "by_split").mkdir(parents=True, exist_ok=True)
+    first = ["experiment", "seed", "hash", "split", "rank"]
     table = table[first + [c for c in table.columns if c not in first]]
-    table.to_csv(out / "scores.csv", index=False)
-    best = table[table["rank"] == 1]
-    best.to_csv(out / "seeds.csv", index=False)
+    table.sort_values(["experiment", "seed", "split", "rank"]).to_csv(out / "scores.csv", index=False)
+    table[table["rank"] == 1].sort_values(["experiment", "seed", "split"]).to_csv(out / "seeds.csv", index=False)
     summary = summarize(table)
-    summary.to_csv(out / "summary.csv", index=False)
+    for (exp, split), ranking in summary.groupby(["experiment", "split"]):
+        ranking = ranking.sort_values("rank").drop(columns=[c for c in ("sensitivity", "sessions") if c != X[exp]])
+        path = out / f"{exp}_ranking.csv" if split == "all" else out / "by_split" / f"{exp}_{split.replace(' ', '')}_ranking.csv"
+        ranking.to_csv(path, index=False)
 
     print(f"{table['seed'].nunique()} seeds ({len(tables)} hash folders), min legitimate through {args.min_legit:g}")
-    top = summary[summary["rank"] == 1]
-    print(top[["experiment", "split", "sensitivity", "sessions", "seeds", "times_best", "seeds_qualifying",
-               "accuracy", "legit_through", "impostor_through"]].round(3).to_string(index=False))
-    print(f"Output: {out}/ (summary.csv = every point over seeds, ranked; seeds.csv = each seed's best; "
-          f"scores.csv = every point of every seed)")
-
+    for exp, x in X.items():
+        ranking = summary[(summary["experiment"] == exp) & (summary["split"] == "all")].sort_values("rank")
+        print(f"\n{exp}: top 5 {x} (all splits, ranked over seeds)")
+        print(ranking.head(5)[["rank", x, "seeds", "times_best", "seeds_qualifying", "accuracy", "legit_through",
+                               "impostor_through"]].round(3).to_string(index=False))
+    print(f"\nOutput: {out}/ (exp1_ranking.csv, exp2_ranking.csv = rank 1 to last over all seeds, all splits; "
+          f"by_split/ = the same per split; seeds.csv = each seed's best; scores.csv = every point of every seed)")
 
 if __name__ == "__main__":
     main()

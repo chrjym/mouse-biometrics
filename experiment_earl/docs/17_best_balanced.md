@@ -27,13 +27,17 @@ summary over seeds.
 Everything goes to **`runs/best_balanced/`** (user request 2026-11-05: one result for many seeds, nothing written into
 the hash folders; the file is rewritten on each call):
 
-- `summary.csv`: per experiment, split and point over seeds, ranked (`rank` 1 = best): `times_best` = seeds where it is
-  rank 1 **and** qualifies, then `seeds_qualifying`, then mean `accuracy`, then the higher x; also `seeds`, mean
-  `legit_through` / `impostor_through` / `balanced_accuracy`, `accuracy_std`, `times_notebook_best`, `qualifies` =
-  qualifies in at least one seed. Experiment 2 is grouped by sessions only, since its sensitivity is each seed's own
-  experiment-1 best.
+- **`exp1_ranking.csv`, `exp2_ranking.csv`**: one ranking per experiment, all splits added, sorted best to worst
+  (`rank` 1, 2, 3, ... top to bottom; user request 2026-11-05). Order: `times_best` = seeds where it is rank 1 **and**
+  qualifies, then `seeds_qualifying`, then mean `accuracy`, then the higher sensitivity / more sessions. Also `seeds`,
+  mean `legit_through` / `impostor_through` / `balanced_accuracy`, `accuracy_std`, `times_notebook_best`,
+  `qualifies` = qualifies in at least one seed. Experiment 2 is ranked by sessions only, since its sensitivity is
+  each seed's own experiment-1 best.
+- `by_split/<exp>_<split>_ranking.csv` (e.g. `exp1_1x5_ranking.csv`): the same ranking for one split.
 - `seeds.csv`: every seed's rank-1 row per experiment and split (with `seed`, `hash` from the `config.yaml` snapshots).
-- `scores.csv`: every ranked point of every seed (what `18_plot_best_balanced.py --seed` reads).
+- `scores.csv`: every ranked point of every seed (what `18_plot_best_balanced.py --seed` reads), sorted by experiment, seed, split, rank.
+
+Old `.csv` files in `runs/best_balanced/` are removed on each call; `plots/` is kept.
 
 Pass hash folders that differ only in seed.
 

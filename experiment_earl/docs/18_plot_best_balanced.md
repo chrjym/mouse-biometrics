@@ -9,13 +9,15 @@ Dotted line = 0.5. Reads `runs/best_balanced/` only, writes `runs/best_balanced/
 ```bash
 .venv/bin/python experiment_earl/src/18_plot_best_balanced.py                              # all seeds, top 10, exp1, split all
 .venv/bin/python experiment_earl/src/18_plot_best_balanced.py --rows 11-20
+.venv/bin/python experiment_earl/src/18_plot_best_balanced.py --rows 21-30
 .venv/bin/python experiment_earl/src/18_plot_best_balanced.py --experiment exp2 --split "1 x 5" --rows 5
 .venv/bin/python experiment_earl/src/18_plot_best_balanced.py --qualifying-only --rows 20
 .venv/bin/python experiment_earl/src/18_plot_best_balanced.py --seed 946                   # one seed's ranking
 ```
 
 - `--rows N` = ranks 1–N, `--rows A-B` = ranks A–B (stops at the last rank; error if A is past it).
-- Ranks = the `rank` column of `summary.csv` (all seeds) or of `scores.csv` for that seed.
+- Ranks = the `rank` column of `<exp>_ranking.csv` (all seeds, split `all`), `by_split/<exp>_<split>_ranking.csv`
+  (`--split`), or `scores.csv` for one `--seed`.
 - `--qualifying-only` drops non-qualifying rows first and renumbers the ranks. On seed 946 exp 1 split `all`, only
   0.06 qualifies; ranks 2–10 are sensitivities 1.00–0.92 where every session goes through (accuracy 0.5).
 - File name: `<all_seeds|seed_N>_<exp>_<split without spaces>[_qualifying]_rank_<A>-<B>.png`.
