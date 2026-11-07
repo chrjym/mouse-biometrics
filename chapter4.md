@@ -49,26 +49,49 @@ with fewer than 10 points were discarded. This produced **109,948 strokes** from
 (96.7 percent) are move strokes and 3,628 (3.3 percent) are drag strokes. Every stroke could be normalized, so all
 109,948 strokes were used in the comparison. Table 4.2 summarizes the strokes of each user.
 
-**Table 4.2.** Strokes per user after segmentation (medians are per stroke)
+**Table 4.2.** Strokes per user after segmentation
 
-| User | Sessions | Strokes | Move | Drag | Median points | Median duration (s) | Median path length (px) | Median straightness |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| user7 | 121 | 14,790 | 14,027 | 763 | 38 | 0.95 | 320 | 0.75 |
-| user9 | 87 | 9,674 | 9,424 | 250 | 60 | 0.87 | 260 | 0.90 |
-| user12 | 191 | 17,023 | 16,341 | 682 | 15 | 1.78 | 554 | 0.59 |
-| user15 | 183 | 12,111 | 11,599 | 512 | 14 | 1.73 | 670 | 0.72 |
-| user16 | 163 | 14,606 | 14,092 | 514 | 15 | 1.70 | 670 | 0.63 |
-| user20 | 94 | 9,495 | 9,099 | 396 | 29 | 1.26 | 382 | 0.79 |
-| user21 | 99 | 7,845 | 7,776 | 69 | 15 | 1.92 | 638 | 0.49 |
-| user23 | 109 | 8,273 | 8,158 | 115 | 15 | 1.79 | 493 | 0.72 |
-| user29 | 104 | 8,399 | 8,230 | 169 | 14 | 1.30 | 409 | 0.78 |
-| user35 | 120 | 7,732 | 7,574 | 158 | 15 | 1.79 | 506 | 0.65 |
-| **All** | **1,271** | **109,948** | **106,320** | **3,628** | **17** | **1.51** | **480** | **0.70** |
+| User | Sessions | Strokes | Move | Drag |
+|---|---:|---:|---:|---:|
+| user7 | 121 | 14,790 | 14,027 | 763 |
+| user9 | 87 | 9,674 | 9,424 | 250 |
+| user12 | 191 | 17,023 | 16,341 | 682 |
+| user15 | 183 | 12,111 | 11,599 | 512 |
+| user16 | 163 | 14,606 | 14,092 | 514 |
+| user20 | 94 | 9,495 | 9,099 | 396 |
+| user21 | 99 | 7,845 | 7,776 | 69 |
+| user23 | 109 | 8,273 | 8,158 | 115 |
+| user29 | 104 | 8,399 | 8,230 | 169 |
+| user35 | 120 | 7,732 | 7,574 | 158 |
+| **All** | **1,271** | **109,948** | **106,320** | **3,628** |
+
+The stroke counts are used directly by the method: strokes are compared only with strokes of the same type (move or
+drag), and a session's number of strokes is the denominator of the 20 percent matching rule.
+
+Table 4.3 gives two descriptive values of the raw strokes. **They are not features of the method**, which compares
+only the normalized 64-point shape of each stroke; they are reported only to explain the need for resampling and the
+matching results.
+
+**Table 4.3.** Descriptive values of the raw strokes, per stroke (not used by the method)
+
+| User | Median recorded points | Median straightness |
+|---|---:|---:|
+| user7 | 38 | 0.75 |
+| user9 | 60 | 0.90 |
+| user12 | 15 | 0.59 |
+| user15 | 14 | 0.72 |
+| user16 | 15 | 0.63 |
+| user20 | 29 | 0.79 |
+| user21 | 15 | 0.49 |
+| user23 | 15 | 0.72 |
+| user29 | 14 | 0.78 |
+| user35 | 15 | 0.65 |
+| **All** | **17** | **0.70** |
 
 *Straightness* is the straight-line distance between a stroke's start and end divided by the length of its path; a
 value of 1 is a perfectly straight stroke.
 
-Two observations follow from Table 4.2. First, user7, user9 and user20 have two to four times as many points per
+Two observations follow from Table 4.3. First, user7, user9 and user20 have two to four times as many points per
 stroke as the other users. These are the three users whose sessions were logged about every 16 milliseconds instead of
 every 110 milliseconds, so the raw number of points reflects the logging rate rather than the user's behavior. This
 confirms the need to redraw every stroke with the same number of points (64) before comparison. Second, the median
@@ -80,12 +103,12 @@ shape matching.
 
 ### 4.3 Shape Matching using Dynamic Time Warping
 
-To show how the matching rule behaves, Table 4.3 compares the strokes of legitimate and impostor test sessions against
+To show how the matching rule behaves, Table 4.4 compares the strokes of legitimate and impostor test sessions against
 the libraries described in Chapter 3, for three library sizes and several sensitivities. The values add up the four
 splits. A legitimate session is compared with its own user's library; an impostor session is compared with the
 library that accepts the most of that impostor's sessions.
 
-**Table 4.3.** Share of strokes matched and share of sessions accepted (seed 945, all four splits)
+**Table 4.4.** Share of strokes matched and share of sessions accepted (seed 945, all four splits)
 
 | Sessions *k* | Sensitivity | Strokes matched: legitimate | Strokes matched: impostor | Sessions accepted: legitimate | Sessions accepted: impostor |
 |---:|---:|---:|---:|---:|---:|
@@ -105,14 +128,14 @@ do, but the gap is small, from about 1 to 11 percentage points. As the sensitivi
 share of matched strokes rises for both groups at almost the same rate. Once it passes the 20 percent threshold, nearly
 every session is accepted, legitimate or not. A larger library makes this happen at a lower sensitivity: with 25
 sessions, 0.05 already accepts 273 of the 275 impostor sessions. The matched stroke pairs that were inspected were
-mostly near-straight lines, which is consistent with the high straightness found in Table 4.2.
+mostly near-straight lines, which is consistent with the high straightness found in Table 4.3.
 
 ### 4.4 Selection of the Best Sensitivity and Number of Sessions
 
-Table 4.4 shows the best setting found for each split, where each setting was scored as the average of the share of
+Table 4.5 shows the best setting found for each split, where each setting was scored as the average of the share of
 legitimate users accepted and the share of impostors rejected (a score of 0.5 equals chance).
 
-**Table 4.4.** Best sensitivity and number of sessions per split (seed 945)
+**Table 4.5.** Best sensitivity and number of sessions per split (seed 945)
 
 | Split (L × I) | Best sensitivity | Sessions *k* | Legitimate users accepted | Impostors rejected | Legitimate sessions accepted | Impostor sessions accepted | Score |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -138,9 +161,9 @@ positive (TP) is an impostor session rejected, a false negative (FN) an impostor
 (TP + TN) / (TP + TN + FP + FN). The best setting is the one with the highest accuracy over the four splits combined.
 
 **Experiment 1.** The best sensitivity was **0.05**, with an accuracy of **0.727**: all 11 impostor sessions were
-rejected, but 6 of the 11 legitimate sessions were rejected as well (Table 4.5).
+rejected, but 6 of the 11 legitimate sessions were rejected as well (Table 4.6).
 
-**Table 4.5.** Experiment 1 at the best sensitivity (0.05, one session per user)
+**Table 4.6.** Experiment 1 at the best sensitivity (0.05, one session per user)
 
 | Split (L × I) | TP | FP | FN | TN | Accuracy |
 |---|---:|---:|---:|---:|---:|
@@ -154,10 +177,10 @@ Below 0.04, every session of both classes was rejected (accuracy 0.50). Above 0.
 accepted: at 0.06, 5 of the 11 impostor sessions passed, and at 0.10, 9 of 11 did.
 
 **Experiment 2.** With the sensitivity fixed at 0.05, the best number of sessions was **5**, with an accuracy of only
-**0.527** (Table 4.6). From 10 sessions upward, the accuracy stayed between 0.50 and 0.51, because almost every
+**0.527** (Table 4.7). From 10 sessions upward, the accuracy stayed between 0.50 and 0.51, because almost every
 session of both classes was accepted.
 
-**Table 4.6.** Experiment 2 at the best number of sessions (sensitivity 0.05, five sessions per user)
+**Table 4.7.** Experiment 2 at the best number of sessions (sensitivity 0.05, five sessions per user)
 
 | Split (L × I) | TP | FP | FN | TN | Accuracy |
 |---|---:|---:|---:|---:|---:|
@@ -169,17 +192,17 @@ session of both classes was accepted.
 
 **Confusion matrices.** As planned with the adviser, the counts of each iteration were added to those of the
 iterations before it, and the confusion matrix of each experiment is the total at the last iteration, all splits
-combined. Table 4.7 therefore covers all 100 sensitivities of Experiment 1, and Table 4.8 all eight session counts of
+combined. Table 4.8 therefore covers all 100 sensitivities of Experiment 1, and Table 4.9 all eight session counts of
 Experiment 2.
 
-**Table 4.7.** Confusion matrix of Experiment 1 (all sensitivities, all splits)
+**Table 4.8.** Confusion matrix of Experiment 1 (all sensitivities, all splits)
 
 | | Actual: Impostor | Actual: Legitimate |
 |---|---:|---:|
 | **Rejected (Impostor)** | TP = 74 | FP = 71 |
 | **Accepted (Legitimate)** | FN = 1,026 | TN = 1,029 |
 
-**Table 4.8.** Confusion matrix of Experiment 2 (sensitivity 0.05, all session counts, all splits)
+**Table 4.9.** Confusion matrix of Experiment 2 (sensitivity 0.05, all session counts, all splits)
 
 | | Actual: Impostor | Actual: Legitimate |
 |---|---:|---:|
@@ -204,14 +227,14 @@ The results answer each procedure of Chapter 3 as follows:
    illegal sessions were removed (Table 4.1).
 2. **Preprocessing and segmentation.** The sessions produced 109,948 strokes, almost all of them move strokes. The
    point counts confirm that the logging rate differs between users and must be removed by resampling, and a large
-   share of strokes is close to a straight line (Table 4.2).
+   share of strokes is close to a straight line (Tables 4.2 and 4.3).
 3. **Shape matching.** Legitimate strokes match their own library only slightly more often than impostor strokes
    match the most similar library. At any sensitivity or library size that accepts most legitimate sessions, most
-   impostor sessions are accepted too (Table 4.3).
-4. **Best sensitivity and sessions.** Every split has a setting above chance (Table 4.4), but these settings rely on
+   impostor sessions are accepted too (Table 4.4).
+4. **Best sensitivity and sessions.** Every split has a setting above chance (Table 4.5), but these settings rely on
    few tested sessions and were chosen on the data they score. Across all splits, the best accuracy was 0.727 in
    Experiment 1 (sensitivity 0.05, one session) and 0.527 in Experiment 2 (five sessions), and the confusion matrices
-   are dominated by impostor sessions that were accepted (Tables 4.5–4.8).
+   are dominated by impostor sessions that were accepted (Tables 4.6–4.9).
 
 Other random draws give similar results: seed 946 reached its best at a sensitivity of 0.06 (accuracy 0.727) and
 seed 989 at 0.01 (accuracy 0.50). Taken together, the initial results suggest that, at the settings tested, matching
@@ -436,10 +459,10 @@ split), `exp{1,2}_overall.csv` (counts and accuracy per point, all splits, with 
 
 | Result | Seed | Source |
 |---|---|---|
-| Tables 4.1, 4.2 (sessions, strokes) | any (counts do not depend on the seed) | dataset folders, `runs/a6e6f7/strokes/all_strokes.csv` |
-| Table 4.3 (strokes matched, sessions accepted) | 945 | `runs/19399f/accuracy.csv` |
-| Table 4.4 (best per split) | 945 | `runs/19399f/best/best.csv` |
-| Tables 4.5–4.8 (Experiments 1 and 2) | 945 | `runs/19399f/experiments/` |
+| Tables 4.1–4.3 (sessions, strokes) | any (counts do not depend on the seed) | dataset folders, `runs/a6e6f7/strokes/all_strokes.csv` |
+| Table 4.4 (strokes matched, sessions accepted) | 945 | `runs/19399f/accuracy.csv` |
+| Table 4.5 (best per split) | 945 | `runs/19399f/best/best.csv` |
+| Tables 4.6–4.9 (Experiments 1 and 2) | 945 | `runs/19399f/experiments/` |
 | Other seeds | 946, 989 | `runs/a6e6f7/experiments/`, `runs/b54011/experiments/` |
 
 ## A.10 Summary of Parameters
