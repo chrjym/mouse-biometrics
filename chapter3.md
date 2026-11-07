@@ -18,9 +18,9 @@ of existing datasets allows the study to work with previously collected mouse mo
 and long data collection process.
 
 The dataset contains 10 users and 1,676 sessions. The researchers organized the sessions into one folder per user, so
-that each session belongs to the user whose folder holds it. The 405 sessions that the dataset's public labels mark as
-illegal were excluded, since these were recorded by another person inside a user's folder and would misrepresent that
-user's behavior. This leaves 1,271 sessions, from 87 to 191 per user.
+that each session belongs to the user whose folder holds it. However, 405 of these sessions were not recorded by the
+user whose folder holds them but by another person, as the dataset's labels show. These sessions were excluded, since
+they would misrepresent that user's behavior. This leaves 1,271 sessions, from 87 to 191 per user.
 
 ### Data Preprocessing and Segmentation
 
