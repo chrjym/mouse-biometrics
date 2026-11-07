@@ -26,7 +26,7 @@ sweep_test_sessions: 40     # tested per user: a legitimate user's last this man
 # A session belongs to the user whose folder it is in, except Balabit's attack sessions (another person in this
 # user's folder): sessions that `labels_file` marks is_illegal=1 are dropped.
 dataset_dir: datasets/balabit/users   # relative to experiment_earl/
-labels_file: datasets/balabit/public_labels.csv   # null = keep every session (old behaviour)
+labels_file: null   # null = every session of a user's folder counts as theirs (test-session identities are unknown); datasets/balabit/public_labels.csv drops is_illegal=1
 
 # --- Chunking (03): cut a session into strokes ---
 pause_gap_s: 0.5           # a pause longer than this many seconds starts a new chunk (clicks also split chunks)
