@@ -60,12 +60,8 @@ bounding-box diagonal, so all strokes were kept (Table 4.2).
 | user35 | 120 | 7,732 | 7,574 | 158 |
 | **All** | **1,271** | **109,948** | **106,320** | **3,628** |
 
-The result of this process is a set of strokes organized by session and movement type, prepared for feature
-extraction.
-
-### Feature Extraction
-
-**Best sensitivity and number of sessions.** The researchers tested the four splits of legitimate users and impostors
+**Best sensitivity and number of sessions.** The strokes were then matched with Dynamic Time Warping to select the
+sessions that build each user's profile. The researchers tested the four splits of legitimate users and impostors
 with sensitivities from 0.01 to 1.00 in steps of 0.01, to find the best sensitivity and the best number of sessions
 for building each user's profile. Table 4.3 shows the best setting of each split and how many sessions passed at that
 setting.
@@ -94,7 +90,13 @@ profile for each user. Table 4.4 shows the sessions of each user in this split.
 | user29 | legitimate | 18 / 25 |
 | user16 | impostor | 12 / 25 |
 
-**Hulls.** From these sessions, the first 0.5-second stroke of every tested session was aligned at (0, 0) and pooled
+These best values were chosen on the same runs that they score, so they are likely optimistic, and the one-session
+settings rest on very few tested sessions. The result of this process is a set of strokes organized by session and
+movement type, together with the sessions of the 5×1 split, prepared for feature extraction.
+
+### Feature Extraction
+
+From the sessions of the 5×1 split, the first 0.5-second stroke of every tested session was aligned at (0, 0) and pooled
 per user. A convex hull was built around each user's pooled points and refined into a concave hull, and each outline
 was resampled to 64 evenly spaced points. Table 4.5 shows the resulting hulls.
 
