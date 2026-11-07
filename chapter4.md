@@ -1,6 +1,132 @@
-# Chapter 4: From Raw Mouse Data to the Confusion Matrix
+# Chapter 4
 
-This chapter describes, step by step, how the experiment turns raw Balabit mouse logs into the confusion matrices of
+## INITIAL RESULTS
+
+### Data Acquisition and Organization
+
+The researchers successfully acquired and organized the Balabit Mouse Dynamic dataset as the main source of mouse data
+for the study. The dataset contains mouse movement records from 10 users with a total of 1,676 sessions wherein it
+provides the needed movement information to evaluate the behavioral patterns of individual users.
+
+The dataset was organized based on the corresponding user and session, which allows the researchers to identify the
+owner of each session and retrieve the mouse movement records needed for the next process.
+
+The result of this process is an organized mouse movement dataset that contains the recorded sessions of the users,
+which serves as the foundation for the preprocessing, segmentation, and geometric feature extraction procedures.
+
+### Data Preprocessing and Segmentation
+
+Before segmentation, the researchers cleaned each session file to remove records that do not represent actual cursor
+movement. Scroll events were removed because they do not change the cursor position. Records with x or y coordinates
+of 65,535 were also removed, since these are logging errors in the dataset rather than screen positions; keeping them
+would create false jumps of about 60,000 pixels. The remaining records were arranged in time order using the client
+timestamp. A stable sort was used so that records sharing the same timestamp keep their recorded order. The
+researchers also excluded the 405 sessions that the dataset's public labels mark as illegal. These sessions were
+recorded by another person inside a user's folder and would misrepresent that user's behavior. This left 1,271
+sessions, from 87 to 191 per user.
+
+Each cleaned session was then divided into strokes, where a stroke is one short, continuous movement of the cursor. A
+new stroke begins after every mouse click, or whenever the pause between two consecutive records is longer than 0.5
+seconds. Strokes with fewer than 10 recorded points were discarded as jitter. Each remaining stroke was labelled a move
+stroke or a drag stroke, depending on whether most of its points were recorded while a mouse button was held down.
+
+The result of this process is a set of 109,948 strokes from the 1,271 sessions. Each stroke is stored with its points,
+its type and the session it came from, and these strokes are the units compared in the shape-matching process.
+
+### Stroke Normalization
+
+The users in the dataset differ in screen resolution, from 1280 × 800 to 1920 × 1080 pixels, and in logging rate:
+about every 16 milliseconds for three users and about every 110 milliseconds for the rest. Raw strokes compared
+directly would partly measure these hardware differences instead of the user's behavior. To compare only the shape of
+each stroke, the researchers moved every stroke so that it starts at the origin, scaled it so that the diagonal of its
+bounding box equals one, and redrew it as 64 points spaced evenly along its path. A stroke in which the cursor did not
+actually move cannot be scaled. Such strokes were left out of the comparison but still counted toward their session's
+total number of strokes.
+
+The result is a uniform representation in which every stroke has the same number of points and the same scale, no
+matter where on the screen it was drawn, how large it was, or how often its points were recorded.
+
+### Shape Matching and Session Decision
+
+The normalized strokes were compared using Dynamic Time Warping (DTW), which measures the distance between two
+sequences while allowing one to be stretched or compressed against the other. The researchers limited this stretching
+to 10 percent of the stroke length (6 of the 64 points) and compared only strokes of the same type: move with move,
+drag with drag. For each stroke of a tested session, the smallest DTW distance to any stroke of the same type in a
+user's library was taken. The stroke was counted as a match when its average distance per point did not exceed the
+sensitivity value. A lower sensitivity is therefore stricter, because two strokes must be closer in shape before they
+count as a match.
+
+A session was accepted as belonging to the owner of the library when at least 20 percent of its strokes matched;
+otherwise it was rejected. Each user's sessions were shuffled once into a fixed order. A legitimate user's library
+consists of the first *k* sessions in this order, and the user is tested with their last *k* sessions, which never
+appear in the library. An impostor is tested with their first *k* sessions against every legitimate user's library.
+The library that accepts the most of the impostor's sessions is used, which represents the legitimate user the
+impostor resembles most.
+
+The result of this process is one decision for every tested session: accepted as the legitimate user, or rejected as
+an impostor.
+
+### Experimental Setup and Evaluation
+
+The researchers evaluated the method on four user splits, written as impostors × legitimate users: 1 × 5, 5 × 1,
+3 × 2 and 2 × 3. Every tested session counts as one decision, with the impostor as the positive class. A true positive
+(TP) is an impostor session that was rejected, and a false negative (FN) is an impostor session that was accepted. A
+true negative (TN) is a legitimate session that was accepted, and a false positive (FP) is a legitimate session that
+was wrongly rejected. Accuracy was computed as (TP + TN) / (TP + TN + FP + FN).
+
+Two experiments were conducted. Experiment 1 (User × User × Sensitivity) used one session per user and tested every
+sensitivity from 0.01 to 1.00 in steps of 0.01. Experiment 2 (User × Sensitivity × Session) fixed the sensitivity at
+Experiment 1's best value and tested libraries of 5, 10, 15 and so on up to 40 sessions per user. In both experiments,
+the counts of each iteration were added to those of the iterations before it. The accuracy graphs plot these running
+totals for each split: legitimate accuracy as TN / (TN + FP) and impostor accuracy as TP / (TP + FN). The best setting
+was chosen from each iteration's own counts, with all splits combined. The confusion matrix of each experiment is the
+running total at the last iteration, with all splits combined.
+
+### Results of Experiment 1
+
+Experiment 1 reached its highest accuracy at a sensitivity of 0.06. At this setting, the four splits together gave 10
+true positives, 5 false positives, 1 false negative and 6 true negatives, for an accuracy of 0.727. The method rejected
+10 of the 11 impostor sessions, but it also rejected 5 of the 11 legitimate sessions. Table X shows the confusion
+matrix over all 100 sensitivities.
+
+**Table X.** Confusion matrix of Experiment 1 (all sensitivities, all splits)
+
+| | Actual: Impostor | Actual: Legitimate |
+|---|---|---|
+| **Rejected (Impostor)** | TP = 68 | FP = 86 |
+| **Accepted (Legitimate)** | FN = 1,032 | TN = 1,014 |
+
+Most sessions of both classes fall in the accepted row. As the sensitivity increases, almost every stroke finds a
+match, so nearly every session is accepted whether it comes from the legitimate user or from an impostor.
+
+### Results of Experiment 2
+
+With the sensitivity fixed at 0.06, the highest accuracy was 0.50, reached at 20 sessions per user. At this point all
+220 legitimate sessions and all 220 impostor sessions were accepted. Table Y shows the confusion matrix over all eight
+session counts.
+
+**Table Y.** Confusion matrix of Experiment 2 (sensitivity 0.06, all session counts, all splits)
+
+| | Actual: Impostor | Actual: Legitimate |
+|---|---|---|
+| **Rejected (Impostor)** | TP = 0 | FP = 28 |
+| **Accepted (Legitimate)** | FN = 1,980 | TN = 1,952 |
+
+Not one impostor session was rejected at any library size. A larger library gives an impostor's strokes more chances
+to find a similar shape, so once a library holds five or more sessions, every impostor session goes past the 20
+percent threshold.
+
+These initial results suggest that, at the settings tested, matching the shapes of individual strokes does not
+separate one user from another. When the matched pairs were inspected, they were mostly near-straight lines, a shape
+that every user produces. Other random user draws gave similar results: seed 945 gave a best sensitivity of 0.05
+(accuracy 0.727) and seed 989 gave 0.01 (accuracy 0.50). Further work is needed to identify stroke features that vary
+less within a user than between users.
+
+---
+
+# Technical Reference: From Raw Mouse Data to the Confusion Matrix
+
+This reference describes, step by step, how the experiment turns raw Balabit mouse logs into the confusion matrices of
 Experiments 1 and 2. Every step follows the simulation notebook (`experiment_earl/notebooks/earl_simulation.ipynb`,
 sections 1, 3 and 9); the parameter values are those of its `SETTINGS` and `EXPERIMENTS` blocks.
 
