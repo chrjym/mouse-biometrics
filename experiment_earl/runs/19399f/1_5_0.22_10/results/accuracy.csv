@@ -1,0 +1,7 @@
+run,sensitivity,sessions,n_legitimate,n_impostor,kind,user,profile,passed,tested,matched_strokes,strokes,through
+1_5_0.22_10,0.22,10,1,5,legitimate,user29,user29,10,10,1455,1483,True
+1_5_0.22_10,0.22,10,1,5,impostor,user15,user29,10,10,951,982,True
+1_5_0.22_10,0.22,10,1,5,impostor,user20,user29,10,10,932,950,True
+1_5_0.22_10,0.22,10,1,5,impostor,user23,user29,10,10,374,383,True
+1_5_0.22_10,0.22,10,1,5,impostor,user35,user29,10,10,322,324,True
+1_5_0.22_10,0.22,10,1,5,impostor,user9,user29,10,10,496,506,True

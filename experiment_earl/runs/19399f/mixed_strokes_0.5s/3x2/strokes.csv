@@ -1,0 +1,6 @@
+user,kind,profile,position,session,passed,stroke,stroke_kind,points,end_dx,end_dy
+user29,legitimate,user29,103,session_8423566466,True,0,move,8,327,336
+user23,legitimate,user23,108,session_7543906287,False,1,move,5,9,361
+user20,legitimate,user20,93,session_1924699326,False,0,move,26,114,-151
+user15,impostor,user29,0,session_3450602680,False,0,move,8,-86,31
+user9,impostor,user29,0,session_1281792837,False,0,move,25,88,121

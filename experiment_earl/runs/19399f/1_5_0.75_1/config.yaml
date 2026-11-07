@@ -1,0 +1,14 @@
+seed: 945
+dataset_dir: datasets/balabit/users
+labels_file: datasets/balabit/public_labels.csv
+pause_gap_s: 0.5
+min_points: 10
+min_length_px: 0
+resample_n: 64
+dtw_band: 0.1
+match_shape_ratio: 0.2
+match_session_ratio: 0.5
+n_legitimate: 1
+n_impostor: 5
+sensitivity: 0.75
+sessions_per_user: 1

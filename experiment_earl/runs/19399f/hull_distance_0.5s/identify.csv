@@ -1,0 +1,9 @@
+user,role,nearest_profile,distance_px,own_distance_px,verified
+user15,legitimate,user15,462.4,462.4,True
+user16,impostor,user15,466.9,612.6,False
+user20,legitimate,user20,2.2,2.2,True
+user23,legitimate,user23,122.1,122.1,True
+user29,legitimate,user29,7.6,7.6,True
+user35,impostor,user16,312.0,,False
+user7,impostor,user16,275.9,,False
+user9,legitimate,user9,91.1,91.1,True
