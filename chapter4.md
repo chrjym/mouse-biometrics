@@ -60,61 +60,70 @@ bounding-box diagonal, so all strokes were kept (Table 4.2).
 | user35 | 120 | 7,732 | 7,574 | 158 |
 | **All** | **1,271** | **109,948** | **106,320** | **3,628** |
 
-**Best sensitivity and number of sessions.** The strokes were then matched with Dynamic Time Warping to select the
-sessions that build each user's profile. The researchers tested the four splits of legitimate users and impostors
-with sensitivities from 0.01 to 1.00 in steps of 0.01 at one session, and with 2 to 50 sessions at the sensitivities
-0.01 to 0.05, 0.10 and 0.20, to find the best sensitivity and the best number of sessions for building each user's
-profile. Each setting was scored as the average of the share of legitimate users accepted and the share of impostors
-rejected, so 0.5 is the score of accepting or rejecting everyone. Table 4.3 shows the best setting of each split and
-how many sessions passed at that setting.
+**Best sensitivity and number of sessions.** The strokes were then matched with Dynamic Time Warping to find the best
+sensitivity and the best number of sessions for building each user's profile. This was done in two experiments on the
+four splits. Each tested session is one decision, with the impostor as the positive class: an impostor session that
+is rejected is a true positive (TP), an impostor session that is accepted is a false negative (FN), a legitimate
+session that is accepted is a true negative (TN), and a legitimate session that is rejected is a false positive (FP).
+The best setting is the one with the highest accuracy, (TP + TN) / (TP + TN + FP + FN), over all four splits
+together.
 
-**Table 4.3.** Best sensitivity and number of sessions per split
+*Experiment 1 (best sensitivity).* Each user was given one session, and the sensitivity was tested from 0.01 to 1.00
+in steps of 0.01. Figure 4.1 shows the results. The legitimate users' accuracy rises with the sensitivity, while the
+impostors' accuracy falls, since a higher sensitivity lets more strokes of any user match. The highest accuracy was
+reached at a sensitivity of 0.05, with 0.73 (Table 4.3).
 
-| Split (L × I) | Best sensitivity | Sessions | Legitimate sessions passed | Impostor sessions passed |
-|---|---:|---:|---:|---:|
-| 1×5 | 0.05 | 1 | 1 of 1 | 0 of 5 |
-| 2×3 | 0.04 | 2 | 2 of 4 | 1 of 6 |
-| 3×2 | 0.05 | 1 | 1 of 3 | 0 of 2 |
-| 5×1 | 0.02 | 25 | 84 of 125 | 12 of 25 |
+![Experiment 1: accuracy per sensitivity with one session](paper/figures/fig4_1_experiment1.png)
 
-The 1×5 and 3×2 splits reached their best setting at a sensitivity of 0.05 with one session, the 2×3 split at 0.04
-with two sessions, and the 5×1 split at 0.02 with 25 sessions. Only the 5×1 split had enough sessions to build a
-profile for each user.
+**Figure 4.1.** Experiment 1: accuracy of the legitimate users (left) and the impostors (right) per sensitivity, with
+one session per user, and the confusion matrix (right). The legend lists the splits as impostors × legitimate users
+(I × L), so "1 x 5" in the figure is the 5×1 split of this chapter. The lines and the confusion matrix add the counts
+of each sensitivity to those before it.
 
-Figure 4.1 shows the score of each split at every sensitivity with one session. All four splits score 0.5 at the
-lowest sensitivities, where every user is rejected, and peak at 0.05, where the 1×5 split reaches 1.0, the 2×3 split
-0.75, the 5×1 split 0.70 and the 3×2 split 0.67. Between 0.06 and 0.12 the scores drop, some below 0.5, as more
-impostors pass, and from 0.13 every split returns to 0.5, because every user, legitimate or impostor, is accepted.
+**Table 4.3.** Experiment 1 at the best sensitivity (0.05, one session)
 
-![Accuracy per sensitivity with one session](paper/figures/fig4_1_accuracy_vs_sensitivity.png)
+| Split (L × I) | TP | FP | FN | TN | Accuracy |
+|---|---:|---:|---:|---:|---:|
+| 1×5 | 5 | 0 | 0 | 1 | 1.00 |
+| 2×3 | 3 | 1 | 0 | 1 | 0.80 |
+| 3×2 | 2 | 2 | 0 | 1 | 0.60 |
+| 5×1 | 1 | 3 | 0 | 2 | 0.50 |
+| **All** | **11** | **6** | **0** | **5** | **0.73** |
 
-**Figure 4.1.** Score of each split per sensitivity with one session (★ = best setting of the split). Sensitivities
-from 0.21 to 1.00 are not shown, since every split scores 0.5 there.
+At a sensitivity of 0.05, all 11 impostor sessions were rejected (FAR = 0 / 11 = 0.0%), but 6 of the 11 legitimate
+sessions were also rejected (FRR = 6 / 11 = 54.5%). The confusion matrix in Figure 4.1 adds the counts of all 100
+sensitivities and all four splits: TP = 74, FP = 71, FN = 1,026 and TN = 1,029, an accuracy of 1,103 / 2,200 = 0.50.
 
-Figure 4.2 shows the score of each split as the number of sessions grows, at that split's best sensitivity. The 1×5,
-2×3 and 3×2 splits fall back to 0.5 after one or two sessions, while the 5×1 split rises from 10 sessions and peaks at
-0.8 with 25 sessions before falling below chance at 30.
+*Experiment 2 (best number of sessions).* The best sensitivity of experiment 1 (0.05) was kept, and the number of
+sessions per user was tested from 5 to 40 in steps of 5. Figure 4.2 shows the results. The legitimate users' accuracy
+stays between 0.90 and 1.00 for every number of sessions, while the impostors' accuracy stays below 0.15 and falls as
+sessions are added, since a larger library gives an impostor's strokes more strokes to match. The highest accuracy
+was reached with 5 sessions, with 0.53 (Table 4.4).
 
-![Accuracy per number of sessions at each split's best sensitivity](paper/figures/fig4_2_accuracy_vs_sessions.png)
+![Experiment 2: accuracy per number of sessions at sensitivity 0.05](paper/figures/fig4_2_experiment2.png)
 
-**Figure 4.2.** Score of each split per number of sessions at its best sensitivity (★ = best setting of the split).
+**Figure 4.2.** Experiment 2: accuracy of the legitimate users (left) and the impostors (right) per number of
+sessions at a sensitivity of 0.05, and the confusion matrix (right). The legend lists the splits as impostors ×
+legitimate users (I × L). The lines and the confusion matrix add the counts of each number of sessions to those
+before it.
 
-Table 4.4 shows the sessions of each user in the 5×1 split.
+**Table 4.4.** Experiment 2 at the best number of sessions (sensitivity 0.05, 5 sessions)
 
-**Table 4.4.** Sessions passed per user in the 5×1 split (sensitivity 0.02, 25 sessions)
+| Split (L × I) | TP | FP | FN | TN | Accuracy |
+|---|---:|---:|---:|---:|---:|
+| 1×5 | 3 | 0 | 22 | 5 | 0.27 |
+| 2×3 | 2 | 1 | 13 | 9 | 0.44 |
+| 3×2 | 1 | 1 | 9 | 14 | 0.60 |
+| 5×1 | 0 | 1 | 5 | 24 | 0.80 |
+| **All** | **6** | **3** | **49** | **52** | **0.53** |
 
-| User | Role | Sessions passed |
-|---|---|---:|
-| user9 | legitimate | 23 / 25 |
-| user15 | legitimate | 9 / 25 |
-| user20 | legitimate | 23 / 25 |
-| user23 | legitimate | 11 / 25 |
-| user29 | legitimate | 18 / 25 |
-| user16 | impostor | 12 / 25 |
+With 5 sessions, 52 of the 55 legitimate sessions were accepted (FRR = 3 / 55 = 5.5%), but 49 of the 55 impostor
+sessions were also accepted (FAR = 49 / 55 = 89.1%). The confusion matrix in Figure 4.2 adds the counts of all eight
+session numbers and all four splits: TP = 24, FP = 6, FN = 1,956 and TN = 1,974, an accuracy of 1,998 / 3,960 = 0.50.
 
-These best values were chosen on the same runs that they score, so they are likely optimistic, and the one-session
-settings rest on very few tested sessions. The result of this process is a set of strokes organized by session and
-movement type, together with the sessions of the 5×1 split, prepared for feature extraction.
+The best values were chosen on the same sessions that they score, so they are likely optimistic, and experiment 1
+rests on one session per user. The result of this process is a set of strokes organized by session and movement
+type, together with the best sensitivity (0.05) and number of sessions (5), prepared for feature extraction.
 
 ### Feature Extraction
 
@@ -159,19 +168,6 @@ For every legitimate user, the genuine distance is the smallest in that user's c
 user29, it is also far below the impostor distances (at most 122.1 px against at least 257.5 px). For user15, the
 margin is small (462.4 px against 466.9 px for user16), and its genuine distance is larger than many impostor
 distances to the other profiles, since only 9 of its 25 sessions passed.
-
-Figure 4.3 shows one of these comparisons, user23 against user29, point by point. Only two users are shown to keep
-the figure readable, but every hull was compared in the same way.
-
-![user23 vs user29 point-by-point comparison](paper/figures/fig4_3_user23_vs_user29.png)
-
-**Figure 4.3.** Point-by-point comparison of the hulls of user23 and user29. Left: the 64 resampled points of each
-hull, with a line joining each pair of points (ring = point 0). Right: the gap at each point, with the average gap
-per point as a horizontal line.
-
-The gaps between the two hulls range from about 140 px to 670 px. The largest gaps are at points 30 to 36, where the
-outline of user29 reaches about 650 px upward while that of user23 stays below 220 px. The two hulls are closest at
-points 12 to 14 and 26 to 28, where both outlines run near the origin.
 
 ### Performance Evaluation
 
