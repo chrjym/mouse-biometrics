@@ -62,9 +62,11 @@ bounding-box diagonal, so all strokes were kept (Table 4.2).
 
 **Best sensitivity and number of sessions.** The strokes were then matched with Dynamic Time Warping to select the
 sessions that build each user's profile. The researchers tested the four splits of legitimate users and impostors
-with sensitivities from 0.01 to 1.00 in steps of 0.01, to find the best sensitivity and the best number of sessions
-for building each user's profile. Table 4.3 shows the best setting of each split and how many sessions passed at that
-setting.
+with sensitivities from 0.01 to 1.00 in steps of 0.01 at one session, and with 2 to 50 sessions at the sensitivities
+0.01 to 0.05, 0.10 and 0.20, to find the best sensitivity and the best number of sessions for building each user's
+profile. Each setting was scored as the average of the share of legitimate users accepted and the share of impostors
+rejected, so 0.5 is the score of accepting or rejecting everyone. Table 4.3 shows the best setting of each split and
+how many sessions passed at that setting.
 
 **Table 4.3.** Best sensitivity and number of sessions per split
 
@@ -77,7 +79,27 @@ setting.
 
 The 1×5 and 3×2 splits reached their best setting at a sensitivity of 0.05 with one session, the 2×3 split at 0.04
 with two sessions, and the 5×1 split at 0.02 with 25 sessions. Only the 5×1 split had enough sessions to build a
-profile for each user. Table 4.4 shows the sessions of each user in this split.
+profile for each user.
+
+Figure 4.1 shows the score of each split at every sensitivity with one session. All four splits score 0.5 at the
+lowest sensitivities, where every user is rejected, and peak at 0.05, where the 1×5 split reaches 1.0, the 2×3 split
+0.75, the 5×1 split 0.70 and the 3×2 split 0.67. Between 0.06 and 0.12 the scores drop, some below 0.5, as more
+impostors pass, and from 0.13 every split returns to 0.5, because every user, legitimate or impostor, is accepted.
+
+![Accuracy per sensitivity with one session](paper/figures/fig4_1_accuracy_vs_sensitivity.png)
+
+**Figure 4.1.** Score of each split per sensitivity with one session (★ = best setting of the split). Sensitivities
+from 0.21 to 1.00 are not shown, since every split scores 0.5 there.
+
+Figure 4.2 shows the score of each split as the number of sessions grows, at that split's best sensitivity. The 1×5,
+2×3 and 3×2 splits fall back to 0.5 after one or two sessions, while the 5×1 split rises from 10 sessions and peaks at
+0.8 with 25 sessions before falling below chance at 30.
+
+![Accuracy per number of sessions at each split's best sensitivity](paper/figures/fig4_2_accuracy_vs_sessions.png)
+
+**Figure 4.2.** Score of each split per number of sessions at its best sensitivity (★ = best setting of the split).
+
+Table 4.4 shows the sessions of each user in the 5×1 split.
 
 **Table 4.4.** Sessions passed per user in the 5×1 split (sensitivity 0.02, 25 sessions)
 
@@ -138,12 +160,12 @@ user29, it is also far below the impostor distances (at most 122.1 px against at
 margin is small (462.4 px against 466.9 px for user16), and its genuine distance is larger than many impostor
 distances to the other profiles, since only 9 of its 25 sessions passed.
 
-Figure 4.1 shows one of these comparisons, user23 against user29, point by point. Only two users are shown to keep
+Figure 4.3 shows one of these comparisons, user23 against user29, point by point. Only two users are shown to keep
 the figure readable, but every hull was compared in the same way.
 
-![user23 vs user29 point-by-point comparison](paper/figures/fig4_1_user23_vs_user29.png)
+![user23 vs user29 point-by-point comparison](paper/figures/fig4_3_user23_vs_user29.png)
 
-**Figure 4.1.** Point-by-point comparison of the hulls of user23 and user29. Left: the 64 resampled points of each
+**Figure 4.3.** Point-by-point comparison of the hulls of user23 and user29. Left: the 64 resampled points of each
 hull, with a line joining each pair of points (ring = point 0). Right: the gap at each point, with the average gap
 per point as a horizontal line.
 
