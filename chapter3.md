@@ -59,15 +59,24 @@ consists of the first *k* sessions in this order, and the user is tested with th
 appear in the library. An impostor is tested with their first *k* sessions against every legitimate user's library,
 and the library that accepts the most of the impostor's sessions is used.
 
-**Selection of the best sensitivity and number of sessions.** The researchers then determined, for each split of
-legitimate users and impostors, the best sensitivity and the best number of sessions to use as a profile. The
-sensitivity was tested from 0.01, incrementing by 0.01 up to 1.00, and the number of sessions *k* used for the library
-and for testing was varied as well. The researchers tested four splits of legitimate users and impostors: one
-legitimate user and five impostors (1×5), two legitimate users and three impostors (2×3), three legitimate users and
-two impostors (3×2), and five legitimate users and one impostor (5×1). Each setting was scored as the average of the
-share of legitimate users accepted and the share of impostors rejected, where a user is accepted when at least half of
-their tested sessions pass. The split whose best setting provides enough sessions to build a profile for each user was
-used in the next processes, and its tested sessions were prepared for feature extraction.
+**Selection of the best sensitivity and number of sessions.** The researchers then determined the best sensitivity
+and the best number of sessions to use as a profile through two experiments. Both used four splits of legitimate
+users and impostors: one legitimate user and five impostors (1×5), two legitimate users and three impostors (2×3),
+three legitimate users and two impostors (3×2), and five legitimate users and one impostor (5×1). Each tested session
+is one decision, counted in a confusion matrix with the impostor as the positive class: an impostor session that is
+rejected is a true positive (TP), an impostor session that is accepted is a false negative (FN), a legitimate session
+that is accepted is a true negative (TN), and a legitimate session that is rejected is a false positive (FP).
+
+1. **Experiment 1 (best sensitivity).** Each user was given one session (*k* = 1), and the sensitivity was tested
+   from 0.01, incrementing by 0.01 up to 1.00.
+2. **Experiment 2 (best number of sessions).** The best sensitivity of experiment 1 was kept, and the number of
+   sessions *k* was tested from 5, incrementing by 5 up to 40.
+
+In each experiment, the counts of the four splits were added together at each setting, and the setting with the
+highest accuracy, (TP + TN) / (TP + TN + FP + FN), was chosen as the best. For the graphs, the accuracy of the
+legitimate users and of the impostors was plotted per setting, with the counts of each setting added to those before
+it; the confusion matrix of each experiment is the total at its last setting. The best sensitivity and number of
+sessions were then used to build the profiles for feature extraction.
 
 ### Feature Extraction (Convex Hull and Concave Hull)
 
