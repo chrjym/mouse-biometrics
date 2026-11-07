@@ -138,6 +138,19 @@ user29, it is also far below the impostor distances (at most 122.1 px against at
 margin is small (462.4 px against 466.9 px for user16), and its genuine distance is larger than many impostor
 distances to the other profiles, since only 9 of its 25 sessions passed.
 
+Figure 4.1 shows one of these comparisons, user23 against user29, point by point. Only two users are shown to keep
+the figure readable, but every hull was compared in the same way.
+
+![user23 vs user29 point-by-point comparison](paper/figures/fig4_1_user23_vs_user29.png)
+
+**Figure 4.1.** Point-by-point comparison of the hulls of user23 and user29. Left: the 64 resampled points of each
+hull, with a line joining each pair of points (ring = point 0). Right: the gap at each point, with the average gap
+per point as a horizontal line.
+
+The gaps between the two hulls range from about 140 px to 670 px. The largest gaps are at points 30 to 36, where the
+outline of user29 reaches about 650 px upward while that of user23 stays below 220 px. The two hulls are closest at
+points 12 to 14 and 26 to 28, where both outlines run near the origin.
+
 ### Performance Evaluation
 
 Each comparison is one authentication attempt: the attempt is accepted as the legitimate user when its distance is at
