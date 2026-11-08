@@ -77,17 +77,17 @@ reached at a sensitivity of 0.05, with 0.73 (Table 4.3).
 
 **Figure 4.1.** Experiment 1: accuracy of the legitimate users (left) and the impostors (right) per sensitivity, with
 one session per user, and the confusion matrix (right). The legend lists the splits as impostors × legitimate users
-(I × L), so "1 x 5" in the figure is the 5×1 split of this chapter. The lines and the confusion matrix add the counts
+(I × L), as in Tables 4.3 and 4.4 (the text of this chapter uses L × I). The lines and the confusion matrix add the counts
 of each sensitivity to those before it.
 
 **Table 4.3.** Experiment 1 at the best sensitivity (0.05, one session)
 
-| Split (L × I) | TP | FP | FN | TN | Accuracy |
+| Split (I × L) | TP | FP | FN | TN | Accuracy |
 |---|---:|---:|---:|---:|---:|
-| 1×5 | 5 | 0 | 0 | 1 | 1.00 |
-| 2×3 | 3 | 1 | 0 | 1 | 0.80 |
-| 3×2 | 2 | 2 | 0 | 1 | 0.60 |
-| 5×1 | 1 | 3 | 0 | 2 | 0.50 |
+| 5×1 | 5 | 0 | 0 | 1 | 1.00 |
+| 3×2 | 3 | 1 | 0 | 1 | 0.80 |
+| 2×3 | 2 | 2 | 0 | 1 | 0.60 |
+| 1×5 | 1 | 3 | 0 | 2 | 0.50 |
 | **All** | **11** | **6** | **0** | **5** | **0.73** |
 
 At a sensitivity of 0.05, all 11 impostor sessions were rejected (FAR = 0 / 11 = 0.0%), but 6 of the 11 legitimate
@@ -109,12 +109,12 @@ before it.
 
 **Table 4.4.** Experiment 2 at the best number of sessions (sensitivity 0.05, 5 sessions)
 
-| Split (L × I) | TP | FP | FN | TN | Accuracy |
+| Split (I × L) | TP | FP | FN | TN | Accuracy |
 |---|---:|---:|---:|---:|---:|
-| 1×5 | 3 | 0 | 22 | 5 | 0.27 |
-| 2×3 | 2 | 1 | 13 | 9 | 0.44 |
-| 3×2 | 1 | 1 | 9 | 14 | 0.60 |
-| 5×1 | 0 | 1 | 5 | 24 | 0.80 |
+| 5×1 | 3 | 0 | 22 | 5 | 0.27 |
+| 3×2 | 2 | 1 | 13 | 9 | 0.44 |
+| 2×3 | 1 | 1 | 9 | 14 | 0.60 |
+| 1×5 | 0 | 1 | 5 | 24 | 0.80 |
 | **All** | **6** | **3** | **49** | **52** | **0.53** |
 
 With 5 sessions, 52 of the 55 legitimate sessions were accepted (FRR = 3 / 55 = 5.5%), but 49 of the 55 impostor
