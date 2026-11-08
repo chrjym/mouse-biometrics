@@ -84,10 +84,10 @@ of each sensitivity to those before it.
 
 | Split (I × L) | TP | FP | FN | TN | Accuracy |
 |---|---:|---:|---:|---:|---:|
+| 1×5 | 1 | 3 | 0 | 2 | 0.50 |
 | 5×1 | 5 | 0 | 0 | 1 | 1.00 |
 | 3×2 | 3 | 1 | 0 | 1 | 0.80 |
 | 2×3 | 2 | 2 | 0 | 1 | 0.60 |
-| 1×5 | 1 | 3 | 0 | 2 | 0.50 |
 | **All** | **11** | **6** | **0** | **5** | **0.73** |
 
 At a sensitivity of 0.05, all 11 impostor sessions were rejected (FAR = 0 / 11 = 0.0%), but 6 of the 11 legitimate
@@ -111,10 +111,10 @@ before it.
 
 | Split (I × L) | TP | FP | FN | TN | Accuracy |
 |---|---:|---:|---:|---:|---:|
+| 1×5 | 0 | 1 | 5 | 24 | 0.80 |
 | 5×1 | 3 | 0 | 22 | 5 | 0.27 |
 | 3×2 | 2 | 1 | 13 | 9 | 0.44 |
 | 2×3 | 1 | 1 | 9 | 14 | 0.60 |
-| 1×5 | 0 | 1 | 5 | 24 | 0.80 |
 | **All** | **6** | **3** | **49** | **52** | **0.53** |
 
 With 5 sessions, 52 of the 55 legitimate sessions were accepted (FRR = 3 / 55 = 5.5%), but 49 of the 55 impostor
