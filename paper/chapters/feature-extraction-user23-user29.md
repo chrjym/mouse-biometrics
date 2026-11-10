@@ -287,7 +287,7 @@ The four cells of Table 5 where user23 and user29 meet. Each compares one mixed 
 
 Gap per point: $g_i = \sqrt{(\Delta x^{mixed}_i - \Delta x^{profile}_i)^2 + (\Delta y^{mixed}_i - \Delta y^{profile}_i)^2}$. Point 0 is the same for a user's mixed hull and profile (user23 (9, 361), user29 (410, 444)), so the own-profile gap at point 0 is 0; across users it is $\sqrt{(9 - 410)^2 + (361 - 444)^2} = 409.5$ px.
 
-Result: each user is about 7–50 times closer to its own profile (122.1 and 7.6 px) than to the other's (418.0 and 418.1 px), so both are identified correctly.
+Result: user23 is about 3.4 times closer to its own profile (122.1 px) than to user29's (418.0 px), and user29 about 55 times closer to its own (7.6 px) than to user23's (418.1 px), so both are identified correctly.
 
 ### Identification result
 
