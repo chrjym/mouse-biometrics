@@ -22,6 +22,16 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
         → Concave hull → 64 data points → Euclidean distance → Accept / Reject
 ```
 
+**Summary: user23 vs user29**
+
+| Step | Value | user23 | user29 | Formula |
+|---|---|---|---|---|
+| Align (0,0) | Sessions registered | 11 | 18 | $\Delta x = x - x_0,\ \Delta y = y - y_0$ |
+| Convex hull | Corners / area (px²) | 9 / 564,836 | 11 / 782,606 | Graham scan |
+| Concave hull | Edge limit / corners / area / share | 116.6 / 42 / 217,090 / 38.4% | 149.6 / 52 / 301,594 / 38.5% | $L = l_{min} + 0.15\,(l_{max} - l_{min})$, $\ \%\ \text{of convex} = \dfrac{A_{concave}}{A_{convex}} \times 100\%$ |
+| Data points | Perimeter (px) / points / spacing (px) | 4,621 / 64 / 72.2 | 4,846 / 64 / 75.7 | $s_i = \frac{i}{64}P$, $\ H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$ |
+| Euclidean distance | Total / RMS per point (px) | 3,353 / 419.1 (pair) | | $d = \sqrt{\sum g_i^2}$, $\ d_{RMS} = d / 8$ |
+
 **Say:**
 > "This part presents the results of feature extraction. From each session, one short mouse stroke of 0.5 seconds was taken. The strokes were aligned at a common starting point, wrapped with a convex hull, tightened into a concave hull, and resampled into 64 data points. These points were then compared using Euclidean distance to decide whether to accept or reject a user."
 
