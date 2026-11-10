@@ -235,6 +235,53 @@ Figure: `experiment_earl/runs/19399f/hull_distance_0.5s/user23_vs_user29.png` (n
 
 To provide interpretable values of how the concave hull outline is compared point by point with the Euclidean distance, the researchers selected two subjects, user23 and user29, as an illustration. Built from their passed strokes (11 and 18), the concave hull of user29 covered 298,036 px² with 53 corners, while that of user23 covered 224,410 px² with 30 corners. user29's hull is larger mainly because its strokes reach far upward, while user23's strokes spread mostly sideways. Both outlines were resampled into 64 evenly spaced data points. Comparing the resampled points of both users, the total Euclidean distance was 3,353 px, an average of 419.1 px per point. The gap was not the same around the shape. It dropped to its lowest values at points 13 (136.4 px) and 27 (142.4 px), where both outlines share similar sideways movement. It rose within the upper part of the shape (points 30 to 36) and peaked at 671.4 px at point 33, the tip of user29's upward arm, where user23 has no strokes. The Euclidean distance on the concave hull therefore shows where two users' movement habits differ, here mainly in vertical movement, and supports distinguishing between them.
 
+## Mixed hull vs profile distances (Table 5)
+
+Source: `experiment_earl/runs/19399f/hull_distance_0.5s/mixed_vs_profiles.csv` and `identify.csv` (notebook section 10).
+
+### How the table was produced
+
+| Step | What was done | Formula | Output |
+|---|---|---|---|
+| 1. Two hulls per user | One 0.5 s stroke per session, aligned at (0,0); **profile** = passed strokes only, **mixed hull** = all tested strokes | $\Delta x_t = x_t - x_0, \quad \Delta y_t = y_t - y_0$ | 6 profiles (user9, user15, user16, user20, user23, user29); 8 mixed hulls (user35 and user7 have no profile) |
+| 2. Concave hull | Convex hull (Graham scan), refined by Delaunay erosion | $L = l_{min} + 0.15(l_{max} - l_{min})$ | `concave_hull_0.5s/<user>/`, `concave_hull_mixed_0.5s/<user>/` |
+| 3. Feature vector | Outline resampled to 64 points from the lowest corner, counter-clockwise | $s_i = \frac{i}{64}P, \quad H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$ | `data_points.csv`, 128 values per hull |
+| 4. Compare | Every mixed hull (rows) against every profile (columns): 8 × 6 = 48 comparisons | $g_i = \sqrt{(\Delta x^{mixed}_i - \Delta x^{profile}_i)^2 + (\Delta y^{mixed}_i - \Delta y^{profile}_i)^2}$ | — |
+| 5. Distance | Gaps combined into one value per pair, rounded to 1 decimal | $d = \sqrt{\sum_{i=0}^{63} g_i^2}, \quad d_{RMS} = \frac{d}{\sqrt{64}}$ | `mixed_vs_profiles.csv` |
+| 6. Identify | Smallest value in each row = nearest profile; verified when it is the user's own | $\min_{profile} d_{RMS}$ | `identify.csv` |
+
+Example: user23's mixed hull vs user29's profile — pair point *i* of both for all 64 points, square the 64 gaps, add them, take the square root, divide by $\sqrt{64} = 8$ → **418.0 px**.
+
+### Table 5
+
+| Mixed hull ↓ / Profile → | user9 | user15 | user16 | user20 | user23 | user29 |
+|---|---|---|---|---|---|---|
+| user9 | **91.1** | 796.7 | 394.0 | 384.3 | 420.1 | 523.7 |
+| user15 | 650.8 | **462.4** | 818.8 | 539.5 | 591.0 | 854.5 |
+| user16 | 693.2 | **466.9** | 612.6 | 532.9 | 514.6 | 637.1 |
+| user20 | 353.6 | 624.8 | 463.6 | **2.2** | 257.5 | 484.5 |
+| user23 | 345.1 | 720.8 | 422.3 | 283.7 | **122.1** | 418.0 |
+| user29 | 538.8 | 872.3 | 291.4 | 484.3 | 418.1 | **7.6** |
+| user35 | 503.7 | 627.7 | **312.0** | 450.7 | 431.0 | 446.1 |
+| user7 | 620.4 | 760.4 | **275.9** | 546.1 | 481.0 | 372.7 |
+
+**Table 5.** Euclidean distance (RMS gap per point, px) between each user's mixed hull (rows) and each enrolled profile (columns). Bold = smallest value in the row (nearest profile).
+
+### Identification result
+
+| User | Role | Nearest profile | Distance (px) | Own profile distance (px) | Verified |
+|---|---|---|---|---|---|
+| user9 | legitimate | user9 | 91.1 | 91.1 | yes |
+| user15 | legitimate | user15 | 462.4 | 462.4 | yes |
+| user20 | legitimate | user20 | 2.2 | 2.2 | yes |
+| user23 | legitimate | user23 | 122.1 | 122.1 | yes |
+| user29 | legitimate | user29 | 7.6 | 7.6 | yes |
+| user16 | impostor | user15 | 466.9 | 612.6 | no |
+| user35 | impostor | user16 | 312.0 | — | no |
+| user7 | impostor | user16 | 275.9 | — | no |
+
+All five legitimate users were nearest to their own profile; no impostor was nearest to its own profile. user15's own distance (462.4 px) is close to user16's distance to user15's profile (466.9 px), because only 9 of user15's sessions passed.
+
 ## Notes
 
 - All values match Table 4: user23 564,836 / 42 / 217,090 / 38.4%; user29 782,606 / 52 / 301,594 / 38.5%.
