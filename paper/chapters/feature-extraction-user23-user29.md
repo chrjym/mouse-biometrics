@@ -36,7 +36,7 @@ Source: `experiment_earl/runs/19399f/concave_hull_mixed_0.5s/<user>/hull.csv`.
 | Data points | Fixed start (lowest corner, counter-clockwise) and arc-length resampling | section 9 | 64 points; $s_i = \frac{i}{64}P$ |
 | Feature vector | Stacking point coordinates | section 9 | $H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$, 128 values |
 | Comparison | Euclidean distance between the two mixed hulls, reported as RMS gap per point | computed from section 9's `data_points.csv` | $d = \sqrt{\sum g_i^2}$, $d_{RMS} = d / \sqrt{64}$ |
-| Decision | Nearest profile (identification); threshold T (verification); FAR, FRR, EER, accuracy | section 10, Chapter 3 | EER 20% at T ≈ 418 px |
+| Decision | Nearest profile (identification); threshold T (verification); FAR, FRR, EER, accuracy | section 10, Chapter 3 | EER ≈ 20% at T ≈ 373–384 px |
 
 ## Formulas used
 
@@ -325,6 +325,68 @@ Each mixed hull is nearest to its own profile (122.1 and 7.6 px), so both users 
 | user7 | impostor | user16 | 275.9 | — | no |
 
 All five legitimate users were nearest to their own profile; no impostor was nearest to its own profile. user15's own distance (462.4 px) is close to user16's distance to user15's profile (466.9 px), because only 9 of user15's sessions passed.
+
+## Performance evaluation
+
+Source: `mixed_vs_profiles.csv` (Table 5) and `identify.csv`. Accept when $d_{RMS} \le T$.
+
+### Evaluation setup
+
+| Item | Value |
+|---|---|
+| Templates | 6 profiles (passed strokes) |
+| Test samples | 8 mixed hulls (5 legitimate, 3 impostors) |
+| Score | RMS gap per point (px), lower = more similar |
+| Attempts | 5 genuine, 43 impostor |
+
+$$d_{RMS} = \frac{\sqrt{\sum g_i^2}}{8}$$
+
+### Identification (nearest profile)
+
+| User | Role | Nearest profile | Distance (px) | Result |
+|---|---|---|---|---|
+| user15 | legitimate | user15 | 462.4 | correct |
+| user20 | legitimate | user20 | 2.2 | correct |
+| user23 | legitimate | user23 | 122.1 | correct |
+| user29 | legitimate | user29 | 7.6 | correct |
+| user9 | legitimate | user9 | 91.1 | correct |
+| user16 | impostor | user15 | 466.9 | rejected |
+| user35 | impostor | user16 | 312.0 | rejected |
+| user7 | impostor | user16 | 275.9 | rejected |
+
+Identification accuracy = **5/5 (100%)**.
+
+### Verification (FAR, FRR, EER)
+
+$$FAR = \frac{\text{impostor attempts accepted}}{\text{all impostor attempts}}, \qquad FRR = \frac{\text{genuine attempts rejected}}{\text{all genuine attempts}}$$
+
+| Threshold T (px) | FAR | FRR | Note |
+|---|---|---|---|
+| 122.1 | 0% | 20% | strict |
+| 372.7 | 18.6% | 20% | near EER |
+| 384.3 | 20.9% | 20% | near EER |
+| 462.4 | 39.5% | 0% | loose |
+
+**EER ≈ 20%** (T ≈ 373–384 px).
+
+### Discussion
+
+- 4 of 5 legitimate users lie close to their own profile (2.2–122.1 px), below the closest impostor score (257.5 px), so they are separated perfectly.
+- The 20% FRR comes from one user, user15 (462.4 px), whose strokes vary between sessions.
+- user29 is 7.6 px from its own profile and 418.1 px from user23's; user23 is 122.1 px from its own and 418.0 px from user29's.
+- Limitation: only 5 genuine attempts, so one error moves FRR by 20 points.
+
+**Conclusion:** the concave-hull distance identified all legitimate users correctly and reached an EER of about 20%, with errors caused mainly by one inconsistent user (user15).
+
+### Presentation slides
+
+| Slide | Title | Content | Key number |
+|---|---|---|---|
+| 1 | How the System Was Evaluated | Setup table + $d_{RMS}$ formula | 5 genuine / 43 impostor |
+| 2 | Identification: Nearest Profile | Identification table | **100%** |
+| 3 | FAR, FRR and EER | FAR/FRR formulas + threshold table | **EER ≈ 20%** |
+| 4 | Why the EER Is 20% | Discussion bullets + `user23_user29_table5.png` | user15 = 462.4 px |
+| 5 | Summary | Conclusion + limitation + future work | — |
 
 ## Notes
 
