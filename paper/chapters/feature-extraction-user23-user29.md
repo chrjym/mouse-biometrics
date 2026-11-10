@@ -201,5 +201,5 @@ To provide interpretable values of how the concave hull outline is compared poin
 - Step 1 counts recorded points (196, 192); step 3 uses distinct points (169, 166), since every stroke starts at (0,0) and repeated points count once.
 - At point 33, user29's outline is at the top of its upward arm (Δy −664) while user23's is near the middle (Δy 11.3), which gives the largest gap.
 - The mixed hulls include impostor-tested strokes: 14 of user23's 25 and 7 of user29's 25 sessions did not pass.
-- Figures (mixed hulls, same values as this file): `experiment_earl/runs/19399f/hull_distance_0.5s/user23_vs_user29.png` (point-by-point gaps) and `user23_vs_user29_steps.png` (steps 1–4); notebook sections 10.1 and 10.2.
+- The mixed-to-mixed distance (3,337 px, 417 px per point) was computed from each mixed hull's `data_points.csv`; the notebook figures `user23_vs_user29.png` and `user23_vs_user29_steps.png` still show the profile comparison (3,353 px, 419 px).
 - Steps 1–6 are feature extraction (Objective 3); step 7 is matching (Objective 4).
