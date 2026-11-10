@@ -267,6 +267,28 @@ Example: user23's mixed hull vs user29's profile — pair point *i* of both for 
 
 **Table 5.** Euclidean distance (RMS gap per point, px) between each user's mixed hull (rows) and each enrolled profile (columns). Bold = smallest value in the row (nearest profile).
 
+### Worked calculation: user23 and user29 in Table 5
+
+The four cells of Table 5 where user23 and user29 meet. Each compares one mixed hull (64 points, `concave_hull_mixed_0.5s/<user>/data_points.csv`) with one profile (64 points, `concave_hull_0.5s/<user>/data_points.csv`).
+
+| Mixed hull | Profile | Gap at point 0 (px) | Largest gap | Smallest gap | $\sum g_i^2$ (px²) | $d = \sqrt{\sum g_i^2}$ (px) | $d_{RMS} = d / 8$ (px) |
+|---|---|---|---|---|---|---|---|
+| user23 | user23 (own) | 0.0 | 271.0 (point 22) | 0.0 (point 0) | 954,839 | 977.2 | **122.1** |
+| user23 | user29 | 409.5 | 686.1 (point 33) | 103.3 (point 27) | 11,184,818 | 3,344.4 | **418.0** |
+| user29 | user29 (own) | 0.0 | 20.5 (point 50) | 0.0 (point 0) | 3,722 | 61.0 | **7.6** |
+| user29 | user23 | 409.5 | 679.6 (point 33) | 138.3 (point 13) | 11,187,572 | 3,344.8 | **418.1** |
+
+| Cell | Calculation | Result | Meaning |
+|---|---|---|---|
+| user23 mixed → user23 profile | $\sqrt{954{,}839} = 977.2$; $977.2 \div 8$ | **122.1 px** | Nearest profile → user23 verified. The 14 strokes of failed sessions in the mixed hull widen its outline; largest gap 271.0 px at point 22, where the mixed hull (191.8, −3.9) sits inside the profile's (421.4, −147.8) |
+| user23 mixed → user29 profile | $\sqrt{11{,}184{,}818} = 3{,}344.4$; $3{,}344.4 \div 8$ | **418.0 px** | Far: peak 686.1 px at point 33, user23 (−160.4, 11.3) vs user29's upward arm (−2.5, −656.4) |
+| user29 mixed → user29 profile | $\sqrt{3{,}722} = 61.0$; $61.0 \div 8$ | **7.6 px** | Nearest profile → user29 verified. 18 of its 25 strokes are in the profile, so the outlines almost coincide (largest gap only 20.5 px) |
+| user29 mixed → user23 profile | $\sqrt{11{,}187{,}572} = 3{,}344.8$; $3{,}344.8 \div 8$ | **418.1 px** | Far: peak 679.6 px at point 33, user29's upward arm (1.7, −664.1) vs user23 (−108.1, 6.6) |
+
+Gap per point: $g_i = \sqrt{(\Delta x^{mixed}_i - \Delta x^{profile}_i)^2 + (\Delta y^{mixed}_i - \Delta y^{profile}_i)^2}$. Point 0 is the same for a user's mixed hull and profile (user23 (9, 361), user29 (410, 444)), so the own-profile gap at point 0 is 0; across users it is $\sqrt{(9 - 410)^2 + (361 - 444)^2} = 409.5$ px.
+
+Result: each user is about 7–50 times closer to its own profile (122.1 and 7.6 px) than to the other's (418.0 and 418.1 px), so both are identified correctly.
+
 ### Identification result
 
 | User | Role | Nearest profile | Distance (px) | Own profile distance (px) | Verified |
