@@ -59,6 +59,8 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 **Formula:** $L = l_{min} + 0.15\,(l_{max} - l_{min})$
 
+**Formula:** $\%\ \text{of convex} = \dfrac{A_{concave}}{A_{convex}} \times 100\%$
+
 **Say:**
 > "The convex hull includes a lot of empty space. Using Delaunay triangulation, long edges longer than the limit L were removed, so the outline follows the actual strokes. The concave hull keeps only about 38% of the convex area, giving a tighter and more personal shape."
 
