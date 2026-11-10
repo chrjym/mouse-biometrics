@@ -178,6 +178,24 @@ $$d_{RMS} = \sqrt{\frac{1}{64}\sum_{i=0}^{63} g_i^2} = \frac{d}{\sqrt{64}} = \fr
 **Say:**
 > "Taking user23 and user29 from Table 5: user29 is only 7.6 pixels from its own profile, and user23 is 122.1 pixels from its own — but both are about 418 pixels from each other."
 
+**Why compare with its own profile?**
+
+Authentication checks whether a person is the user they claim to be:
+
+1. **Enrolment:** each user's strokes are stored as their profile (64 points).
+2. **Login:** a person claims to be a user; their test hull is compared with that user's profile.
+3. **Decision:** distance ≤ T → accept; distance > T → reject.
+
+| Trial | Example | Expected | Measures |
+|---|---|---|---|
+| Genuine (own profile) | user23 → user23 = 122.1 px | small → accept | FRR |
+| Impostor (other profile) | user29 → user23 = 418.1 px | large → reject | FAR |
+
+Own distances (7.6, 122.1) are much smaller than the cross distance (≈ 418), so a threshold between them separates the two users.
+
+**Say:**
+> "We compare each user with their own profile because that is the genuine login: the user claims to be themselves and must be accepted. Comparing with another user's profile is the impostor attempt, which must be rejected. A good feature keeps the own distance small and the other distance large — here 122 and 8 pixels against 418."
+
 ---
 
 ## Deck p. 50 — Performance evaluation: setup (≈ 1 min)
