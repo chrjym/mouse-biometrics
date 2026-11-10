@@ -30,7 +30,7 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 | Convex hull | Corners / area (px²) | 9 / 564,836 | 11 / 782,606 | Graham scan |
 | Concave hull | Edge limit / corners / area / share | 116.6 / 42 / 217,090 / 38.4% | 149.6 / 52 / 301,594 / 38.5% | $L = l_{min} + 0.15\,(l_{max} - l_{min})$, $\ \%\ \text{of convex} = \dfrac{A_{concave}}{A_{convex}} \times 100\%$ |
 | Data points | Perimeter (px) / points / spacing (px) | 4,621 / 64 / 72.2 | 4,846 / 64 / 75.7 | $s_i = \frac{i}{64}P$, $\ H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$ |
-| Euclidean distance | Total / RMS per point (px) | 3,353 / 419.1 (pair) | | $d = \sqrt{\sum g_i^2}$, $\ d_{RMS} = d / 8$ |
+| Euclidean distance | Total / RMS per point (px) | 3,353 / 419.1 (pair) | | $d = \sqrt{\sum g_i^2}$, $\ d_{RMS} = \sqrt{\frac{1}{64}\sum g_i^2} = d / 8$ |
 
 **Say:**
 > "This part presents the results of feature extraction. From each session, one short mouse stroke of 0.5 seconds was taken. The strokes were aligned at a common starting point, wrapped with a convex hull, tightened into a concave hull, and resampled into 64 data points. These points were then compared using Euclidean distance to decide whether to accept or reject a user."
@@ -153,7 +153,13 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 | Smallest gaps | point 13 (136.4 px), point 27 (142.4 px) |
 | Largest gap | **point 33 (671.4 px)** |
 
-**Formula:** $d = \sqrt{\sum g_i^2}$, $\quad d_{RMS} = d / 8$
+**Formula:**
+
+$$g_i = \sqrt{(x_{a,i} - x_{b,i})^2 + (y_{a,i} - y_{b,i})^2}$$
+
+$$d = \sqrt{\sum_{i=0}^{63} g_i^2}$$
+
+$$d_{RMS} = \sqrt{\frac{1}{64}\sum_{i=0}^{63} g_i^2} = \frac{d}{\sqrt{64}} = \frac{d}{8}$$
 
 **Say:**
 > "Comparing the 64 points of user23 and user29, the total distance was 3,353 pixels, or about 419 pixels per point. The gap is not equal everywhere. It is smallest at points 13 and 27, where both users move sideways in a similar way, and largest at point 33 — the tip of user29's upward movement, where user23 has no strokes. So the distance shows exactly where two users' habits differ: here, in vertical movement."
