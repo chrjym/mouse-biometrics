@@ -123,7 +123,7 @@ I found these while checking the manuscript against the data. **I have not chang
 
 ### Slide M6: The two experiments
 
-- **Visual:** two side-by-side boxes.
+- **Visual: ready-made.** `two_experiments.pptx` (preview `figures/two_experiments.png`, rebuild with `make_experiments_slide.py --template "<deck>.pptx"`): the two boxes below as editable shapes on the deck layout, an arrow labelled "best sensitivity" from Experiment 1 to Experiment 2, and the running-total note and output line at the bottom.
 
   | | Experiment 1: best sensitivity | Experiment 2: best number of sessions |
   |---|---|---|
