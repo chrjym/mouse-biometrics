@@ -159,6 +159,41 @@ Negative Δy is upward (screen coordinates).
 | Total distance | $d = \sqrt{11{,}135{,}764}$ | **3,337 px** |
 | RMS gap per point | $d \div \sqrt{64} = 3{,}337 \div 8$ | **417 px** |
 
+## Point-by-point Euclidean distance: user23 vs user29
+
+### Concept
+
+Both concave hull outlines are converted into 64 points in the same order (from point 0, the lowest corner, counter-clockwise). Point *i* of user23 is compared with point *i* of user29, and the 64 gaps are combined into one distance.
+
+- **Left panel (hull data points):** user23's outline (purple) and user29's outline (green), 64 points each; the ring marks point 0; each grey line joins point *i* of both users, and its length is the gap $g_i$. Short lines = the outlines are close; long lines = they differ.
+- **Right panel (gap per point):** each bar is one grey line's length (points 0–63); the orange line is the RMS gap. Low bars = shared movement; tall bars = where the shapes differ.
+
+$$g_i = \sqrt{(\Delta x^{23}_i - \Delta x^{29}_i)^2 + (\Delta y^{23}_i - \Delta y^{29}_i)^2}$$
+
+$$d = \sqrt{\sum_{i=0}^{63} g_i^2} = \sqrt{11{,}135{,}764} = 3{,}337 \text{ px}, \qquad d_{RMS} = \frac{3{,}337}{\sqrt{64}} = 417.1 \text{ px per point}$$
+
+### Table
+
+| Item | user23 | user29 | Interpretation |
+|---|---|---|---|
+| Concave hull area (px²) | 217,090 | 301,594 | user29's hull is larger because its strokes reach far upward |
+| Concave corners | 42 | 52 | user29's outline is more detailed |
+| Movement reach | Δx −871 to 787 px (sideways) | Δy up to −689 px (upward) | user23 moves sideways; user29 also moves far upward |
+| Data points | 64 | 64 | Both outlines resampled to the same number of points |
+| Point 0 (Δx, Δy) | (9, 361) | (410, 444) | Gap at point 0 = 409.5 px |
+| Total Euclidean distance | 3,337 px | | $d = \sqrt{\sum g_i^2}$ |
+| Average gap per point (RMS) | 417.1 px | | $d_{RMS} = d / \sqrt{64}$ |
+| Lowest gaps | 98.4 px (point 27), 111.8 px (point 13) | | Both outlines share similar sideways movement |
+| Highest gaps | above 520 px (points 31–35) | | Upper part of the shape |
+| Peak gap | 694.6 px (point 33) | | Tip of user29's upward arm, where user23 has no strokes |
+| Distance to own profile | 122.1 px | 7.6 px | Each mixed hull is nearest to its own profile |
+| Distance to the other's profile | 418.0 px (to user29) | 418.1 px (to user23) | About 418 px apart in both directions |
+| Conclusion | The users differ mainly in vertical movement | | The concave hull distance shows where their habits differ |
+
+### Explanation
+
+To provide interpretable values of how the concave hull outline is compared point by point with the Euclidean distance, the researchers selected two subjects, user23 and user29, as an illustration. The concave hull of user29 covered 301,594 px² with 52 corners, while that of user23 covered 217,090 px² with 42 corners. user29's hull is larger mainly because its strokes reach far upward (to Δy = −689 px), while user23's strokes spread mostly sideways. Both outlines were resampled into 64 evenly spaced data points. Comparing the resampled points of both users, the total Euclidean distance was 3,337 px, an average of 417.1 px per point. The gap was not the same around the shape. It dropped to its lowest values at points 27 (98.4 px) and 13 (111.8 px), where both outlines share similar sideways movement. It peaked within the upper part of the shape (points 31 to 35, above 520 px), reaching 694.6 px at point 33, the tip of user29's upward arm, where user23 has no strokes. The Euclidean distance on the concave hull therefore shows where two users' movement habits differ, here mainly in vertical movement, and supports distinguishing between them.
+
 ## Notes
 
 - All values match Table 4: user23 564,836 / 42 / 217,090 / 38.4%; user29 782,606 / 52 / 301,594 / 38.5%.
