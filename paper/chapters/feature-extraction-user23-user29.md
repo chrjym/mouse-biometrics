@@ -75,27 +75,27 @@ $$Accuracy = \frac{\text{correct decisions}}{\text{all decisions}}, \qquad EER =
 
 ## Summary
 
-| Step | Value | user23 | user29 |
-|---|---|---|---|
-| 0. Sessions | Sessions passed / registered | 11 / 25 | 18 / 25 |
-| 1. Align at (0,0) | Strokes | 11 | 18 |
-| | Recorded points | 116 | 152 |
-| | Horizontal reach Δx (px) | −634 to 787 | −308 to 871 |
-| | Vertical reach Δy (px) | −231 to 361 | −689 to 444 |
-| 2. Convex hull | Corners | 8 | 11 |
-| | Area (px²) | 522,470 | 782,606 |
-| 3. Concave hull | Edge limit L (px) | 118.7 | 149.6 |
-| | Corners | 30 | 53 |
-| | Area (px²) | 224,410 | 298,036 |
-| | Concave / convex | 43.0% | 38.1% |
-| 4. Fixed start | Point 0 (Δx, Δy) | (9, 361) | (410, 444) |
-| 5. Data points | Perimeter (px) | 3,975 | 4,863 |
-| | Points | 64 | 64 |
-| | Spacing (px) | 62.1 | 76.0 |
-| 6. Feature vector | Values | 128 | 128 |
-| 7. Euclidean distance | Total distance (px) | 3,353 | |
-| | RMS gap per point (px) | 419 | |
-| | Largest gap | 671 px at point 33 | |
+| Steps | Value | user23 | user29 | Formula |
+|---|---|---|---|---|
+| Sessions | Sessions passed / registered | 11 / 25 | 18 / 25 | — |
+| Align (0,0) | Strokes | 11 | 18 | $\Delta x_t = x_t - x_0, \quad \Delta y_t = y_t - y_0$ |
+| | Recorded points | 116 | 152 | — |
+| | Horizontal reach Δx (px) | −634 to 787 | −308 to 871 | $\min \Delta x,\ \max \Delta x$ |
+| | Vertical reach Δy (px) | −231 to 361 | −689 to 444 | $\min \Delta y,\ \max \Delta y$ |
+| Convex hull | Corners | 8 | 11 | $\mathrm{cross}(O,A,B) = (x_A - x_O)(y_B - y_O) - (y_A - y_O)(x_B - x_O)$ |
+| | Area (px²) | 522,470 | 782,606 | $\frac{1}{2}\left\lvert\sum(x_k y_{k+1} - x_{k+1} y_k)\right\rvert$ |
+| Concave hull | Edge limit L (px) | 118.7 | 149.6 | $L = l_{min} + 0.15(l_{max} - l_{min})$ |
+| | Corners | 30 | 53 | edges $> L$ removed |
+| | Area (px²) | 224,410 | 298,036 | $\frac{1}{2}\left\lvert\sum(x_k y_{k+1} - x_{k+1} y_k)\right\rvert$ |
+| | Concave / convex | 43.0% | 38.1% | $\frac{Area_{concave}}{Area_{convex}} \times 100\%$ |
+| Fixed start | Point 0 (Δx, Δy) | (9, 361) | (410, 444) | lowest corner, counter-clockwise |
+| Data points | Perimeter P (px) | 3,975 | 4,863 | $P = \sum\sqrt{(x_{k+1} - x_k)^2 + (y_{k+1} - y_k)^2}$ |
+| | Points | 64 | 64 | $s_i = \frac{i}{64}P, \quad i = 0, \dots, 63$ |
+| | Spacing (px) | 62.1 | 76.0 | $\Delta s = \frac{P}{64}$ |
+| Feature vector | Values | 128 | 128 | $H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$ |
+| Euclidean distance | Gap per point | 409.5 (point 0) to 671.4 (point 33) | | $g_i = \sqrt{(\Delta x^A_i - \Delta x^B_i)^2 + (\Delta y^A_i - \Delta y^B_i)^2}$ |
+| | Total distance (px) | 3,353 | | $d = \sqrt{\sum_{i=0}^{63} g_i^2}$ |
+| | RMS gap per point (px) | 419 | | $d_{RMS} = \frac{d}{\sqrt{64}}$ |
 
 Negative Δy is upward (screen coordinates).
 
