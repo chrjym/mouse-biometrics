@@ -100,6 +100,17 @@ $$FAR = \frac{\text{impostor attempts accepted}}{\text{all impostor attempts}}, 
 
 $$Accuracy = \frac{\text{correct decisions}}{\text{all decisions}}, \qquad EER = FAR = FRR$$
 
+## Compact table (for the paper)
+
+| Steps | Value | user23 | user29 | Formula |
+|---|---|---|---|---|
+| Align (0,0) | Strokes (passed sessions) | 11 | 18 | $\Delta x_t = x_t - x_0, \quad \Delta y_t = y_t - y_0$ |
+| Convex hull | Corners / area (px²) | 8 / 522,470 | 11 / 782,606 | $\frac{1}{2}\left\lvert\sum(x_k y_{k+1} - x_{k+1} y_k)\right\rvert$ |
+| Concave hull | Edge limit (px) / corners / area (px²) / share of convex | 118.7 / 30 / 224,410 / 43.0% | 149.6 / 53 / 298,036 / 38.1% | $L = l_{min} + 0.15(l_{max} - l_{min})$ |
+| Data points | Perimeter (px) / points / spacing (px) | 3,975 / 64 / 62.1 | 4,863 / 64 / 76.0 | $s_i = \frac{i}{64}P$ |
+| Feature vector | Values | 128 | 128 | $H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$ |
+| Euclidean distance | Total / RMS per point (px) | 3,353 / 419 | | $d = \sqrt{\sum g_i^2}, \quad d_{RMS} = \frac{d}{\sqrt{64}}$ |
+
 ## Summary
 
 | Steps | Value | user23 | user29 | Formula |
