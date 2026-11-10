@@ -36,7 +36,7 @@ Source: `experiment_earl/runs/19399f/concave_hull_mixed_0.5s/<user>/hull.csv`.
 | Data points | Fixed start (lowest corner, counter-clockwise) and arc-length resampling | section 9 | 64 points; $s_i = \frac{i}{64}P$ |
 | Feature vector | Stacking point coordinates | section 9 | $H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$, 128 values |
 | Comparison | Euclidean distance between the two mixed hulls, reported as RMS gap per point | computed from section 9's `data_points.csv` | $d = \sqrt{\sum g_i^2}$, $d_{RMS} = d / \sqrt{64}$ |
-| Decision | Nearest profile (identification); threshold T (verification); FAR, FRR, EER, accuracy | section 10, Chapter 3 | EER ≈ 20% at T ≈ 373–384 px |
+| Decision | Nearest profile (identification); threshold T (verification); FAR, FRR, EER, accuracy | section 10, Chapter 3 | EER 20% at T = 418.0 px |
 
 ## Formulas used
 
@@ -334,10 +334,10 @@ Source: `mixed_vs_profiles.csv` (Table 5) and `identify.csv`. Accept when $d_{RM
 
 | Item | Value |
 |---|---|
-| Templates | 6 profiles (passed strokes) |
+| Templates | 5 profiles of legitimate users (user15, user20, user23, user29, user9) |
 | Test samples | 8 mixed hulls (5 legitimate, 3 impostors) |
 | Score | RMS gap per point (px), lower = more similar |
-| Attempts | 5 genuine, 43 impostor |
+| Attempts | 40 = 5 genuine + 35 impostor (8 test hulls × 5 profiles) |
 
 $$d_{RMS} = \frac{\sqrt{\sum g_i^2}}{8}$$
 
@@ -351,8 +351,8 @@ $$d_{RMS} = \frac{\sqrt{\sum g_i^2}}{8}$$
 | user29 | legitimate | user29 | 7.6 | correct |
 | user9 | legitimate | user9 | 91.1 | correct |
 | user16 | impostor | user15 | 466.9 | rejected |
-| user35 | impostor | user16 | 312.0 | rejected |
-| user7 | impostor | user16 | 275.9 | rejected |
+| user35 | impostor | user23 | 431.0 | rejected |
+| user7 | impostor | user29 | 372.7 | rejected |
 
 Identification accuracy = **5/5 (100%)**.
 
@@ -362,12 +362,12 @@ $$FAR = \frac{\text{impostor attempts accepted}}{\text{all impostor attempts}}, 
 
 | Threshold T (px) | FAR | FRR | Note |
 |---|---|---|---|
-| 122.1 | 0% | 20% | strict |
-| 372.7 | 18.6% | 20% | near EER |
-| 384.3 | 20.9% | 20% | near EER |
-| 462.4 | 39.5% | 0% | loose |
+| 122.1 | 0/35 = 0% | 1/5 = 20% | zero-FAR; accuracy 39/40 = 97.5% |
+| 384.3 | 6/35 = 17.1% | 1/5 = 20% | |
+| 418.0 | 7/35 = 20.0% | 1/5 = 20% | **EER**; accuracy 32/40 = 80.0% |
+| 462.4 | 12/35 = 34.3% | 0/5 = 0% | loose |
 
-**EER ≈ 20%** (T ≈ 373–384 px).
+**EER = 20% at T = 418.0 px.**
 
 ### Discussion
 
@@ -382,9 +382,9 @@ $$FAR = \frac{\text{impostor attempts accepted}}{\text{all impostor attempts}}, 
 
 | Slide | Title | Content | Key number |
 |---|---|---|---|
-| 1 | How the System Was Evaluated | Setup table + $d_{RMS}$ formula | 5 genuine / 43 impostor |
+| 1 | How the System Was Evaluated | Setup table + $d_{RMS}$ formula | 5 genuine / 35 impostor |
 | 2 | Identification: Nearest Profile | Identification table | **100%** |
-| 3 | FAR, FRR and EER | FAR/FRR formulas + threshold table | **EER ≈ 20%** |
+| 3 | FAR, FRR and EER | FAR/FRR formulas + threshold table | **EER = 20% at 418.0 px** |
 | 4 | Why the EER Is 20% | Discussion bullets + `user23_user29_table5.png` | user15 = 462.4 px |
 | 5 | Summary | Conclusion + limitation + future work | — |
 
