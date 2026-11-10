@@ -369,6 +369,75 @@ $$FAR = \frac{\text{impostor attempts accepted}}{\text{all impostor attempts}}, 
 
 **EER = 20% at T = 418.0 px.**
 
+### Threshold determination
+
+1. Compute all 40 distances (8 test hulls × 5 profiles).
+2. Label each: genuine (same user, 5) or impostor (different user, 35).
+3. Sort from smallest to largest.
+4. Try each distance as T.
+5. At each T, count FAR = impostors ≤ T ÷ 35 and FRR = genuine > T ÷ 5.
+6. Choose the zero-FAR T (largest T with no impostor accepted) and the EER T (FAR = FRR).
+
+$$\text{Decision} = \begin{cases} \text{Accept}, & d_{RMS} \le T \\ \text{Reject}, & d_{RMS} > T \end{cases}, \qquad Accuracy = \frac{\text{genuine accepted} + \text{impostors rejected}}{40}$$
+
+| T (px) | Distance comes from | FAR | FRR | Accuracy |
+|---|---|---|---|---|
+| 2.2 | user20 (genuine) | 0/35 = 0% | 4/5 = 80% | 36/40 = 90.0% |
+| 7.6 | user29 (genuine) | 0% | 3/5 = 60% | 37/40 = 92.5% |
+| 91.1 | user9 (genuine) | 0% | 2/5 = 40% | 38/40 = 95.0% |
+| **122.1** | **user23 (genuine)** | **0%** | **1/5 = 20%** | **39/40 = 97.5%** (zero-FAR) |
+| 257.5 | user20 → user23 profile | 1/35 = 2.9% | 20% | 38/40 = 95.0% |
+| 283.7 | user23 → user20 profile | 2/35 = 5.7% | 20% | 37/40 = 92.5% |
+| 345.1 | user23 → user9 profile | 3/35 = 8.6% | 20% | 36/40 = 90.0% |
+| 353.6 | user20 → user9 profile | 4/35 = 11.4% | 20% | 35/40 = 87.5% |
+| 372.7 | user7 → user29 profile | 5/35 = 14.3% | 20% | 34/40 = 85.0% |
+| 384.3 | user9 → user20 profile | 6/35 = 17.1% | 20% | 33/40 = 82.5% |
+| **418.0** | **user23 → user29 profile** | **7/35 = 20.0%** | **1/5 = 20.0%** | **32/40 = 80.0%** (EER) |
+| 462.4 | user15 (genuine) | 12/35 = 34.3% | 0/5 = 0% | 35/40 = 87.5% |
+
+### Genuine user distances
+
+| User | Distance (px) | Sessions passed | Zero-FAR threshold (T = 122.1 px) | EER threshold (T = 418.0 px) |
+|---|---|---|---|---|
+| user20 | 2.2 | 23/25 | Accepted | Accepted |
+| user29 | 7.6 | 18/25 | Accepted | Accepted |
+| user9 | 91.1 | 23/25 | Accepted | Accepted |
+| user23 | 122.1 (highest accepted) | 11/25 | Accepted | Accepted |
+| user15 | 462.4 | 9/25 | Rejected (false reject) | Rejected (false reject) |
+| **FRR** | | | **1/5 = 20%** | **1/5 = 20%** |
+
+### Falsely accepted impostors at T = 418.0 px
+
+First name = who moves the mouse; second = claimed profile.
+
+| Impostor → claimed profile | Distance (px) | Decision |
+|---|---|---|
+| user20 → user23 | 257.5 (lowest) | Accepted (false accept) |
+| user23 → user20 | 283.7 | Accepted (false accept) |
+| user23 → user9 | 345.1 | Accepted (false accept) |
+| user20 → user9 | 353.6 | Accepted (false accept) |
+| user7 → user29 | 372.7 | Accepted (false accept) |
+| user9 → user20 | 384.3 | Accepted (false accept) |
+| user23 → user29 | 418.0 | Accepted (false accept) |
+| **FAR** | | **7/35 = 20.0%** |
+
+The other 28 impostor attempts (80%) were rejected; the next one, user29 → user23 at 418.1 px, lies 0.1 px above T.
+
+### Final result
+
+| Measure | Result |
+|---|---|
+| Trials | 40 (5 genuine, 35 impostor) |
+| Identification accuracy | **5/5 = 100%** |
+| Zero-FAR (T = 122.1 px) | FAR **0%** (0/35), FRR **20%** (1/5), accuracy **97.5%** (39/40) |
+| EER (T = 418.0 px) | FAR **20%** (7/35), FRR **20%** (1/5), **EER = 20%**, accuracy **80%** (32/40) |
+| Only false reject | user15 (462.4 px; 9/25 sessions passed) |
+| Most similar impostor pair | user20 → user23 profile (257.5 px) |
+
+The concave-hull Euclidean distance identified all five legitimate users correctly (100%). At the strict threshold of 122.1 px, it rejected every impostor (FAR 0%) and only falsely rejected user15, giving 97.5% accuracy. At the balanced threshold of 418.0 px, FAR and FRR were equal, giving an EER of 20% and 80% accuracy. The only genuine error came from user15, whose low enrollment yield (9/25 sessions) produced an inconsistent profile. This suggests that short 0.5-second hull outlines can distinguish users, but more users and sessions are needed to confirm it.
+
+**Key message:** 100% identification, 0% FAR at T = 122.1 px, and EER = 20% at T = 418.0 px.
+
 ### Discussion
 
 - 4 of 5 legitimate users lie close to their own profile (2.2–122.1 px), below the closest impostor score (257.5 px), so they are separated perfectly.
