@@ -84,7 +84,9 @@ I found these while checking the manuscript against the data. **I have not chang
 
 ### Slide M4: Matching strokes with DTW
 
-- **Visual:** a simple diagram (draw it): one stroke from a tested session → compared with every same-type stroke in a user's library → smallest distance → match if ≤ sensitivity. Then a session bar: matched strokes / all strokes ≥ 20% → accepted.
+- **Visual: ready-made.** `matching_dtw.pptx` (preview `figures/matching_dtw.png`, rebuild with `make_matching_slide.py --template "<deck>.pptx" --experiment experiment_earl`). Editable shapes on the deck's "Chapter Intro" layout:
+  - Top row: one tested stroke → compared with every same-type stroke in the library (d₁ … dₙ; a drag stroke crossed out as skipped) → smallest distance ÷ 64 points → diamond "d ≤ sensitivity?" → match / no match. The strokes drawn are real user29 strokes, normalized like the notebook. The distances stay symbolic (no values are invented).
+  - Bottom row: session bars with the real counts from run `19399f`, split 1x5, sensitivity 0.05, 1 session: **user29's own session matched 19 of 66 strokes (29%) → accepted**; **impostor user16 matched 9 of 65 (14%) against user9's library (its best) → rejected**, with the 20% line dashed.
 - **On-slide text:**
   - **Dynamic Time Warping (DTW)** compares two strokes while allowing one to stretch against the other; stretching limited to **10% of the stroke length**
   - Only strokes of the **same type** (move–move, drag–drag) are compared
