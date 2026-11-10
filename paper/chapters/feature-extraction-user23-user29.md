@@ -4,6 +4,33 @@ Run `19399f` (seed 945), split 5L × 1I, sensitivity 0.02, 25 sessions. Values a
 
 Figures: `experiment_earl/runs/19399f/hull_distance_0.5s/user23_vs_user29_steps.png` (steps 1–6) and `user23_vs_user29.png` (step 7). Notebook: `experiment_earl/notebooks/passed_strokes.ipynb`, sections 10.1 and 10.2.
 
+## Mixed hulls of all users (Table 4)
+
+| User | Strokes tested (passed) | Convex area (px²) | Concave corners | Concave area (px²) | Concave / convex |
+|---|---|---|---|---|---|
+| user9 | 25 (23) | 584,226 | 50 | 236,902 | 40.5% |
+| user15 | 25 (9) | 1,648,464 | 36 | 583,712 | 35.4% |
+| user16 | 25 (12) | 695,418 | 52 | 196,514 | 28.3% |
+| user20 | 25 (23) | 703,078 | 75 | 259,444 | 36.9% |
+| user23 | 25 (11) | 564,836 | 42 | 217,090 | 38.4% |
+| user29 | 25 (18) | 782,606 | 52 | 301,594 | 38.5% |
+| user35 | 1 (0) | 305 | 5 | 226 | 74.1% |
+| user7 | 1 (0) | 13,642 | 26 | 3,680 | 27.0% |
+
+**Table 4.** Convex and concave hulls of each user's mixed hull (all tested 0.5 s strokes; passed strokes in parentheses).
+
+Source: `experiment_earl/runs/19399f/concave_hull_mixed_0.5s/<user>/hull.csv`.
+
+The comparison between user23 and user29 below uses their profiles, built from passed strokes only (11 and 18), so its values differ from the mixed hulls in Table 4.
+
+| | user23 profile | user23 mixed (Table 4) | user29 profile | user29 mixed (Table 4) |
+|---|---|---|---|---|
+| Strokes used | 11 | 25 | 18 | 25 |
+| Convex area (px²) | 522,470 | 564,836 | 782,606 | 782,606 |
+| Concave corners | 30 | 42 | 53 | 52 |
+| Concave area (px²) | 224,410 | 217,090 | 298,036 | 301,594 |
+| Concave / convex | 43.0% | 38.4% | 38.1% | 38.5% |
+
 ## Methods used
 
 | Stage | Method | Tool / source | Setting |
