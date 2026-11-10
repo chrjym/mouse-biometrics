@@ -21,6 +21,11 @@ Every figure the slides need is copied into `paper/defense/figures/`:
 | `exp1_confusion.png` | Experiment 1 confusion matrix (manuscript Figure 2) | same |
 | `exp2_graph.png` | Experiment 2 accuracy curves (manuscript Figure 3) | same |
 | `exp2_confusion.png` | Experiment 2 confusion matrix (manuscript Figure 4) | same |
+| `process_overview_diagram.png` | Slide M1 flow, **transparent PNG** (no title, logo or background) | `make_visual_pngs.py` |
+| `matching_dtw_diagram.png` | Slide M4 DTW matching diagram, **transparent PNG** | `make_matching_png.py --experiment experiment_earl` (real user29 strokes, run `19399f` counts) |
+| `two_experiments_diagram.png` | Slide M6 two experiments, **transparent PNG** | `make_visual_pngs.py` |
+
+The transparent PNGs (300 dpi) are meant to be dropped onto your own slides. They are drawn for the deck's white background: the text outside the boxes is dark and won't show on a dark slide. The `.pptx` versions (`process_overview.pptx`, `matching_dtw.pptx`, `two_experiments.pptx`) have the same content as editable shapes.
 
 ---
 
