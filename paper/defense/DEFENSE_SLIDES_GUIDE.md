@@ -23,7 +23,7 @@ Every figure the slides need is copied into `paper/defense/figures/`:
 | `exp2_confusion.png` | Experiment 2 confusion matrix (manuscript Figure 4) | same |
 | `process_overview_diagram.png` | Slide M1 flow, **transparent PNG** (no title, logo or background) | `make_visual_pngs.py` |
 | `matching_dtw_diagram.png` | Slide M4 DTW matching diagram, **transparent PNG**, compact with short labels (10.25 × 3.9 in) | `make_matching_png.py --experiment experiment_earl`. The image has no source line, so say it: *"The strokes are real user29 strokes. The bars are from run 19399f, split 1x5, sensitivity 0.05, one session: user29's own session matched 19 of 66 strokes against its own library; impostor user16 matched 9 of 65 against user9's library, its best."* |
-| `two_experiments_diagram.png` | Slide M6 two experiments, **transparent PNG** | `make_visual_pngs.py` |
+| `two_experiments_diagram.png` | Slide M6 two experiments, **transparent PNG**, compact with short labels (9.54 × 2.96 in) | `make_visual_pngs.py`. The image has no footer, so say it: *"Both experiments use all four splits (1x5, 5x1, 3x2, 2x3) and add their counts together; the best setting has the highest accuracy. The graphs add each setting's counts to the ones before it, and each confusion matrix is the total at the last setting. The output, the best sensitivity and number of sessions, builds each user's profile."* |
 
 The transparent PNGs (300 dpi) are meant to be dropped onto your own slides. They are drawn for the deck's white background: the text outside the boxes is dark and won't show on a dark slide. The `.pptx` versions (`process_overview.pptx`, `matching_dtw.pptx`, `two_experiments.pptx`) have the same content as editable shapes.
 

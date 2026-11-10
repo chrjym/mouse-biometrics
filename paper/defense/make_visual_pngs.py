@@ -8,7 +8,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from matplotlib.patches import FancyArrow  # noqa: E402
 from make_matching_png import GREEN, arrow, plt, rbox, t  # noqa: E402  (also registers the Carlito font)
-from make_experiments_slide import EXPERIMENTS, ROWS  # noqa: E402
 from make_process_overview import STEPS  # noqa: E402
 
 
@@ -40,31 +39,34 @@ def process_overview(out: Path, dpi: int) -> None:
     plt.close(fig)
 
 
+SHORT_ROWS = ["Sessions (k)", "Sensitivity", "Splits", "Best"]
+SHORT_EXPERIMENTS = [
+    ("Experiment 1", "Best sensitivity", ["1", "0.01 \u2192 1.00 (step 0.01)", "all four", "highest accuracy"]),
+    ("Experiment 2", "Best sessions", ["5, 10 \u2026 40", "best of Exp 1", "all four", "highest accuracy"]),
+]
+
+
 def two_experiments(out: Path, dpi: int) -> None:
-    w, gap, h, head = 5.0, 1.25, 3.75, 0.85
-    fig, ax = canvas(2 * w + gap + 0.04, h + 0.95)
+    w, gap, h, head = 4.2, 1.1, 2.9, 0.8
+    fig, ax = canvas(2 * w + gap + 0.04, h + 0.06)
     top = 0.03
-    for i, (name, goal, values) in enumerate(EXPERIMENTS):
+    for i, (name, goal, values) in enumerate(SHORT_EXPERIMENTS):
         x = i * (w + gap)
         rbox(ax, x, top, w, h)
         rbox(ax, x, top, w, head, fill=GREEN, edge=None)
-        t(ax, x + w / 2, top + 0.27, name, 13, True, "white")
-        t(ax, x + w / 2, top + 0.57, goal, 18, True, "white")
-        row_h = (h - head - 0.15) / len(ROWS)
-        for j, (key, value) in enumerate(zip(ROWS, values)):
-            y = top + head + 0.1 + j * row_h
+        t(ax, x + w / 2, top + 0.24, name, 13, True, "white")
+        t(ax, x + w / 2, top + 0.53, goal, 18, True, "white")
+        row_h = (h - head - 0.1) / len(SHORT_ROWS)
+        for j, (key, value) in enumerate(zip(SHORT_ROWS, values)):
+            y = top + head + 0.05 + j * row_h
             if j:
-                ax.plot([x + 0.12, x + w - 0.12], [y - 0.03, y - 0.03], color=GREEN, lw=0.75)
-            t(ax, x + 0.15, y + row_h / 2 - 0.03, key, 12, True, GREEN, ha="left")
-            t(ax, x + 1.75, y + row_h / 2 - 0.03, "\n".join(textwrap.wrap(value, 36)), 13, ha="left")
-    ax_x = w + 0.12
-    ax.add_patch(FancyArrow(ax_x, top + h / 2, gap - 0.24, 0, width=0.3, head_width=0.6, head_length=0.3,
+                ax.plot([x + 0.12, x + w - 0.12], [y, y], color=GREEN, lw=0.75)
+            t(ax, x + 0.18, y + row_h / 2, key, 14, True, GREEN, ha="left")
+            t(ax, x + 1.6, y + row_h / 2, value, 15, ha="left")
+    ax_x = w + 0.1
+    ax.add_patch(FancyArrow(ax_x, top + h / 2 + 0.2, gap - 0.2, 0, width=0.3, head_width=0.6, head_length=0.3,
                             length_includes_head=True, fc=GREEN, ec="none"))
-    t(ax, ax_x + (gap - 0.24) / 2, top + h / 2 - 0.55, "best\nsensitivity", 11, True, GREEN)
-    t(ax, 0.0, top + h + 0.3, "Graphs: each setting's counts are added to the ones before it (running total). "
-                              "Confusion matrix of each experiment = total at its last setting.", 12, ha="left")
-    t(ax, 0.0, top + h + 0.6, "Output → best sensitivity and number of sessions, used to build each user's profile.",
-      12, True, GREEN, ha="left")
+    t(ax, ax_x + (gap - 0.2) / 2, top + h / 2 - 0.35, "best\nsensitivity", 13, True, GREEN)
     fig.savefig(out, dpi=dpi, transparent=True)
     plt.close(fig)
 
