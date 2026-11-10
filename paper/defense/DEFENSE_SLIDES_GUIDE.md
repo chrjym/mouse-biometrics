@@ -47,8 +47,9 @@ I found these while checking the manuscript against the data. **I have not chang
 
 ### Slide M1: Process overview
 
-- **Visual:** a horizontal flow of 5 boxes (draw with PowerPoint shapes). Optionally crop the first two "Process" steps from the manuscript's Conceptual Framework (Figure 1, Chapter II), but don't show the hull/Euclidean boxes on this slide.
+- **Visual: ready-made.** `process_overview.pptx` is this slide built on the deck's own "Chapter Intro" layout (MMSU logo, background, Garamond title). The five steps are editable PowerPoint shapes (each step is a group, plus four arrows). Copy the slide into the deck, or select the shapes and paste them onto your own slide. Preview: `figures/process_overview.png`. Rebuild with `make_process_overview.py --template "<deck>.pptx"`.
   `Balabit raw data → Clean & cut into strokes → Normalize strokes → DTW matching (sensitivity, sessions) → Confusion matrix & accuracy`
+  No hull/Euclidean boxes are on it. Box 5 says "Output: best sensitivity and number of sessions" without the numbers, so the results stay on the Results slides.
 - **On-slide text:**
   - Input: Balabit Mouse Dynamics dataset, 10 users
   - Output of this stage: the best **sensitivity** and **number of sessions** used to build each user's profile
