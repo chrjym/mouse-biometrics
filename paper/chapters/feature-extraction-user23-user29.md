@@ -269,7 +269,7 @@ Example: user23's mixed hull vs user29's profile — pair point *i* of both for 
 
 ### Worked calculation: user23 and user29 in Table 5
 
-The four cells of Table 5 where user23 and user29 meet. Each compares one mixed hull (64 points, `concave_hull_mixed_0.5s/<user>/data_points.csv`) with one profile (64 points, `concave_hull_0.5s/<user>/data_points.csv`).
+The four cells of Table 5 where user23 and user29 meet. Figure: `experiment_earl/runs/19399f/hull_distance_0.5s/user23_user29_table5.png`. Each compares one mixed hull (64 points, `concave_hull_mixed_0.5s/<user>/data_points.csv`) with one profile (64 points, `concave_hull_0.5s/<user>/data_points.csv`).
 
 | Mixed hull | Profile | Gap at point 0 (px) | Largest gap | Smallest gap | $\sum g_i^2$ (px²) | $d = \sqrt{\sum g_i^2}$ (px) | $d_{RMS} = d / 8$ (px) |
 |---|---|---|---|---|---|---|---|
