@@ -289,6 +289,28 @@ Gap per point: $g_i = \sqrt{(\Delta x^{mixed}_i - \Delta x^{profile}_i)^2 + (\De
 
 Result: user23 is about 3.4 times closer to its own profile (122.1 px) than to user29's (418.0 px), and user29 about 55 times closer to its own (7.6 px) than to user23's (418.1 px), so both are identified correctly.
 
+### Figure as a table: user23 and user29 (`user23_user29_table5.png`)
+
+**Table X.** Euclidean distance between the mixed hulls and profiles of user23 and user29 (64 data points).
+
+| Mixed hull | Profile | Strokes (mixed / profile) | $d = \sqrt{\sum g_i^2}$ (px) | $d_{RMS} = d \div 8$ (px) | Largest gap | Nearest? |
+|---|---|---|---|---|---|---|
+| user23 | user23 (own) | 25 / 11 passed | √954,839 = 977.2 | 977.2 ÷ 8 = **122.1** | 271.0 px (point 22) | yes |
+| user23 | user29 | 25 / 18 passed | √11,184,818 = 3,344.4 | 3,344.4 ÷ 8 = **418.0** | 686.1 px (point 33) | no |
+| user29 | user23 | 25 / 11 passed | √11,187,572 = 3,344.8 | 3,344.8 ÷ 8 = **418.1** | 679.6 px (point 33) | no |
+| user29 | user29 (own) | 25 / 18 passed | √3,722 = 61.0 | 61.0 ÷ 8 = **7.6** | 20.5 px (point 50) | yes |
+
+$$g_i = \sqrt{(\Delta x^{mixed}_i - \Delta x^{profile}_i)^2 + (\Delta y^{mixed}_i - \Delta y^{profile}_i)^2}, \qquad d = \sqrt{\sum_{i=0}^{63} g_i^2}, \qquad d_{RMS} = \frac{d}{\sqrt{64}}$$
+
+**Gap per point:**
+
+| Mixed hull | vs user23 profile | vs user29 profile |
+|---|---|---|
+| user23 | low bars throughout (RMS 122.1 px); highest around points 20–25 (271.0 px) | high bars throughout (RMS 418.0 px); peaks at points 30–35 (686.1 px) and 45–47 |
+| user29 | high bars throughout (RMS 418.1 px); peaks at points 30–35 (679.6 px) | almost zero (RMS 7.6 px); highest 20.5 px at point 50 |
+
+Each mixed hull is nearest to its own profile (122.1 and 7.6 px), so both users are identified correctly. The two users differ most at point 33, user29's upward arm.
+
 ### Identification result
 
 | User | Role | Nearest profile | Distance (px) | Own profile distance (px) | Verified |
