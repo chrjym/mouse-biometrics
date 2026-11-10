@@ -63,6 +63,26 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 ---
 
+## Slide 4b — Hull results of all users (Table 4) (≈ 1 min)
+
+| User | Strokes tested (passed) | Convex area (px²) | Concave corners | Concave area (px²) | Concave / convex |
+|---|---|---|---|---|---|
+| user9 | 25 (23) | 584,226 | 50 | 236,902 | 40.5% |
+| user15 | 25 (9) | 1,648,464 | 36 | 583,712 | 35.4% |
+| user16 | 25 (12) | 695,418 | 52 | 196,514 | 28.3% |
+| user20 | 25 (23) | 703,078 | 75 | 259,444 | 36.9% |
+| user23 | 25 (11) | 564,836 | 42 | 217,090 | 38.4% |
+| user29 | 25 (18) | 782,606 | 52 | 301,594 | 38.5% |
+| user35 | 1 (0) | 305 | 5 | 226 | 74.1% |
+| user7 | 1 (0) | 13,642 | 26 | 3,680 | 27.0% |
+
+**Table 4.** Convex and concave hulls of each user's mixed hull (all tested 0.5 s strokes; passed in parentheses).
+
+**Say:**
+> "Table 4 shows the hull results for all users. Each user has a different hull size and number of corners, and the concave hull keeps only about 27–41% of the convex area. user15 has the largest area, 1.6 million px², because its strokes vary widely — only 9 of 25 sessions passed. user35 and user7 had only one tested stroke each, so their hulls are very small."
+
+---
+
 ## Slide 5 — Data points and feature vector (≈ 1.5 min)
 
 **Show:** steps figure, column 4.
@@ -102,6 +122,21 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 **Show:** `user23_user29_table5.png` and the table.
 
+**Table 5.** RMS distance (px) of every test hull (row) to every profile (column); bold = own profile.
+
+| Test hull ↓ / Profile → | user15 | user16 | user20 | user23 | user29 | user9 |
+|---|---|---|---|---|---|---|
+| user15 | **462.4** | 818.8 | 539.5 | 591.0 | 854.5 | 650.8 |
+| user16 | 466.9 | 612.6 | 532.9 | 514.6 | 637.1 | 693.2 |
+| user20 | 624.8 | 463.6 | **2.2** | 257.5 | 484.5 | 353.6 |
+| user23 | 720.8 | 422.3 | 283.7 | **122.1** | 418.0 | 345.1 |
+| user29 | 872.3 | 291.4 | 484.3 | 418.1 | **7.6** | 538.8 |
+| user35 | 627.7 | 312.0 | 450.7 | 431.0 | 446.1 | 503.7 |
+| user7 | 760.4 | 275.9 | 546.1 | 481.0 | 372.7 | 620.4 |
+| user9 | 796.7 | 394.0 | 384.3 | 420.1 | 523.7 | **91.1** |
+
+Focus on user23 and user29:
+
 | Test hull → profile | RMS distance (px) | Meaning |
 |---|---|---|
 | user23 → user23 | **122.1** | same user, close |
@@ -110,7 +145,7 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 | user29 → user23 | 418.1 | different user, far |
 
 **Say:**
-> "Here, each user's test strokes were compared with the enrolled profiles. user29 is only 7.6 pixels from its own profile, and user23 is 122.1 pixels from its own — but both are about 418 pixels from each other. A user is always much closer to their own profile than to another user's."
+> "Here, each user's test strokes were compared with the enrolled profiles. user29 is only 7.6 pixels from its own profile, and user23 is 122.1 pixels from its own — but both are about 418 pixels from each other. Looking at the whole table, every legitimate user's smallest value is on their own profile (in bold), so each user is closest to their own profile."
 
 ---
 
@@ -124,6 +159,26 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 **Say:**
 > "To evaluate performance, all 8 test hulls were compared with the 5 legitimate profiles, giving 40 trials: 5 genuine and 35 impostor. user16's profile was excluded because it was built from wrongly accepted impostor sessions."
+
+---
+
+## Slide 8b — Identification result (≈ 1 min)
+
+| User | Role | Nearest profile | Distance (px) | Result |
+|---|---|---|---|---|
+| user15 | legitimate | user15 | 462.4 | correct |
+| user20 | legitimate | user20 | 2.2 | correct |
+| user23 | legitimate | user23 | 122.1 | correct |
+| user29 | legitimate | user29 | 7.6 | correct |
+| user9 | legitimate | user9 | 91.1 | correct |
+| user16 | impostor | user15 | 466.9 | rejected |
+| user35 | impostor | user23 | 431.0 | rejected |
+| user7 | impostor | user29 | 372.7 | rejected |
+
+**Identification accuracy = 5/5 (100%).**
+
+**Say:**
+> "In identification, each test hull is assigned to its nearest profile. All five legitimate users were nearest to their own profile, giving 100% identification accuracy. The three impostors were nearest to other users' profiles, so none was identified as itself."
 
 ---
 
