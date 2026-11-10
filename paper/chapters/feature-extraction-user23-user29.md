@@ -21,6 +21,58 @@ Figures: `experiment_earl/runs/19399f/hull_distance_0.5s/user23_vs_user29_steps.
 | Comparison | Euclidean distance, reported as RMS gap per point | section 10 | $d = \sqrt{\sum g_i^2}$, $d_{RMS} = d / \sqrt{64}$ |
 | Decision | Nearest profile (identification); threshold T (verification); FAR, FRR, EER, accuracy | section 10, Chapter 3 | EER 20% at T ≈ 418 px |
 
+## Formulas used
+
+**1. Alignment**
+
+$$\Delta x_t = x_t - x_0, \qquad \Delta y_t = y_t - y_0$$
+
+**2. Convex hull (Graham scan)**
+
+$$\mathrm{cross}(O,A,B) = (x_A - x_O)(y_B - y_O) - (y_A - y_O)(x_B - x_O)$$
+
+**3. Area (shoelace)**
+
+$$Area = \frac{1}{2}\left|\sum_{k=1}^{n}(x_k y_{k+1} - x_{k+1} y_k)\right|$$
+
+**4. Concave hull edge limit (Delaunay erosion)**
+
+$$L = l_{min} + r(l_{max} - l_{min}), \qquad r = 0.15$$
+
+**5. Concave / convex ratio**
+
+$$Ratio = \frac{Area_{concave}}{Area_{convex}} \times 100\%$$
+
+**6. Perimeter**
+
+$$P = \sum_{k=1}^{n}\sqrt{(x_{k+1} - x_k)^2 + (y_{k+1} - y_k)^2}$$
+
+**7. Data point spacing and positions**
+
+$$\Delta s = \frac{P}{64}, \qquad s_i = \frac{i}{64}P, \qquad i = 0, \dots, 63$$
+
+**8. Feature vector**
+
+$$H = (\Delta x_0, \Delta y_0, \Delta x_1, \Delta y_1, \dots, \Delta x_{63}, \Delta y_{63})$$
+
+**9. Gap per point**
+
+$$g_i = \sqrt{(\Delta x^A_i - \Delta x^B_i)^2 + (\Delta y^A_i - \Delta y^B_i)^2}$$
+
+**10. Euclidean distance**
+
+$$d(A,B) = \sqrt{\sum_{i=0}^{63} g_i^2}$$
+
+**11. RMS gap per point**
+
+$$d_{RMS} = \frac{d(A,B)}{\sqrt{64}}$$
+
+**12. Evaluation**
+
+$$FAR = \frac{\text{impostor attempts accepted}}{\text{all impostor attempts}}, \qquad FRR = \frac{\text{genuine attempts rejected}}{\text{all genuine attempts}}$$
+
+$$Accuracy = \frac{\text{correct decisions}}{\text{all decisions}}, \qquad EER = FAR = FRR$$
+
 ## Summary
 
 | Step | Value | user23 | user29 |
