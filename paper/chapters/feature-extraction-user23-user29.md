@@ -4,6 +4,23 @@ Run `19399f` (seed 945), split 5L × 1I, sensitivity 0.02, 25 sessions. Values a
 
 Figures: `experiment_earl/runs/19399f/hull_distance_0.5s/user23_vs_user29_steps.png` (steps 1–6) and `user23_vs_user29.png` (step 7). Notebook: `experiment_earl/notebooks/passed_strokes.ipynb`, sections 10.1 and 10.2.
 
+## Methods used
+
+| Stage | Method | Tool / source | Setting |
+|---|---|---|---|
+| Data | Balabit Mouse Dynamics Challenge dataset; sessions with `is_illegal = 1` removed | `datasets/balabit/users/` | 10 users; seed 945 draws the users and session order |
+| Session screening | EARL shape matching: banded Dynamic Time Warping (DTW) between a session's strokes and the legitimate user's library | `earl_simulation.ipynb` → `runs/19399f/best/best_sessions.csv` | sensitivity 0.02, DTW band 0.1, session passes at ≥ 20% matched strokes, 25 sessions |
+| Stroke segmentation | Pause-based segmentation; first stroke lasting ≥ 0.5 s, cut to exactly 0.5 s | `passed_strokes.ipynb` sections 3–4 | pause > 0.5 s or a click ends a stroke |
+| Grouping | Profile = passed strokes; mixed hull = all tested strokes | sections 3–4 | this file uses the **profile** |
+| Alignment | Translation to the origin | section 3 | $\Delta x = x - x_0,\ \Delta y = y - y_0$ |
+| Convex hull | Graham scan | section 6 | cross product $(x_A - x_O)(y_B - y_O) - (y_A - y_O)(x_B - x_O)$ |
+| Area | Shoelace formula | sections 6, 8 | $\frac{1}{2}\lvert\sum(x_k y_{k+1} - x_{k+1} y_k)\rvert$ |
+| Concave hull | Delaunay triangulation with edge erosion (Davis) | section 8 (`scipy.spatial.Delaunay`) | ratio 0.15; $L = l_{min} + 0.15(l_{max} - l_{min})$ |
+| Data points | Fixed start (lowest corner, counter-clockwise) and arc-length resampling | section 9 | 64 points; $s_i = \frac{i}{64}P$ |
+| Feature vector | Stacking point coordinates | section 9 | $H = (\Delta x_0, \Delta y_0, \dots, \Delta x_{63}, \Delta y_{63})$, 128 values |
+| Comparison | Euclidean distance, reported as RMS gap per point | section 10 | $d = \sqrt{\sum g_i^2}$, $d_{RMS} = d / \sqrt{64}$ |
+| Decision | Nearest profile (identification); threshold T (verification); FAR, FRR, EER, accuracy | section 10, Chapter 3 | EER 20% at T ≈ 418 px |
+
 ## Summary
 
 | Step | Value | user23 | user29 |
