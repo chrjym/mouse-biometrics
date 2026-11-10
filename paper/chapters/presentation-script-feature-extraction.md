@@ -6,7 +6,14 @@ Total time: about 12–15 minutes. Say the **"Say"** parts aloud. Point at the n
 
 ---
 
-## Slide 1 — Overview of the process (≈ 1 min)
+
+Slides follow the deck *THESIS PROPOSAL*, Chapter IV (pages 44–55). Pages 36–43 (data acquisition, segmentation, Experiments 1 and 2) are not covered by this script.
+
+---
+
+## Deck p. 44 — Result Feature Extraction (≈ 5 min)
+
+### Lead-in: overview of the process
 
 **Show:** the flow.
 
@@ -18,9 +25,7 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 **Say:**
 > "This part presents the results of feature extraction. From each session, one short mouse stroke of 0.5 seconds was taken. The strokes were aligned at a common starting point, wrapped with a convex hull, tightened into a concave hull, and resampled into 64 data points. These points were then compared using Euclidean distance to decide whether to accept or reject a user."
 
----
-
-## Slide 2 — Stroke extraction and alignment (≈ 1 min)
+### Stroke extraction and alignment
 
 **Show:** `user23_vs_user29_steps.png`, column 1.
 
@@ -29,9 +34,7 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 **Formula:** $\Delta x = x - x_0,\ \Delta y = y - y_0$
 
----
-
-## Slide 3 — Convex hull (≈ 1 min)
+### Convex hull
 
 **Show:** steps figure, column 2, and the table.
 
@@ -43,9 +46,7 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 **Say:**
 > "Using the Graham scan, the outermost points of all strokes were connected to form the convex hull, the smallest outline that encloses every stroke. user29 covers a larger area because its strokes reach far upward."
 
----
-
-## Slide 4 — Concave hull (≈ 1.5 min)
+### Concave hull
 
 **Show:** steps figure, column 3, and the table.
 
@@ -61,9 +62,7 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 **Say:**
 > "The convex hull includes a lot of empty space. Using Delaunay triangulation, long edges longer than the limit L were removed, so the outline follows the actual strokes. The concave hull keeps only about 38% of the convex area, giving a tighter and more personal shape."
 
----
-
-## Slide 4b — Hull results of all users (Table 4) (≈ 1 min)
+### Hull results of all users (Table 4)
 
 | User | Strokes tested (passed) | Convex area (px²) | Concave corners | Concave area (px²) | Concave / convex |
 |---|---|---|---|---|---|
@@ -83,7 +82,16 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 ---
 
-## Slide 5 — Data points and feature vector (≈ 1.5 min)
+## Deck p. 45 — Hull figures: user23 and user29 (≈ 30 s)
+
+**Show:** legitimate and impostor strokes of user23 and user29 with their concave (orange) and convex (dashed) hulls.
+
+**Say:**
+> "These figures show the hulls for user23 and user29. user23's strokes spread sideways, while user29's reach far upward. The orange concave hull follows the strokes closely; the dashed convex hull includes the empty space around them."
+
+---
+
+## Deck p. 46 — Euclidean Distance: steps, data points and feature vector (≈ 1.5 min)
 
 **Show:** steps figure, column 4.
 
@@ -100,7 +108,29 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 ---
 
-## Slide 6 — Euclidean distance: user23 vs user29 (≈ 2 min)
+## Deck p. 47 — Test hull vs profile (Table 5) (≈ 1 min)
+
+**Show:** `user23_user29_table5.png` and the table.
+
+**Table 5.** RMS distance (px) of every test hull (row) to every profile (column); bold = own profile.
+
+| Test hull ↓ / Profile → | user15 | user16 | user20 | user23 | user29 | user9 |
+|---|---|---|---|---|---|---|
+| user15 | **462.4** | 818.8 | 539.5 | 591.0 | 854.5 | 650.8 |
+| user16 | 466.9 | 612.6 | 532.9 | 514.6 | 637.1 | 693.2 |
+| user20 | 624.8 | 463.6 | **2.2** | 257.5 | 484.5 | 353.6 |
+| user23 | 720.8 | 422.3 | 283.7 | **122.1** | 418.0 | 345.1 |
+| user29 | 872.3 | 291.4 | 484.3 | 418.1 | **7.6** | 538.8 |
+| user35 | 627.7 | 312.0 | 450.7 | 431.0 | 446.1 | 503.7 |
+| user7 | 760.4 | 275.9 | 546.1 | 481.0 | 372.7 | 620.4 |
+| user9 | 796.7 | 394.0 | 384.3 | 420.1 | 523.7 | **91.1** |
+
+**Say:**
+> "Here, each user's test strokes were compared with the enrolled profiles. Every legitimate user's smallest value is on their own profile (in bold), so each user is closest to their own profile."
+
+---
+
+## Deck p. 48 — Euclidean distance: user23 vs user29 (≈ 2 min)
 
 **Show:** `user23_vs_user29.png` (profiles).
 
@@ -118,24 +148,7 @@ Sessions → Screen (EARL DTW) → 0.5 s stroke → Align (0,0) → Convex hull
 
 ---
 
-## Slide 7 — Test hull vs profile (Table 5) (≈ 1.5 min)
-
-**Show:** `user23_user29_table5.png` and the table.
-
-**Table 5.** RMS distance (px) of every test hull (row) to every profile (column); bold = own profile.
-
-| Test hull ↓ / Profile → | user15 | user16 | user20 | user23 | user29 | user9 |
-|---|---|---|---|---|---|---|
-| user15 | **462.4** | 818.8 | 539.5 | 591.0 | 854.5 | 650.8 |
-| user16 | 466.9 | 612.6 | 532.9 | 514.6 | 637.1 | 693.2 |
-| user20 | 624.8 | 463.6 | **2.2** | 257.5 | 484.5 | 353.6 |
-| user23 | 720.8 | 422.3 | 283.7 | **122.1** | 418.0 | 345.1 |
-| user29 | 872.3 | 291.4 | 484.3 | 418.1 | **7.6** | 538.8 |
-| user35 | 627.7 | 312.0 | 450.7 | 431.0 | 446.1 | 503.7 |
-| user7 | 760.4 | 275.9 | 546.1 | 481.0 | 372.7 | 620.4 |
-| user9 | 796.7 | 394.0 | 384.3 | 420.1 | 523.7 | **91.1** |
-
-Focus on user23 and user29:
+## Deck p. 49 — Euclidean distance: own vs other profile (≈ 1 min)
 
 | Test hull → profile | RMS distance (px) | Meaning |
 |---|---|---|
@@ -145,11 +158,11 @@ Focus on user23 and user29:
 | user29 → user23 | 418.1 | different user, far |
 
 **Say:**
-> "Here, each user's test strokes were compared with the enrolled profiles. user29 is only 7.6 pixels from its own profile, and user23 is 122.1 pixels from its own — but both are about 418 pixels from each other. Looking at the whole table, every legitimate user's smallest value is on their own profile (in bold), so each user is closest to their own profile."
+> "Taking user23 and user29 from Table 5: user29 is only 7.6 pixels from its own profile, and user23 is 122.1 pixels from its own — but both are about 418 pixels from each other."
 
 ---
 
-## Slide 8 — Performance evaluation: setup (≈ 1 min)
+## Deck p. 50 — Performance evaluation: setup (≈ 1 min)
 
 - Goal: can 0.5 s concave-hull outlines authenticate users?
 - Score: Euclidean distance (RMS px per point)
@@ -160,46 +173,11 @@ Focus on user23 and user29:
 **Say:**
 > "To evaluate performance, all 8 test hulls were compared with the 5 legitimate profiles, giving 40 trials: 5 genuine and 35 impostor. user16's profile was excluded because it was built from wrongly accepted impostor sessions."
 
----
-
-## Slide 8b — Identification result (≈ 1 min)
-
-| User | Role | Nearest profile | Distance (px) | Result |
-|---|---|---|---|---|
-| user15 | legitimate | user15 | 462.4 | correct |
-| user20 | legitimate | user20 | 2.2 | correct |
-| user23 | legitimate | user23 | 122.1 | correct |
-| user29 | legitimate | user29 | 7.6 | correct |
-| user9 | legitimate | user9 | 91.1 | correct |
-| user16 | impostor | user15 | 466.9 | rejected |
-| user35 | impostor | user23 | 431.0 | rejected |
-| user7 | impostor | user29 | 372.7 | rejected |
-
-**Identification accuracy = 5/5 (100%).**
-
-**Say:**
-> "In identification, each test hull is assigned to its nearest profile. All five legitimate users were nearest to their own profile, giving 100% identification accuracy. The three impostors were nearest to other users' profiles, so none was identified as itself."
+*Deck p. 51 is a duplicate of p. 50; skip it or remove it.*
 
 ---
 
-## Slide 9 — How the threshold was determined (≈ 1.5 min)
-
-**Formulas:** $FAR = \frac{\text{impostors accepted}}{35}$, $\quad FRR = \frac{\text{genuine rejected}}{5}$, $\quad EER: FAR = FRR$
-
-| T (px) | FAR | FRR | Accuracy |
-|---|---|---|---|
-| **122.1** | **0%** | 20% | **97.5%** (zero-FAR) |
-| 257.5 | 2.9% | 20% | 95.0% |
-| 384.3 | 17.1% | 20% | 82.5% |
-| **418.0** | **20%** | **20%** | **80.0%** (EER) |
-| 462.4 | 34.3% | 0% | 87.5% |
-
-**Say:**
-> "The threshold was not guessed. All 40 distances were sorted, and each one was tried as T. At each value, we counted impostors wrongly accepted and genuine users wrongly rejected. Two thresholds matter: 122.1 pixels, where no impostor gets in, and 418.0 pixels, where FAR equals FRR — the Equal Error Rate."
-
----
-
-## Slide 10 — Genuine users (≈ 1 min)
+## Deck p. 52 — Genuine users (≈ 1 min)
 
 | User | Distance (px) | Sessions passed | T = 122.1 | T = 418.0 |
 |---|---|---|---|---|
@@ -214,7 +192,7 @@ Focus on user23 and user29:
 
 ---
 
-## Slide 11 — Impostors accepted at T = 418.0 px (≈ 1 min)
+## Deck p. 53 — Impostors accepted at T = 418.0 px (≈ 1 min)
 
 | Impostor → claimed profile | Distance (px) |
 |---|---|
@@ -232,7 +210,42 @@ Focus on user23 and user29:
 
 ---
 
-## Slide 12 — Final result (≈ 1 min)
+## Deck p. 54 — Performance evaluation: final result (≈ 3 min)
+
+### Identification result
+
+| User | Role | Nearest profile | Distance (px) | Result |
+|---|---|---|---|---|
+| user15 | legitimate | user15 | 462.4 | correct |
+| user20 | legitimate | user20 | 2.2 | correct |
+| user23 | legitimate | user23 | 122.1 | correct |
+| user29 | legitimate | user29 | 7.6 | correct |
+| user9 | legitimate | user9 | 91.1 | correct |
+| user16 | impostor | user15 | 466.9 | rejected |
+| user35 | impostor | user23 | 431.0 | rejected |
+| user7 | impostor | user29 | 372.7 | rejected |
+
+**Identification accuracy = 5/5 (100%).**
+
+**Say:**
+> "In identification, each test hull is assigned to its nearest profile. All five legitimate users were nearest to their own profile, giving 100% identification accuracy. The three impostors were nearest to other users' profiles, so none was identified as itself."
+
+### How the threshold was determined
+
+**Formulas:** $FAR = \frac{\text{impostors accepted}}{35}$, $\quad FRR = \frac{\text{genuine rejected}}{5}$, $\quad EER: FAR = FRR$
+
+| T (px) | FAR | FRR | Accuracy |
+|---|---|---|---|
+| **122.1** | **0%** | 20% | **97.5%** (zero-FAR) |
+| 257.5 | 2.9% | 20% | 95.0% |
+| 384.3 | 17.1% | 20% | 82.5% |
+| **418.0** | **20%** | **20%** | **80.0%** (EER) |
+| 462.4 | 34.3% | 0% | 87.5% |
+
+**Say:**
+> "The threshold was not guessed. All 40 distances were sorted, and each one was tried as T. At each value, we counted impostors wrongly accepted and genuine users wrongly rejected. Two thresholds matter: 122.1 pixels, where no impostor gets in, and 418.0 pixels, where FAR equals FRR — the Equal Error Rate."
+
+### Summary
 
 | Measure | Result |
 |---|---|
@@ -245,7 +258,9 @@ Focus on user23 and user29:
 
 ---
 
-## Slide 13 — Discussion and limitations (≈ 1 min)
+## Deck p. 55 — Conclusion (≈ 1.5 min)
+
+### Discussion and limitations
 
 - Geometry carries identity: user29 moves upward, user23 sideways.
 - Consistent enrollment means a better match (user20: 23/25 → 2.2 px; user15: 9/25 → 462.4 px).
@@ -255,9 +270,7 @@ Focus on user23 and user29:
 **Say:**
 > "The results show that the shape of a short movement reflects a user's habit. Users with consistent sessions matched best. The main weakness is users with few passed sessions, and the small number of trials, so more users and sessions are needed."
 
----
-
-## Slide 14 — Conclusion (≈ 30 s)
+### Conclusion
 
 > **"A single 0.5-second mouse stroke, turned into a concave-hull outline of 64 points, can distinguish users: 100% identification, 0% FAR at T = 122.1 px, and an EER of 20%."**
 
